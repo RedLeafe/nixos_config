@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 system=${1:-"x86_64-linux"}
 outputname=${2:-"installer"}
-nix build --show-trace .#legacyPackages.${system}.nixosConfigurations.${outputname}.config.system.build.isoImage
+FLAKE=${FLAKE:-"$(realpath "$(dirname "$(readlink -f "$0")")")/.."} &&\
+nix --extra-experimental-features "nix-command flakes" build --show-trace "$FLAKE#legacyPackages.${system}.nixosConfigurations.${outputname}.config.system.build.isoImage"
 # sudo dd if=./result/iso/something.iso of=/dev/sdd bs=1M status=progress
