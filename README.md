@@ -1,6 +1,6 @@
 to build the installer, run `./scripts/isoInstaller`
 
-create a VMWare box, with minimum 2gb memory, 2 cores, and 50gb disk space (disk space will be reduced later, for now its a dev box for making stuff)
+create a VMWare box, with minimum 2gb memory, 2 cores, and 35gb disk space (disk space will be reduced later, for now its a dev box for making stuff)
 
 for system type choose other linux 6+ 64bit
 
