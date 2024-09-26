@@ -61,7 +61,7 @@
         };
         installer = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit self inputs system-modules username hostname;
+            inherit self inputs system-modules stateVersion username hostname;
           };
           inherit system;
           modules = [

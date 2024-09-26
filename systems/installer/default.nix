@@ -1,4 +1,4 @@
-{ config, pkgs, self, modulesPath, system-modules, hostname, username, inputs, ... }: let
+{ config, pkgs, self, stateVersion, system-modules, hostname, username, inputs, ... }: let
   tmux_new = pkgs.tmux.override {
     isAlacritty = false;
   };
@@ -18,7 +18,6 @@
 
 in {
   imports = with system-modules; [
-    "${modulesPath}/installer/cd-dvd/installation-cd-base.nix"
     ./minimal-graphical-base.nix
     shell.${login_shell}
     ranger
@@ -139,5 +138,7 @@ in {
       '';
     }
   ]);
+
+  system.stateVersion = stateVersion;
 
 }
