@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+system=${1:-"x86_64-linux"}
+outputname=${2:-"installer"}
+nix build --show-trace .#legacyPackages.${system}.nixosConfigurations.${outputname}.config.system.build.isoImage
+# sudo dd if=./result/iso/something.iso of=/dev/sdd bs=1M status=progress
