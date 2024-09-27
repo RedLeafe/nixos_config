@@ -12,6 +12,7 @@ in {
     lightdm
     i3
     LD
+    AD
   ];
 
   users.users.${username} = {
@@ -34,6 +35,9 @@ in {
     i3.enable = true;
     i3.tmuxDefault = true;    
     LD.enable = true;
+    AD.enable = true;
+    AD.domain = "alien.moon.mine";
+    AD.nameservers = [ "192.168.220.254" ];
   };
 
   virtualisation.docker.enable = true;

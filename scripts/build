@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
-[ -n "$1" ] && hostname=${1:-"nix"} && shift 1 &&\
+[ -z "$1" ] && hostname="nix"
+[ -n "$1" ] && hostname=$1 && shift 1 &&\
 [ -n "$1" ] && [ "$1" == "up" ] && isUp="-u" && shift 1
 FLAKE=${FLAKE:-"$(realpath "$(dirname "$(readlink -f "$0")")")/.."} && export FLAKE &&\
 nix --extra-experimental-features "nix-command flakes" run nixpkgs#nh -- os switch -v $isUp -H "$hostname" -- --show-trace "$@"

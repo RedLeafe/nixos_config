@@ -22,6 +22,11 @@ in {
         type = str;
         description = "AD.DOMAIN.COM";
       };
+      nameservers = lib.mkOption {
+        default = [];
+        type = listOf str;
+        description = "IPs of AD nameservers";
+      };
     };
   };
 
@@ -29,6 +34,9 @@ in {
     AD_D = lib.toUpper cfg.domain;
     ad_d = lib.toLower cfg.domain;
   in {
+
+    networking.networkmanager.insertNameservers = lib.mkIf (cfg.nameservers != []) cfg.nameservers;
+
     services = {
       sssd = {
         enable = true;
