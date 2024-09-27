@@ -96,6 +96,7 @@ nixos_config
 
 - [flakes](https://nixos.wiki/wiki/Flakes)
 - [modules](https://nixos.wiki/wiki/NixOS_modules)
+- [overlays](https://nixos.wiki/wiki/Overlays)
 - [nix packages search](https://search.nixos.org/packages)
 - [nixos module options search](https://search.nixos.org/options)
 - [home-manager module options search](https://mipmip.github.io/home-manager-option-search/)
