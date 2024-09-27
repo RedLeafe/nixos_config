@@ -59,7 +59,7 @@ in {
           [sssd]
           domains = ${ad_d}
           config_file_version = 2
-          services = nss, pam
+          services = nss, pam, sshd, sudo
       
           [domain/${ad_d}]
           # default_shell = ${pkgs.zsh}/bin/zsh
@@ -84,6 +84,7 @@ in {
     };
 
     security.pam.services.sshd.makeHomeDir = true;
+    security.pam.services.sshd.startSession = true;
 
     security.krb5 = {
       enable = true;
@@ -91,6 +92,9 @@ in {
         libdefaults = {
           udp_preference_limit = 0;
           default_realm = AD_D;
+          permitted_enctypes = "aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96";
+          default_tgs_enctypes = "aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96";
+          default_tkt_enctypes = "aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96";
         };
       };
     };
