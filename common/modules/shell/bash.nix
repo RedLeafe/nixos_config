@@ -18,14 +18,14 @@ in {
     programs.bash = {
       enableVteIntegration = true;
       initExtra = ''
-        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${../atomic-emodipt.omp.json})"
+        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${./atomic-emodipt.omp.json})"
         source ${fzfinit}
       '';
     };
   } else {
     programs.bash = {
       promptInit = ''
-        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${../atomic-emodipt.omp.json})"
+        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${./atomic-emodipt.omp.json})"
         source ${fzfinit}
       '';
     };

@@ -19,7 +19,7 @@ in {
       enable = true;
       interactiveShellInit = ''
         fish_vi_key_bindings
-        ${pkgs.oh-my-posh}/bin/oh-my-posh init fish --config ${../atomic-emodipt.omp.json} | source
+        ${pkgs.oh-my-posh}/bin/oh-my-posh init fish --config ${./atomic-emodipt.omp.json} | source
         source ${fzfinit}
       '';
     };
@@ -30,7 +30,7 @@ in {
         fish_vi_key_bindings
       '';
       promptInit = ''
-        ${pkgs.oh-my-posh}/bin/oh-my-posh init fish --config ${../atomic-emodipt.omp.json} | source
+        ${pkgs.oh-my-posh}/bin/oh-my-posh init fish --config ${./atomic-emodipt.omp.json} | source
         source ${fzfinit}
       '';
     };
