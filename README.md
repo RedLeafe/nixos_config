@@ -34,7 +34,7 @@ Then run `sudo adcli join -D <YOUR_AD_DOMAIN> -U <YOUR_AD_USERNAME>` and enter y
 
 To rebuild any changes from within your vm, navigate to the config and run `./scripts/build`
 
-when you add or remove files, be sure to run `git add` or nix wont reflect the changes. Although, currently the config isn't a git repo so this doesn't apply yet.
+when you add or remove files, be sure to run `git add` or nix wont reflect the changes. Although, currently the config provisioned by the installer isn't a git repo so this doesn't apply until it is one.
 
 ## Structure:
 
