@@ -28,6 +28,8 @@ so that it is no longer owned by root
 
 Then run `sudo adcli join -D <YOUR_AD_DOMAIN> -U <YOUR_AD_USERNAME>` and enter your password at the prompt.
 
+(AD apparently only half works right now... It will get there...)
+
 `cd nixos_config` and check it out!
 
 `alt+f2` for chromium, `alt+d` for dmenu app launcher, view other keybinds in the [i3 config](./common/modules/i3/config)
