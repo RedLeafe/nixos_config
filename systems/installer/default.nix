@@ -38,34 +38,30 @@ in {
   isoImage.isoBaseName = "space_dust_installer";
 
   environment.shellAliases = let
+    diskoscript = pkgs.writeShellScript "disko" ''
+      hostname=''${1:-'${hostname}'}
+      sudo disko --mode disko --flake /iso/nixos_config#$hostname
+    '';
+    installscript = pkgs.writeShellScript "install" ''
+      hostname=''${1:-'${hostname}'}
+      username=''${2:-'${username}'}
+      sudo nixos-install --show-trace --flake /iso/nixos_config#$hostname
+      echo "please set password for user $username"
+      sudo passwd --root /mnt $username
+      umask 077
+      sudo mkdir -p /mnt/home/$username
+      sudo cp -rvL /iso/nixos_config /mnt/home/$username/nixos_config 2>&1 | tee -a ./copylog.txt
+      sudo chmod -R u+w /mnt/home/$username/nixos_config
+    '';
   in {
     SPACEOS = "${pkgs.writeShellScript "SPACEOS" ''
       hostname=''${1:-'${hostname}'}
       username=''${2:-'${username}'}
-      sudo disko --mode disko --flake /iso/nixos_config#$hostname
-      sudo nixos-install --show-trace --flake /iso/nixos_config#$hostname
-      echo "please set password for user $username"
-      sudo passwd --root /mnt $username
-      umask 077
-      sudo mkdir -p /mnt/home/$username
-      sudo cp -r /iso/nixos_config /mnt/home/$username/nixos_config
-      sudo chmod -R u+w /mnt/home/$username/nixos_config
+      ${diskoscript} "$hostname"
+      ${installscript} "$hostname" "$username"
     ''}";
-    SPACEOS-disko = "${pkgs.writeShellScript "SPACEOS-disko" ''
-      hostname=''${1:-'${hostname}'}
-      sudo disko --mode disko --flake /iso/nixos_config#$hostname
-    ''}";
-    SPACEOS-install = "${pkgs.writeShellScript "SPACEOS-install" ''
-      hostname=''${1:-'${hostname}'}
-      username=''${2:-'${username}'}
-      sudo nixos-install --show-trace --flake /iso/nixos_config#$hostname
-      echo "please set password for user $username"
-      sudo passwd --root /mnt $username
-      umask 077
-      sudo mkdir -p /mnt/home/$username
-      sudo cp -r /iso/nixos_config /mnt/home/$username/nixos_config
-      sudo chmod -R u+w /mnt/home/$username/nixos_config
-    ''}";
+    SPACEOS-disko = "${diskoscript}";
+    SPACEOS-install = "${installscript}";
     lsnc = "ls --color=never";
     la = "ls -a";
     ll = "ls -l";
