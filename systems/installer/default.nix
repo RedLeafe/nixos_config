@@ -50,7 +50,7 @@ in {
       sudo passwd --root /mnt $username
       umask 077
       sudo mkdir -p /mnt/home/$username
-      sudo cp -rvL /iso/nixos_config /mnt/home/$username/nixos_config 2>&1 | tee -a ./copylog.txt
+      sudo cp -rvL /iso/nixos_config /mnt/home/$username/nixos_config
       sudo chmod -R u+w /mnt/home/$username/nixos_config
     '';
   in {
