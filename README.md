@@ -53,12 +53,6 @@ nixos_config
 │   ├── modules
 │   │   ├── AD
 │   │   │   └── default.nix
-│   │   ├── i3
-│   │   │   ├── background.png
-│   │   │   ├── config
-│   │   │   ├── default.nix
-│   │   │   ├── dmenu_recency.sh
-│   │   │   └── i3bar.nix
 │   │   ├── ... other modules
 │   │   │
 │   │   │
@@ -79,6 +73,9 @@ nixos_config
 │   # Below this point, are the configurations for
 │   # the systems and home manager configs output by the flake
 │   # They import the modules and overlays from the common directory.
+│   # and set some options for them, as well as containing other
+│   # misc system or user config that didnt make sense to abstract
+│   # into their own modules.
 │
 ├── homes <- the directory for home manager configurations
 │   ├── main-home.nix <- the only one that exists rn
