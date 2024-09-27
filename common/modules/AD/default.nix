@@ -27,11 +27,16 @@ in {
         type = listOf str;
         description = "IPs of AD nameservers";
       };
-      # ADuser = lib.mkOption {
-      #   default = "Administrator";
-      #   type = str;
-      #   description = "AD user to use for sudo adcli join -D command";
-      # };
+      ADuser = lib.mkOption {
+        default = "Administrator";
+        type = str;
+        description = "AD user to use for sudo adcli join -D command";
+      };
+      keyfile_path = lib.mkOption {
+        default = "Administrator";
+        type = str;
+        description = "AD user to use for sudo adcli join -D command";
+      };
     };
   };
 
@@ -41,7 +46,8 @@ in {
   in {
 
     # system.activationScripts.loginAD.text = ''
-    #   sudo adcli join -D ${ad_d} --user=${cfg.aduser}
+    #   sudo adcli join -D ${ad_d} --user=${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
+    #   sudo rm -rf '${keyfile_path}'
     # '';
 
     networking.networkmanager.insertNameservers = lib.mkIf (cfg.nameservers != []) cfg.nameservers;
