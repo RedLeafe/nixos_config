@@ -30,7 +30,7 @@ Then run `sudo adcli join -D <YOUR_AD_DOMAIN> -U <YOUR_AD_USERNAME>` and enter y
 
 `cd nixos_config` and check it out!
 
-`alt+f2` for chromium, view other keybinds in the i3 config at common/modules/i3
+`alt+f2` for chromium, `alt+d` for dmenu app launcher, view other keybinds in the i3 config at common/modules/i3
 
 when you add or remove files, be sure to run `git add` or nix wont reflect the changes.
 
