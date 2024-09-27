@@ -1,12 +1,12 @@
-{ moduleNamespace, ... }: # <- a function
-# that returns a module
-{config, pkgs, inputs, lib, self, ... }: {
+{ moduleNamespace, homeManager, inputs, ... }:
+{config, pkgs, lib, ... }: let
+  cfg = config.${moduleNamespace}.fish;
+in {
   _file = ./fish.nix;
   options = {
-    ${moduleNamespace}.fish.enable = lib.mkEnableOption "fish";
+    ${moduleNamespace}.fish.enable = lib.mkEnableOption "birdeeFish";
   };
-  config = lib.mkIf config.${moduleNamespace}.fish.enable (let
-    cfg = config.${moduleNamespace}.fish;
+  config = lib.mkIf cfg.enable (let
     fzfinit = pkgs.stdenv.mkDerivation {
       name = "fzfinit";
       builder = pkgs.writeText "builder.sh" /* bash */ ''
@@ -14,7 +14,16 @@
         ${pkgs.fzf}/bin/fzf --fish > $out
       '';
     };
-  in {
+  in if homeManager then {
+    programs.fish = {
+      enable = true;
+      interactiveShellInit = ''
+        fish_vi_key_bindings
+        ${pkgs.oh-my-posh}/bin/oh-my-posh init fish --config ${../atomic-emodipt.omp.json} | source
+        source ${fzfinit}
+      '';
+    };
+  } else {
     programs.fish = {
       enable = true;
       interactiveShellInit = ''

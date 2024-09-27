@@ -1,13 +1,12 @@
-{ moduleNamespace, ... }: # <- a function
-# that returns a module
-{config, pkgs, self, inputs, lib, ... }:
-{
+{ moduleNamespace, homeManager, inputs, ... }:
+{config, pkgs, lib, ... }: let
+  cfg = config.${moduleNamespace}.bash;
+in {
   _file = ./bash.nix;
   options = {
-    ${moduleNamespace}.bash.enable = lib.mkEnableOption "Bash";
+    ${moduleNamespace}.bash.enable = lib.mkEnableOption "birdeeBash";
   };
-  config = lib.mkIf config.${moduleNamespace}.bash.enable (let
-    cfg = config.${moduleNamespace}.bash;
+  config = lib.mkIf cfg.enable (let
     fzfinit = pkgs.stdenv.mkDerivation {
       name = "fzfinit";
       builder = pkgs.writeText "builder.sh" /* bash */ ''
@@ -15,10 +14,17 @@
         ${pkgs.fzf}/bin/fzf --bash > $out
       '';
     };
-  in {
+  in if homeManager then {
     programs.bash = {
       enableVteIntegration = true;
       initExtra = ''
+        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${../atomic-emodipt.omp.json})"
+        source ${fzfinit}
+      '';
+    };
+  } else {
+    programs.bash = {
+      promptInit = ''
         eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${../atomic-emodipt.omp.json})"
         source ${fzfinit}
       '';

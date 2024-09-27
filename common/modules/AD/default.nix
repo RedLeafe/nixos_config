@@ -47,7 +47,6 @@ in {
 
     # system.activationScripts.loginAD.text = ''
     #   sudo adcli join -D ${ad_d} --user=${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
-    #   sudo rm -rf '${keyfile_path}'
     # '';
 
     networking.networkmanager.insertNameservers = lib.mkIf (cfg.nameservers != []) cfg.nameservers;
@@ -55,6 +54,8 @@ in {
     services = {
       sssd = {
         enable = true;
+        kcm = true;
+        sshAuthorizedKeysIntegration = true;
         config = ''
           [sssd]
           domains = ${ad_d}
@@ -86,15 +87,14 @@ in {
     security.pam.services.sshd.makeHomeDir = true;
     security.pam.services.sshd.startSession = true;
 
+    security.pam.krb5.enable = true;
+
     security.krb5 = {
       enable = true;
       settings = {
         libdefaults = {
           udp_preference_limit = 0;
           default_realm = AD_D;
-          permitted_enctypes = "aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96";
-          default_tgs_enctypes = "aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96";
-          default_tkt_enctypes = "aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96";
         };
       };
     };
@@ -110,6 +110,8 @@ in {
         User = "root";
       };
     };
+
+    programs.oddjobd.enable = true;
 
     environment.systemPackages = with pkgs; [
       adcli         # Helper library and tools for Active Directory client operations
