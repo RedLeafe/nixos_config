@@ -60,8 +60,12 @@ in {
           [sssd]
           domains = ${ad_d}
           config_file_version = 2
-          services = nss, pam, sshd, sudo
-      
+          services = nss, pam, sshd
+
+          [nss]
+
+          [pam]
+
           [domain/${ad_d}]
           # default_shell = ${pkgs.zsh}/bin/zsh
           # shell_fallback = ${pkgs.zsh}/bin/zsh

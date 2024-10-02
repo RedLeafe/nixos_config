@@ -31,8 +31,7 @@
   {
     diskoConfigurations.${hostname} = import ./disko/sda_swap.nix;
     legacyPackages = forAllSys (system: {
-      nixosConfigurations = let
-      in {
+      nixosConfigurations = {
         ${hostname} = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit stateVersion self inputs system-modules home-modules username hostname;

@@ -142,6 +142,21 @@ in {
       tx
     ]);
 
+    # hardware.bluetooth.enable = true; # enables support for Bluetooth
+    # hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
+    # services.blueman.enable = true;
+
+    # Enable sound with pipewire.
+    hardware.pulseaudio.enable = false;
+    hardware.pulseaudio.package = pkgs.pulseaudioFull;
+    security.rtkit.enable = true;
+    services.pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
+
     # for tmux
     security.wrappers = {
       utempter = {

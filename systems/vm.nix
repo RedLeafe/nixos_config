@@ -47,9 +47,6 @@ in {
 
   users.defaultUserShell = pkgs.zsh;
 
-  # not needed for docker
-  # boot.kernelModules = [ "kvm" ];
-
   boot.kernelParams = [ "net.ifnames=0" "biosdevname=0" ];
 
   services.clamav.daemon.enable = true;
@@ -61,25 +58,11 @@ in {
   environment.interactiveShellInit = ''
   '';
   environment.shellAliases = {
-    lsnc = "lsd --color=never";
-    la = "lsd -a";
-    ll = "lsd -lh";
-    l  = "lsd -alh";
+    lsnc = "${pkgs.lsd}/bin/lsd --color=never";
+    la = "${pkgs.lsd}/bin/lsd -a";
+    ll = "${pkgs.lsd}/bin/lsd -lh";
+    l  = "${pkgs.lsd}/bin/lsd -alh";
   };
-
-  # Bootloader.
-  boot.loader.timeout = 3;
-  boot.loader.grub.enable = true;
-
-  # disko sets this for us and will throw if we set it
-  # boot.loader.grub.device = [ "/dev/sda" ];
-
-  /* if you needed to swap it to an efi partition
-     you could try these:
-    boot.loader.grub.efiSupport = true;
-    boot.loader.grub.efiInstallAsRemovable = true;
-    boot.loader.efi.canTouchEfiVariables = true;
-  */
 
   networking.hostName = hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -103,13 +86,23 @@ in {
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    ports = [ 22 ];
+    settings = {
+      PasswordAuthentication = false;
+      AllowUsers = null; # Allows all users by default. Can be [ "user1" "user2" ]
+      UseDns = true;
+      X11Forwarding = false;
+      PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
+    };
+  };
+  services.fail2ban.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  # firewall.
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   security = {
     pam = {
@@ -149,32 +142,15 @@ in {
     persistent = true;
   };
 
-  # hardware.bluetooth.enable = true; # enables support for Bluetooth
-  # hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
-  # services.blueman.enable = true;
-
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
-
-  # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
-  hardware.pulseaudio.package = pkgs.pulseaudioFull;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
   services.libinput.touchpad.disableWhileTyping = true;
-  # services.xserver.synaptics.enable = true;
-  # services.xserver.synaptics.palmDetect = true;
+
   fonts.packages = with pkgs; [
     fira-code
     openmoji-color
