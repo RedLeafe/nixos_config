@@ -43,13 +43,16 @@ in {
   config = lib.mkIf cfg.enable (let
     AD_D = lib.toUpper cfg.domain;
     ad_d = lib.toLower cfg.domain;
+    isNMnet = config.networking.networkmanager.enable;
   in {
 
     # system.activationScripts.loginAD.text = ''
     #   sudo adcli join -D ${ad_d} --user=${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
     # '';
 
-    networking.networkmanager.insertNameservers = lib.mkIf (cfg.nameservers != []) cfg.nameservers;
+    networking.networkmanager.insertNameservers = lib.mkIf (isNMnet && cfg.nameservers != []) cfg.nameservers;
+
+    networking.nameservers = lib.mkIf (! isNMnet && cfg.nameservers != []) cfg.nameservers;
 
     services = {
       sssd = {
@@ -60,7 +63,7 @@ in {
           [sssd]
           domains = ${ad_d}
           config_file_version = 2
-          services = nss, pam, sshd
+          services = nss, pam, ssh
 
           [nss]
 
