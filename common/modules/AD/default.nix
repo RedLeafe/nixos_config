@@ -75,7 +75,7 @@ in {
           krb5_realm = ${AD_D}
           realmd_tags = manages-system joined-with-samba
           id_provider = ad
-          fallback_homedir = /Users/%u
+          override_homedir = /home/%u
           ad_domain = ${ad_d}
           use_fully_qualified_names = false
           ldap_id_mapping = false
