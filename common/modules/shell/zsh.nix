@@ -1,4 +1,4 @@
-{ moduleNamespace, homeManager, inputs, ... }:
+{ moduleNamespace, homeManager, ... }:
 {config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.zsh;
 in {

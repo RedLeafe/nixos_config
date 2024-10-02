@@ -27,16 +27,16 @@ in {
         type = listOf str;
         description = "IPs of AD nameservers";
       };
-      ADuser = lib.mkOption {
-        default = "Administrator";
-        type = str;
-        description = "AD user to use for sudo adcli join -D command";
-      };
-      keyfile_path = lib.mkOption {
-        default = "Administrator";
-        type = str;
-        description = "AD user to use for sudo adcli join -D command";
-      };
+      # ADuser = lib.mkOption {
+      #   default = "Administrator";
+      #   type = str;
+      #   description = "AD user to use for sudo adcli join -D command";
+      # };
+      # keyfile_path = lib.mkOption {
+      #   default = "Administrator";
+      #   type = str;
+      #   description = "AD user to use for sudo adcli join -D command";
+      # };
     };
   };
 
@@ -87,6 +87,9 @@ in {
     security.pam.services.sshd.makeHomeDir = true;
     security.pam.services.sshd.startSession = true;
 
+    security.pam.services.sssd.makeHomeDir = true;
+    security.pam.services.sssd.startSession = true;
+
     security.pam.krb5.enable = true;
 
     security.krb5 = {
@@ -99,17 +102,17 @@ in {
       };
     };
 
-    systemd.services.realmd = {
-      description = "Realm Discovery Service";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
-      serviceConfig = {
-        Type = "dbus";
-        BusName = "org.freedesktop.realmd";
-        ExecStart = "${pkgs.realmd}/libexec/realmd";
-        User = "root";
-      };
-    };
+    # systemd.services.realmd = {
+    #   description = "Realm Discovery Service";
+    #   wantedBy = [ "multi-user.target" ];
+    #   after = [ "network.target" ];
+    #   serviceConfig = {
+    #     Type = "dbus";
+    #     BusName = "org.freedesktop.realmd";
+    #     ExecStart = "${pkgs.realmd}/libexec/realmd";
+    #     User = "root";
+    #   };
+    # };
 
     programs.oddjobd.enable = true;
 
@@ -119,7 +122,7 @@ in {
       samba4Full    # Standard Windows interoperability suite of programs for Linux and Unix
       sssd          # System Security Services Daemon
       krb5          # MIT Kerberos 5
-      realmd        # DBus service for configuring Kerberos and other
+      # realmd        # DBus service for configuring Kerberos and other
     ];
 
   });

@@ -22,6 +22,9 @@ in {
     description = "";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     initialPassword = "test";
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC43l4qRFhbaZRHbkbiuGJa9CmqBhF8ppnWk7yA4BbGEMWTXK8lnDak9jFVAQHk1UVpGJctR0u/E9Gxl2m7lIMV9fibcYYD34nmzm+ycod92uGq+g10mEWLgidl93+eE1NOt0x1jyfNiZ+tii6KFMQRSyLu68eD5SqOiT2V4Qh6GtFbIPWJQ6SXnOFCJG767ywB5wl+1sQFMkD1JJvi7KmuqekrvM5vvjFjQpHEezOXhn/cGx5ynk/xN/YaUYx93apGQ2blGm8ZIWuqegeR0nquhWa69fIpo7KfYqmxI016t7PZB6/RQmkJevr/d42WAS3kvp6nQ1cvidiiKx79mDMV operations@wrccdc.org"
+    ];
     # this is packages for nixOS user config.
     # packages = []; # empty because that is managed by home-manager
   };
@@ -44,7 +47,10 @@ in {
 
   users.defaultUserShell = pkgs.zsh;
 
-  boot.kernelModules = [ "kvm" ];
+  # not needed for docker
+  # boot.kernelModules = [ "kvm" ];
+
+  boot.kernelParams = [ "net.ifnames=0" "biosdevname=0" ];
 
   services.clamav.daemon.enable = true;
   services.clamav.updater.enable = true;
@@ -202,7 +208,6 @@ in {
     smartmontools # for diagnosing hard disks
     nix-info
     pciutils
-    lm_sensors
     usbutils
     nvme-cli
     unzip

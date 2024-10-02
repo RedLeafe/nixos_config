@@ -68,7 +68,7 @@
             { nixpkgs.overlays = overlays; }
             ./systems/installer
           ];
-        };        
+        };
       };
     });
   };
