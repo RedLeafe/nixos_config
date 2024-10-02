@@ -115,7 +115,6 @@ in {
     grex
     exfatprogs
     ntfs3g
-    psensor
     btop
     nix-output-monitor
     nh

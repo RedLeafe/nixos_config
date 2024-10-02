@@ -40,17 +40,19 @@ in {
   environment.shellAliases = let
     diskoscript = pkgs.writeShellScript "disko" ''
       hostname=''${1:-'${hostname}'}
+      [ ! -d /home/nixos/nixos_config ] && cp -r /iso/nixos_config /home/nixos
       sudo disko --mode disko --flake /iso/nixos_config#$hostname
     '';
     installscript = pkgs.writeShellScript "install" ''
       hostname=''${1:-'${hostname}'}
       username=''${2:-'${username}'}
-      sudo nixos-install --show-trace --flake /iso/nixos_config#$hostname
+      [ ! -d /home/nixos/nixos_config ] && cp -r /iso/nixos_config /home/nixos
+      sudo nixos-install --show-trace --flake /home/nixos/nixos_config#$hostname
       echo "please set password for user $username"
       sudo passwd --root /mnt $username
       umask 077
       sudo mkdir -p /mnt/home/$username
-      sudo cp -rvL /iso/nixos_config /mnt/home/$username/nixos_config
+      sudo cp -rvL /home/nixos/nixos_config /mnt/home/$username/nixos_config
       sudo chmod -R u+w /mnt/home/$username/nixos_config
     '';
   in {
