@@ -76,15 +76,15 @@ in {
   # networking = {
   #   dhcpcd.enable = false;
   #   interfaces.eth0.ipv4.addresses = [{
-  #     address = "10.100.136.223";
-  #     prefixLength = 24;
-  #   }];
-  #   interfaces.eth1.ipv4.addresses = [{
   #     address = "192.168.220.223";
   #     prefixLength = 24;
   #   }];
+  #   interfaces.eth1.ipv4.addresses = [{
+  #     address = "10.100.136.223";
+  #     prefixLength = 24;
+  #   }];
   #   defaultGateway = {
-  #     address = "10.100.136.1";
+  #     address = "192.168.220.2";
   #     interface = "eth0";
   #   };
   # };
