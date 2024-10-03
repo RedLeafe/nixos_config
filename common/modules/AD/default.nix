@@ -103,41 +103,33 @@ in {
       };
     };
 
-    systemd.services.realmd = let
-      # DBus service for configuring Kerberos and other
-      realmd_service_fixed = let
-        servicescript = pkgs.writeShellScript "realmd" ''
-          exec ${pkgs.realmd}/libexec/realmd
-        '';
-        # TODO: wrap the script in an FHS env to fix the dumb static paths
-      in pkgs.buildFHSEnv {
-      };
-    in {
-      description = "Realm Discovery Service";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
-      serviceConfig = {
-        Type = "dbus";
-        BusName = "org.freedesktop.realmd";
-        ExecStart = realmd_service_fixed;
-        User = "root";
-      };
-    };
+    # systemd.services.realmd = {
+    #   description = "Realm Discovery Service";
+    #   wantedBy = [ "multi-user.target" ];
+    #   after = [ "network.target" ];
+    #   serviceConfig = {
+    #     Type = "dbus";
+    #     BusName = "org.freedesktop.realmd";
+    #     ExecStart = "${pkgs.realmd}/libexec/realmd";
+    #     User = "root";
+    #   };
+    # };
 
     programs.oddjobd.enable = true;
 
-    environment.systemPackages = with pkgs; let
-      # DBus service for configuring Kerberos and other
-      # TODO: wrap the program in an FHS env to fix the dumb static paths
-      realmd_fixed = pkgs.buildFHSEnv {
-      };
-    in [
+    services.samba.enable = true;
+    services.samba.package = pkgs.sambaFull;
+    services.samba.smbd.enable = true;
+    services.samba.nsswins = true;
+    services.samba.winbindd.enable = true;
+
+    environment.systemPackages = with pkgs; [
       adcli         # Helper library and tools for Active Directory client operations
       oddjob        # Odd Job Daemon
-      samba4Full    # Standard Windows interoperability suite of programs for Linux and Unix
+      sambaFull    # Standard Windows interoperability suite of programs for Linux and Unix
       sssd          # System Security Services Daemon
       krb5          # MIT Kerberos 5
-      realmd_fixed
+      # realmd  # DBus service for configuring Kerberos and other
     ];
 
   });
