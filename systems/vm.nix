@@ -15,20 +15,6 @@ in {
     AD
   ];
 
-  users.users.${username} = {
-    name = username;
-    shell = pkgs.zsh;
-    isNormalUser = true;
-    description = "";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
-    initialPassword = "test";
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC43l4qRFhbaZRHbkbiuGJa9CmqBhF8ppnWk7yA4BbGEMWTXK8lnDak9jFVAQHk1UVpGJctR0u/E9Gxl2m7lIMV9fibcYYD34nmzm+ycod92uGq+g10mEWLgidl93+eE1NOt0x1jyfNiZ+tii6KFMQRSyLu68eD5SqOiT2V4Qh6GtFbIPWJQ6SXnOFCJG767ywB5wl+1sQFMkD1JJvi7KmuqekrvM5vvjFjQpHEezOXhn/cGx5ynk/xN/YaUYx93apGQ2blGm8ZIWuqegeR0nquhWa69fIpo7KfYqmxI016t7PZB6/RQmkJevr/d42WAS3kvp6nQ1cvidiiKx79mDMV operations@wrccdc.org"
-    ];
-    # this is packages for nixOS user config.
-    # packages = []; # empty because that is managed by home-manager
-  };
-
   moon_mods = {
     zsh.enable = true;
     bash.enable = true;
@@ -64,6 +50,21 @@ in {
     l  = "${pkgs.lsd}/bin/lsd -alh";
   };
 
+  users.users.${username} = {
+    name = username;
+    shell = pkgs.zsh;
+    isNormalUser = true;
+    description = "";
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    initialPassword = "test";
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC43l4qRFhbaZRHbkbiuGJa9CmqBhF8ppnWk7yA4BbGEMWTXK8lnDak9jFVAQHk1UVpGJctR0u/E9Gxl2m7lIMV9fibcYYD34nmzm+ycod92uGq+g10mEWLgidl93+eE1NOt0x1jyfNiZ+tii6KFMQRSyLu68eD5SqOiT2V4Qh6GtFbIPWJQ6SXnOFCJG767ywB5wl+1sQFMkD1JJvi7KmuqekrvM5vvjFjQpHEezOXhn/cGx5ynk/xN/YaUYx93apGQ2blGm8ZIWuqegeR0nquhWa69fIpo7KfYqmxI016t7PZB6/RQmkJevr/d42WAS3kvp6nQ1cvidiiKx79mDMV operations@wrccdc.org"
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLEyyBJpJnaUHPNNOybf3ZiK0z3AkJ66fdzE+CMxlknY09mjcF6x2ZIkLeSgnnhNcoMF/7TCvNIt9g25nqX5V80oO7zkVZtisbRfx1hFnCrmYNFKdoh3dNY0D5qvl5kGl9SAnzI6SqPTbJzlVgqVeRPBB9pZXEnZ1bf8PxqfMvP+KJX1FHadAgP3twYFMBgKLeWz+a5gfEXFs2OJLSPaqvoR/7hq1Ovad6N3sn2hqf+Ke+50x7c0fwMTJTqbY8W3m0VZchPO/jReSl9bw1ZhtmpP06E2vlzkGsZbiQowESXGkhu9+700lDn76yeN+nf77+1bpHt6Wqqjf0gYImR6Xspb/dE2DZugs3zgcMFlr5/K5+oXKJ9CdICY5X1u/eV9nP/YUgHmaCb/uG96FCOBALV6a++JuuQttEQqkofVw+jeRc8RZvSWbDGFhP1rl5IAlYE4pQ4Y5zOtoiP+fyTrh3P6273Ql0VLr85e3Nzr+LPMRU9+5skxPQkehus8Ut2hc= marlowe@riomaggiore"
+    ];
+    # this is packages for nixOS user config.
+    # packages = []; # empty because that is managed by home-manager
+  };
+
   networking.hostName = hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -97,6 +98,11 @@ in {
   };
 
   # List services that you want to enable:
+
+  programs.ssh.pubkeyAcceptedKeyTypes = [
+    "ssh-rsa"
+    "ssh-ed25519"
+  ];
 
   # Enable the OpenSSH daemon.
   services.openssh = {

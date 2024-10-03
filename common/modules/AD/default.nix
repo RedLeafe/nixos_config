@@ -1,13 +1,11 @@
 # NOTE:
 # run the following to join AD:
-# sudo adcli join --domain=your.domain.com --user=administrator
+# sudo adcli join -D alien.moon.mine -U Administrator
 # source:
 # https://www.reddit.com/r/NixOS/comments/1fin29x/successful_active_directory_client_example/
 
 # TODO:
-# test it
-# It probably wont work.
-# make it work.
+# Make it able to login with AD users.
 
 { moduleNamespace, ... }: # <- a function
 # that returns a module
@@ -76,7 +74,7 @@ in {
           krb5_store_password_if_offline = True
           cache_credentials = True
           krb5_realm = ${AD_D}
-          # realmd_tags = manages-system joined-with-samba
+          realmd_tags = manages-system joined-with-samba
           id_provider = ad
           override_homedir = /home/%u
           # fallback_homedir = /Users/%u
@@ -91,6 +89,11 @@ in {
         '';
       };
     };
+
+    # users.ldap.server = "ldap://kerberos.alien.moon.mine/";
+    # users.ldap.daemon.enable = true;
+    # users.ldap.enable = true;
+    # users.ldap.base = "CN=Users,DC=alien,DC=moon,DC=mine";
 
     security.pam.services.sshd.makeHomeDir = true;
     security.pam.services.sshd.startSession = true;
@@ -110,17 +113,17 @@ in {
       };
     };
 
-    # systemd.services.realmd = {
-    #   description = "Realm Discovery Service";
-    #   wantedBy = [ "multi-user.target" ];
-    #   after = [ "network.target" ];
-    #   serviceConfig = {
-    #     Type = "dbus";
-    #     BusName = "org.freedesktop.realmd";
-    #     ExecStart = "${pkgs.realmd}/libexec/realmd";
-    #     User = "root";
-    #   };
-    # };
+    systemd.services.realmd = {
+      description = "Realm Discovery Service";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+      serviceConfig = {
+        Type = "dbus";
+        BusName = "org.freedesktop.realmd";
+        ExecStart = "${pkgs.realmd}/libexec/realmd";
+        User = "root";
+      };
+    };
 
     programs.oddjobd.enable = true;
 
@@ -130,7 +133,7 @@ in {
       samba4Full    # Standard Windows interoperability suite of programs for Linux and Unix
       sssd          # System Security Services Daemon
       krb5          # MIT Kerberos 5
-      # realmd        # DBus service for configuring Kerberos and other
+      realmd        # DBus service for configuring Kerberos and other
     ];
 
   });
