@@ -19,10 +19,12 @@ in {
     zsh.enable = true;
     bash.enable = true;
     fish.enable = true;
+
     alacritty.enable = true;
     lightdm.enable = true;
     i3.enable = true;
     i3.tmuxDefault = true;    
+
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
@@ -79,7 +81,7 @@ in {
     domain = "alien.moon.mine";
     search = [ "alien.moon.mine" ];
     interfaces.eth0.ipv4.addresses = [{
-      address = "192.168.220.223";
+      address = "192.168.220.44";
       prefixLength = 24;
     }];
     defaultGateway = {
