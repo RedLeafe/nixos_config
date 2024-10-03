@@ -28,14 +28,11 @@ in {
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
-    AD.nameservers = [ "192.168.220.254" ];
   };
 
   virtualisation.docker.enable = true;
 
   users.defaultUserShell = pkgs.zsh;
-
-  boot.kernelParams = [ "net.ifnames=0" "biosdevname=0" ];
 
   services.clamav.daemon.enable = true;
   services.clamav.updater.enable = true;
@@ -76,6 +73,7 @@ in {
 
   # Enable networking
   # networking.networkmanager.enable = true;
+  # networking.networkmanager.insertNameservers = [ "192.168.220.254" ];
   networking = {
     dhcpcd.enable = false;
     domain = "alien.moon.mine";
@@ -88,7 +86,10 @@ in {
       address = "192.168.220.2";
       interface = "eth0";
     };
+    nameservers = [ "192.168.220.254" ];
   };
+
+  boot.kernelParams = [ "net.ifnames=0" "biosdevname=0" ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

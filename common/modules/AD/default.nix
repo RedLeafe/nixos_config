@@ -20,11 +20,6 @@ in {
         type = str;
         description = "AD.DOMAIN.COM";
       };
-      nameservers = lib.mkOption {
-        default = [];
-        type = listOf str;
-        description = "IPs of AD nameservers";
-      };
       # ADuser = lib.mkOption {
       #   default = "Administrator";
       #   type = str;
@@ -41,16 +36,11 @@ in {
   config = lib.mkIf cfg.enable (let
     AD_D = lib.toUpper cfg.domain;
     ad_d = lib.toLower cfg.domain;
-    isNMnet = config.networking.networkmanager.enable;
   in {
 
     # system.activationScripts.loginAD.text = ''
     #   sudo adcli join -D ${ad_d} --user=${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
     # '';
-
-    networking.networkmanager.insertNameservers = lib.mkIf (isNMnet && cfg.nameservers != []) cfg.nameservers;
-
-    networking.nameservers = lib.mkIf (! isNMnet && cfg.nameservers != []) cfg.nameservers;
 
     services = {
       sssd = {
