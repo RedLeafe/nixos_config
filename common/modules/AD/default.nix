@@ -64,7 +64,7 @@ in {
           krb5_store_password_if_offline = True
           cache_credentials = True
           krb5_realm = ${AD_D}
-          realmd_tags = manages-system joined-with-samba
+          # realmd_tags = manages-system joined-with-samba
           id_provider = ad
           override_homedir = /home/%u
           # fallback_homedir = /Users/%u
