@@ -52,10 +52,13 @@ in {
           domains = ${ad_d}
           config_file_version = 2
           services = nss, pam, ssh
+          debug_level = 6
 
           [nss]
+          debug_level = 6
 
           [pam]
+          debug_level = 6
 
           [domain/${ad_d}]
           # default_shell = ${pkgs.zsh}/bin/zsh
@@ -76,14 +79,16 @@ in {
           chpass_provider = ad
           ad_gpo_access_control = permissive
           enumerate = true
+          debug_level = 6
         '';
       };
     };
 
-    # users.ldap.server = "ldap://kerberos.alien.moon.mine/";
-    # users.ldap.daemon.enable = true;
-    # users.ldap.enable = true;
-    # users.ldap.base = "CN=Users,DC=alien,DC=moon,DC=mine";
+    users.ldap.server = "ldap://kerberos.alien.moon.mine/";
+    users.ldap.daemon.enable = true;
+    users.ldap.enable = true;
+    users.ldap.nsswitch = true;
+    users.ldap.base = "CN=Users,DC=alien,DC=moon,DC=mine";
 
     security.pam.services.sshd.makeHomeDir = true;
     security.pam.services.sshd.startSession = true;
@@ -99,6 +104,13 @@ in {
         libdefaults = {
           udp_preference_limit = 0;
           default_realm = AD_D;
+        };
+        realms = {
+          "${AD_D}" = {
+            admin_server = "kerberos.${ad_d}";
+            default_domain = "${ad_d}";
+            kdc = [ "kerberos.${ad_d}" ];
+          };
         };
       };
     };
@@ -117,11 +129,11 @@ in {
 
     programs.oddjobd.enable = true;
 
-    services.samba.enable = true;
-    services.samba.package = pkgs.sambaFull;
-    services.samba.smbd.enable = true;
-    services.samba.nsswins = true;
-    services.samba.winbindd.enable = true;
+    # services.samba.enable = true;
+    # services.samba.package = pkgs.sambaFull;
+    # services.samba.smbd.enable = true;
+    # services.samba.nsswins = true;
+    # services.samba.winbindd.enable = true;
 
     environment.systemPackages = with pkgs; [
       adcli         # Helper library and tools for Active Directory client operations
