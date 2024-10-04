@@ -108,12 +108,13 @@ in {
     "ssh-rsa"
     "ssh-ed25519"
   ];
+  programs.ssh.package = pkgs.opensshWithKerberos;
 
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
     ports = [ 22 ];
-    package = pkgs.openssh_hpnWithKerberos;
+    package = pkgs.opensshWithKerberos;
     settings = {
       PasswordAuthentication = false;
       AllowUsers = null; # Allows all users by default. Can be [ "user1" "user2" ]
