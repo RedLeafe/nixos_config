@@ -20,6 +20,11 @@ in {
         type = str;
         description = "AD.DOMAIN.COM";
       };
+      domain_short = lib.mkOption {
+        default = "AD";
+        type = str;
+        description = "AD";
+      };
       domain_controller = lib.mkOption {
         default = "dc.ad.domain.com";
         type = str;
@@ -46,6 +51,8 @@ in {
   config = lib.mkIf cfg.enable (let
     AD_D = lib.toUpper cfg.domain;
     ad_d = lib.toLower cfg.domain;
+    AD_S = lib.toUpper cfg.domain_short;
+    ad_s = lib.toLower cfg.domain_short;
   in {
 
     # system.activationScripts.loginAD.text = ''
@@ -146,6 +153,23 @@ in {
     # services.samba.smbd.enable = true;
     # services.samba.nsswins = true;
     # services.samba.winbindd.enable = true;
+
+    systemd.services.samba-smbd.enable = lib.mkDefault false;
+    services.samba = {
+      enable = true;
+      enableNmbd = lib.mkDefault false;
+      enableWinbindd = lib.mkDefault false;
+      package = pkgs.samba4Full;
+      securityType = "ads";
+      extraConfig = ''
+        realm = ${AD_D}
+        workgroup = ${AD_S}
+        password server = ${AD_D}
+        client use spnego = yes
+        client signing = yes
+        kerberos method = secrets and keytab
+      '';
+    };
 
     environment.systemPackages = with pkgs; [
       adcli         # Helper library and tools for Active Directory client operations
