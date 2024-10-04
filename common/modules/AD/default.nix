@@ -161,14 +161,16 @@ in {
       enableWinbindd = lib.mkDefault false;
       package = pkgs.samba4Full;
       securityType = "ads";
-      extraConfig = ''
-        realm = ${AD_D}
-        workgroup = ${AD_S}
-        password server = ${AD_D}
-        client use spnego = yes
-        client signing = yes
-        kerberos method = secrets and keytab
-      '';
+      settings = {
+        global = {
+          realm = AD_D;
+          workgroup = AD_S;
+          "password server" = AD_D;
+          "client use spnego" = "yes";
+          "client signing" = "yes";
+          "kerberos method" = "secrets and keytab";
+        };
+      };
     };
 
     environment.systemPackages = with pkgs; [
