@@ -113,6 +113,7 @@ in {
   services.openssh = {
     enable = true;
     ports = [ 22 ];
+    package = pkgs.openssh_hpnWithKerberos;
     settings = {
       PasswordAuthentication = false;
       AllowUsers = null; # Allows all users by default. Can be [ "user1" "user2" ]
