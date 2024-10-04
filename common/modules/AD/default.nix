@@ -20,6 +20,21 @@ in {
         type = str;
         description = "AD.DOMAIN.COM";
       };
+      domain_short = lib.mkOption {
+        default = "AD";
+        type = str;
+        description = "AD";
+      };
+      domain_controller = lib.mkOption {
+        default = "dc.ad.domain.com";
+        type = str;
+        description = "domain controller for AD";
+      };
+      ldap_search_base = lib.mkOption {
+        default = "CN=Users,DC=example,DC=com";
+        type = str;
+        description = "ldap search base";
+      };
       # ADuser = lib.mkOption {
       #   default = "Administrator";
       #   type = str;
@@ -36,6 +51,8 @@ in {
   config = lib.mkIf cfg.enable (let
     AD_D = lib.toUpper cfg.domain;
     ad_d = lib.toLower cfg.domain;
+    AD_S = lib.toUpper cfg.domain_short;
+    ad_s = lib.toLower cfg.domain_short;
   in {
 
     # system.activationScripts.loginAD.text = ''
@@ -88,7 +105,9 @@ in {
     users.ldap.daemon.enable = true;
     users.ldap.enable = true;
     users.ldap.nsswitch = true;
-    users.ldap.base = "CN=Users,DC=alien,DC=moon,DC=mine";
+    users.ldap.useTLS = true;
+    users.ldap.loginPam = true;
+    users.ldap.base = cfg.ldap_search_base;
 
     security.pam.services.sshd.makeHomeDir = true;
     security.pam.services.sshd.startSession = true;
@@ -107,9 +126,9 @@ in {
         };
         realms = {
           "${AD_D}" = {
-            admin_server = "kerberos.${ad_d}";
-            default_domain = "${ad_d}";
-            kdc = [ "kerberos.${ad_d}" ];
+            admin_server = cfg.domain_controller;
+            default_domain = ad_d;
+            kdc = [ cfg.domain_controller ];
           };
         };
       };
@@ -134,6 +153,23 @@ in {
     # services.samba.smbd.enable = true;
     # services.samba.nsswins = true;
     # services.samba.winbindd.enable = true;
+
+    systemd.services.samba-smbd.enable = lib.mkDefault false;
+    services.samba = {
+      enable = true;
+      enableNmbd = lib.mkDefault false;
+      enableWinbindd = lib.mkDefault false;
+      package = pkgs.samba4Full;
+      securityType = "ads";
+      extraConfig = ''
+        realm = ${AD_D}
+        workgroup = ${AD_S}
+        password server = ${AD_D}
+        client use spnego = yes
+        client signing = yes
+        kerberos method = secrets and keytab
+      '';
+    };
 
     environment.systemPackages = with pkgs; [
       adcli         # Helper library and tools for Active Directory client operations

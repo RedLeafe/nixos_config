@@ -29,6 +29,9 @@ in {
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
+    AD.domain_short = "alien";
+    AD.domain_controller = "kerberos.alien.moon.mine";
+    AD.ldap_search_base = "CN=Users,DC=alien,DC=moon,DC=mine";
     WP.enable = true;
   };
 
@@ -108,11 +111,13 @@ in {
     "ssh-rsa"
     "ssh-ed25519"
   ];
+  programs.ssh.package = pkgs.opensshWithKerberos;
 
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
     ports = [ 22 ];
+    package = pkgs.opensshWithKerberos;
     settings = {
       PasswordAuthentication = false;
       AllowUsers = null; # Allows all users by default. Can be [ "user1" "user2" ]
@@ -120,6 +125,12 @@ in {
       X11Forwarding = false;
       PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
+    extraConfig = ''
+      KerberosAuthentication yes
+      KerberosOrLocalPasswd yes
+      GSSAPIAuthentication yes
+      GSSAPICleanupCredentials yes
+    '';
   };
   services.fail2ban.enable = true;
 
