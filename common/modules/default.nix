@@ -13,6 +13,7 @@
 in
 {
   LD = import (systemOnly ./LD) { inherit moduleNamespace; };
+  WP = import (systemOnly ./WP) { inherit moduleNamespace inputs; };
   AD = import (systemOnly ./AD) { inherit moduleNamespace; };
   NFS = import (systemOnly ./NFS) { inherit moduleNamespace; };
   lightdm = import (systemOnly ./lightdm) { inherit moduleNamespace; };

@@ -64,7 +64,7 @@ in {
           krb5_store_password_if_offline = True
           cache_credentials = True
           krb5_realm = ${AD_D}
-          realmd_tags = manages-system joined-with-samba
+          # realmd_tags = manages-system joined-with-samba
           id_provider = ad
           override_homedir = /home/%u
           # fallback_homedir = /Users/%u
@@ -103,27 +103,33 @@ in {
       };
     };
 
-    systemd.services.realmd = {
-      description = "Realm Discovery Service";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
-      serviceConfig = {
-        Type = "dbus";
-        BusName = "org.freedesktop.realmd";
-        ExecStart = "${pkgs.realmd}/libexec/realmd";
-        User = "root";
-      };
-    };
+    # systemd.services.realmd = {
+    #   description = "Realm Discovery Service";
+    #   wantedBy = [ "multi-user.target" ];
+    #   after = [ "network.target" ];
+    #   serviceConfig = {
+    #     Type = "dbus";
+    #     BusName = "org.freedesktop.realmd";
+    #     ExecStart = "${pkgs.realmd}/libexec/realmd";
+    #     User = "root";
+    #   };
+    # };
 
     programs.oddjobd.enable = true;
+
+    services.samba.enable = true;
+    services.samba.package = pkgs.sambaFull;
+    services.samba.smbd.enable = true;
+    services.samba.nsswins = true;
+    services.samba.winbindd.enable = true;
 
     environment.systemPackages = with pkgs; [
       adcli         # Helper library and tools for Active Directory client operations
       oddjob        # Odd Job Daemon
-      samba4Full    # Standard Windows interoperability suite of programs for Linux and Unix
+      sambaFull    # Standard Windows interoperability suite of programs for Linux and Unix
       sssd          # System Security Services Daemon
       krb5          # MIT Kerberos 5
-      realmd        # DBus service for configuring Kerberos and other
+      # realmd  # DBus service for configuring Kerberos and other
     ];
 
   });
