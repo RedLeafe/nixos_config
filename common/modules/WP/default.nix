@@ -11,5 +11,7 @@ in {
 
   config = lib.mkIf cfg.enable (let
   in {
+    services.wordpress.sites."localhost" = {
+    };
   });
 }

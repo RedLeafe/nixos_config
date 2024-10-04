@@ -13,6 +13,7 @@ in {
     i3
     LD
     AD
+    WP
   ];
 
   moon_mods = {
@@ -28,6 +29,7 @@ in {
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
+    WP.enable = true;
   };
 
   virtualisation.docker.enable = true;
