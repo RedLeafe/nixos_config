@@ -101,7 +101,7 @@ in {
       };
     };
 
-    users.ldap.server = "ldap://kerberos.alien.moon.mine/";
+    users.ldap.server = "ldap://${cfg.domain_controller}/";
     users.ldap.daemon.enable = true;
     users.ldap.enable = true;
     users.ldap.nsswitch = true;
