@@ -120,6 +120,12 @@ in {
       X11Forwarding = false;
       PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
+    extraConfig = ''
+      KerberosAuthentication yes
+      KerberosOrLocalPasswd yes
+      GSSAPIAuthentication yes
+      GSSAPICleanupCredentials yes
+    '';
   };
   services.fail2ban.enable = true;
 
