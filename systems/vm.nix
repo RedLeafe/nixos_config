@@ -29,6 +29,8 @@ in {
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
+    AD.domain_controller = "kerberos.alien.moon.mine";
+    AD.ldap_search_base = "CN=Users,DC=alien,DC=moon,DC=mine";
     WP.enable = true;
   };
 

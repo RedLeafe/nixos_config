@@ -20,6 +20,16 @@ in {
         type = str;
         description = "AD.DOMAIN.COM";
       };
+      domain_controller = lib.mkOption {
+        default = "dc.ad.domain.com";
+        type = str;
+        description = "domain controller for AD";
+      };
+      ldap_search_base = lib.mkOption {
+        default = "CN=Users,DC=example,DC=com";
+        type = str;
+        description = "ldap search base";
+      };
       # ADuser = lib.mkOption {
       #   default = "Administrator";
       #   type = str;
@@ -88,7 +98,9 @@ in {
     users.ldap.daemon.enable = true;
     users.ldap.enable = true;
     users.ldap.nsswitch = true;
-    users.ldap.base = "CN=Users,DC=alien,DC=moon,DC=mine";
+    users.ldap.useTLS = true;
+    users.ldap.loginPam = true;
+    users.ldap.base = cfg.ldap_search_base;
 
     security.pam.services.sshd.makeHomeDir = true;
     security.pam.services.sshd.startSession = true;
@@ -107,9 +119,9 @@ in {
         };
         realms = {
           "${AD_D}" = {
-            admin_server = "kerberos.${ad_d}";
-            default_domain = "${ad_d}";
-            kdc = [ "kerberos.${ad_d}" ];
+            admin_server = cfg.domain_controller;
+            default_domain = ad_d;
+            kdc = [ cfg.domain_controller ];
           };
         };
       };
