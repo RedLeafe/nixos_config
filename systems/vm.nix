@@ -21,6 +21,7 @@ in {
     fish.enable = true;
     ranger.enable = true;
     xtermwm.enable = true;
+    xtermwm.fontName = "FiraMono Nerd Font";
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
