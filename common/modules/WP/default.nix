@@ -36,11 +36,7 @@ in {
       plugins = {
         inherit ldap-login-for-intranet-sites;
       };
-      # poolConfig = {
-      # };
     };
-    services.httpd.user = "root";
-    services.httpd.group = "root";
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
     };
