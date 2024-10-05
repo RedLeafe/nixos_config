@@ -10,6 +10,15 @@ in {
   };
 
   config = lib.mkIf cfg.enable (let
+    ldap-plugin = pkgs.stdenv.mkDerivation rec {
+      name = "ldap-login-for-intranet-sites";
+      version = "5.1.5";
+      src = pkgs.fetchzip {
+        url = "https://downloads.wordpress.org/plugin/${name}.${version}.zip";
+        hash = "";
+      };
+      installPhase = "mkdir -p $out; cp -R * $out/";
+    };
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
@@ -19,6 +28,9 @@ in {
       database = {
         host = "localhost";
       };
+      plugins = [
+        ldap-plugin
+      ];
       # poolConfig = {
       #   "listen.owner" = "root";
       #   "listen.group" = "root";
