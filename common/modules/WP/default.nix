@@ -11,7 +11,18 @@ in {
 
   config = lib.mkIf cfg.enable (let
   in {
-    services.wordpress.sites."localhost" = {
+    services.wordpress.sites."LunarLooters" = {
+      virtualHost = {
+        listenAddresses = [ "0.0.0.0" ];
+        hostName = "nix.alien.moon.mine";
+      };
+      database = {
+        host = "localhost";
+      };
+      poolConfig = {
+        "listen.owner" = "root";
+        "listen.group" = "root";
+      };
     };
   });
 }
