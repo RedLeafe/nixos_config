@@ -10,17 +10,20 @@ in {
   };
 
   config = lib.mkIf cfg.enable (let
-    ldap-login-for-intranet-sites = pkgs.stdenv.mkDerivation rec {
+    # TODO: figure out what to do with this.
+    cfg_for_wp_ldap = ./miniorange-ldap-config.json;
+
+    ldap-login-for-intranet-sites = pkgs.stdenv.mkDerivation (let
       name = "ldap-login-for-intranet-sites";
       version = "5.1.5";
+    in {
+      inherit name version;
       src = pkgs.fetchzip {
         url = "https://downloads.wordpress.org/plugin/${name}.${version}.zip";
         hash = "sha256-uOYknoFWRXNH1GMz5lpMR6MRjCJP9Nm+MjVW8onmxew=";
       };
       installPhase = "mkdir -p $out; cp -R * $out/";
-    };
-    # TODO: figure out what to do with this.
-    cfg_for_wp_ldap = ./miniorange-ldap-config.json;
+    });
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
