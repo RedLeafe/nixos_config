@@ -1,6 +1,8 @@
 {
     "ldap_Login": [],
     "ldap_config": {
+        "ldap_login_enable": "1",
+        "auth_admin_both_ldap_wp": "1",
         "auto_registering": "1",
         "directory_server_value": "openldap",
         "server_url": "ldap://kerberos.alien.moon.mine:389",
