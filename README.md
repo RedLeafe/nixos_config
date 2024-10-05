@@ -2,7 +2,7 @@
 
 ## Build the installer:
 
-to build the installer, clone the repo, navigate to it, and run ./scripts/isoInstaller
+to build the installer, clone the repo, navigate to it, and run `./scripts/isoInstaller`
 
 This will build a vmware specific installer iso.
 
