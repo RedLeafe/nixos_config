@@ -28,6 +28,8 @@ so that it is no longer owned by root
 
 Then run `sudo net ads join -U Administrator` and enter your password at the prompt.
 
+Afterwards, reboot the machine again.
+
 `cd nixos_config` and check it out!
 
 To rebuild any changes from within your vm, navigate to the config and run `./scripts/build`
