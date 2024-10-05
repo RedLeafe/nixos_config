@@ -79,7 +79,7 @@ nixos_config
 │       └── ... other overlays
 │
 ├── disko <- used for provisioning disks on first install, and configuring the nixos options to find them
-│   ├── sda_swap.nix
+│   ├── sdaBIOS.nix
 │   └── ... other disko modules
 │
 │   # Below this point, are the configurations for
