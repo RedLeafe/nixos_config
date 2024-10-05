@@ -33,9 +33,7 @@
             disko.nixosModules.disko
             self.diskoConfigurations.${hostname}
             ./systems/vmware
-            ({ ... }:{
-              nixpkgs.overlays = overlays;
-            })
+            { nixpkgs.overlays = overlays; }
           ];
         };
         installer = nixpkgs.lib.nixosSystem {
