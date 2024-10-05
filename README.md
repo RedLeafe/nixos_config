@@ -2,7 +2,7 @@
 
 to build the installer, run `./scripts/isoInstaller`
 
-create a VMWare box, with minimum 2gb memory, 2 cores, and 35gb disk space (disk space will be reduced later, for now its a dev box for making stuff)
+create a VMWare box, with minimum 2gb memory, 2 cores, and 35gb disk space (still testing what the actual minimum is)
 
 for system type choose other linux 5 or 6+ 64bit
 
@@ -19,14 +19,14 @@ and then for the user.
 
 Once it is done, run `reboot`.
 
-Start it back up, log in,
+Start it back up, log in as pluto.
 
-first run `sudo chown -R pluto:users /home/pluto/nixos_config`
+first run `ssh-keygen` to get some keys so you can ssh in as the pluto user
+
+then run `sudo chown -R pluto:users /home/pluto/nixos_config`
 so that it is no longer owned by root
 
 Then run `sudo net ads join -U Administrator` and enter your password at the prompt.
-
-(AD apparently only half works right now... It will get there...)
 
 `cd nixos_config` and check it out!
 
