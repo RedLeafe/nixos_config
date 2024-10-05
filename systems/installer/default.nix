@@ -1,31 +1,19 @@
 { config, pkgs, self, stateVersion, system-modules, hostname, username, inputs, ... }: let
-  tmux_new = pkgs.tmux.override {
-    isAlacritty = false;
-  };
-  tx = pkgs.writeShellScriptBin "tx" ''
-    if ! echo "$PATH" | grep -q "${tmux_new}/bin"; then
-      export PATH=${tmux_new}/bin:$PATH
-    fi
-    if [[ $(tmux list-sessions -F '#{?session_attached,1,0}' | grep -c '0') -ne 0 ]]; then
-      selected_session=$(tmux list-sessions -F '#{?session_attached,,#{session_name}}' | tr '\n' ' ' | awk '{print $1}')
-      exec tmux new-session -At $selected_session
-    else
-      exec tmux new-session
-    fi
-  '';
   login_shell = "zsh";
   nerd_font_string = "FiraMono";
-
 in {
   imports = with system-modules; [
     ./minimal-graphical-base.nix
     shell.${login_shell}
     ranger
+    xtermwm
   ] ++ (if login_shell == "bash" then [] else [
     shell.bash
   ]);
 
   moon_mods = {
+    xtermwm.enable = true;
+    xtermwm.fontName = "${nerd_font_string} Nerd Font";
     ${login_shell}.enable = true;
     ranger = {
       enable = true;
@@ -47,7 +35,7 @@ in {
       hostname=''${1:-'${hostname}'}
       username=''${2:-'${username}'}
       [ ! -d /home/nixos/nixos_config ] && cp -r /iso/nixos_config /home/nixos
-      sudo nixos-install --show-trace --flake /home/nixos/nixos_config#$hostname
+      sudo nixos-install --verbose --show-trace --flake /home/nixos/nixos_config#$hostname
       echo "please set password for user $username"
       sudo passwd --root /mnt $username
       umask 077
@@ -76,8 +64,6 @@ in {
 
   environment.systemPackages = with pkgs; [
     inputs.disko.packages.${system}.default
-    tmux_new
-    tx
     neovim
     git
     findutils
@@ -108,34 +94,6 @@ in {
     };
   };
   fonts.fontDir.enable = true;
-
-  services.xserver.enable = true;
-  services.displayManager.defaultSession = "xterm-installer";
-  services.xserver.desktopManager.session = (let
-    maximizer = "${inputs.maximizer.packages.${pkgs.system}.default}/bin/maximize_program";
-    launchScript = pkgs.writeShellScript "mysh" /*bash*/ ''
-      # a tiny c program that uses libX11 to make xterm fullscreen.
-      ${maximizer} xterm > /dev/null 2>&1 &
-      # tmux launcher script
-      exec ${tx}/bin/tx
-    '';
-  in [
-    { name = "xterm-installer";
-      start = /*bash*/ ''
-        ${pkgs.xorg.xrdb}/bin/xrdb -merge ${pkgs.writeText "Xresources" ''
-          xterm*termName: xterm-256color
-          xterm*faceName: ${nerd_font_string} Nerd Font
-          xterm*faceSize: 12
-          xterm*background: black
-          xterm*foreground: white
-          xterm*title: xterm
-          xterm*loginShell: true
-        ''}
-        ${pkgs.xterm}/bin/xterm -name xterm -e ${launchScript} &
-        waitPID=$!
-      '';
-    }
-  ]);
 
   system.stateVersion = stateVersion;
 

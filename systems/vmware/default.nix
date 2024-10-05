@@ -7,6 +7,13 @@ in {
   ];
   virtualisation.vmware.guest.enable = true;
 
+  swapDevices = let
+    GB = v: v*1024;
+  in [ {
+    device = "/var/lib/swapfile";
+    size = GB 3;
+  } ];
+
   # Bootloader.
   boot.loader.timeout = 3;
   boot.loader.grub.enable = true;

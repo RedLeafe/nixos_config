@@ -4,8 +4,12 @@
   cfg = config.${moduleNamespace}.xtermwm;
 in {
   options = {
-    ${moduleNamespace}.xtermwm = with lib.types; {
-      enable = lib.mkEnableOption "xterm as window manager";
+    ${moduleNamespace}.xtermwm = with lib; {
+      enable = mkEnableOption "xterm as window manager";
+      fontName = mkOption {
+        default = "FiraMono Nerd Font";
+        type = types.str;
+      };
     };
   };
   config = lib.mkIf cfg.enable (let
@@ -40,7 +44,7 @@ in {
         start = /*bash*/ ''
           ${pkgs.xorg.xrdb}/bin/xrdb -merge ${pkgs.writeText "Xresources" ''
             xterm*termName: xterm-256color
-            xterm*faceName: FiraMono Nerd Font
+            xterm*faceName: ${cfg.fontName}
             xterm*faceSize: 12
             xterm*background: black
             xterm*foreground: white

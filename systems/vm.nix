@@ -21,6 +21,7 @@ in {
     fish.enable = true;
     ranger.enable = true;
     xtermwm.enable = true;
+    xtermwm.fontName = "FiraMono Nerd Font";
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
@@ -31,6 +32,7 @@ in {
   };
 
   programs.git = {
+    enable = true;
     config = {
       core.fsmonitor = true;
     };
@@ -244,7 +246,6 @@ in {
     unzip
     xclip
     xsel
-    git
     ntfs3g
   ];
 

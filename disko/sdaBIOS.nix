@@ -1,5 +1,5 @@
 {
-  # it will be named disk-SPACEOS-{boot, root, swap}
+  # it will be named disk-SPACEOS-{boot, root}
   disko.devices = {
     disk = {
       SPACEOS = {
@@ -13,18 +13,11 @@
               type = "EF02";
             };
             root = {
-              end = "-3G";
+              size = "100%";
               content = {
                 type = "filesystem";
                 format = "ext4";
                 mountpoint = "/";
-              };
-            };
-            swap = {
-              size = "100%";
-              content = {
-                type = "swap";
-                resumeDevice = true; # resume from hiberation from this device
               };
             };
           };

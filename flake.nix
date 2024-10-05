@@ -21,7 +21,7 @@
     hostname = "nix";
   in
   {
-    diskoConfigurations.${hostname} = import ./disko/sda_swap.nix;
+    diskoConfigurations.${hostname} = import ./disko/sdaBIOS.nix;
     legacyPackages = forAllSys (system: {
       nixosConfigurations = {
         ${hostname} = nixpkgs.lib.nixosSystem {
@@ -31,7 +31,7 @@
           inherit system;
           modules = [
             disko.nixosModules.disko
-            ./disko/sda_swap.nix
+            self.diskoConfigurations.${hostname}
             ./systems/vmware
             ({ ... }:{
               nixpkgs.overlays = overlays;
