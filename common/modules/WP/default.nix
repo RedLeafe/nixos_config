@@ -14,7 +14,7 @@ in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
         listenAddresses = [ "0.0.0.0" ];
-        hostName = "*";
+        serverAliases = [ "*" ];
       };
       database = {
         host = "localhost";
