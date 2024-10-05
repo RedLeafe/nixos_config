@@ -7,7 +7,7 @@
 , pluginSpecs ? null # <-- type list of plugin or spec [ drv1 { plugin = drv2; extraConfig = ""; } ]
 , global_env_vars ? {}
 , passthruvars ? []
-, isAlacritty ? true
+, isAlacritty ? false
 , extraConfig ? ""
 , ...
 }: let

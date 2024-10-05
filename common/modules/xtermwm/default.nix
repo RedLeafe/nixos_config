@@ -13,12 +13,9 @@ in {
     };
   };
   config = lib.mkIf cfg.enable (let
-    tmux_new = pkgs.tmux.override {
-      isAlacritty = false;
-    };
     tx = pkgs.writeShellScriptBin "tx" ''
-      if ! echo "$PATH" | grep -q "${tmux_new}/bin"; then
-        export PATH=${tmux_new}/bin:$PATH
+      if ! echo "$PATH" | grep -q "${pkgs.tmux}/bin"; then
+        export PATH=${pkgs.tmux}/bin:$PATH
       fi
       if [[ $(tmux list-sessions -F '#{?session_attached,1,0}' | grep -c '0') -ne 0 ]]; then
         selected_session=$(tmux list-sessions -F '#{?session_attached,,#{session_name}}' | tr '\n' ' ' | awk '{print $1}')
@@ -59,7 +56,7 @@ in {
 
     environment.systemPackages = [
       tx
-      tmux_new
+      pkgs.tmux
     ];
   });
 }
