@@ -5,12 +5,10 @@
 { config, pkgs, self, inputs, stateVersion, username, hostname, system-modules, ... }: let
 in {
   imports = with system-modules; [
-    alacritty
     shell.bash
     shell.zsh
     shell.fish
-    lightdm
-    i3
+    xtermwm
     LD
     AD
     WP
@@ -20,12 +18,7 @@ in {
     zsh.enable = true;
     bash.enable = true;
     fish.enable = true;
-
-    alacritty.enable = true;
-    lightdm.enable = true;
-    i3.enable = true;
-    i3.tmuxDefault = true;    
-
+    xtermwm.enable = true;
     LD.enable = true;
     AD.enable = true;
     AD.domain = "alien.moon.mine";
@@ -33,6 +26,12 @@ in {
     AD.domain_controller = "kerberos.alien.moon.mine";
     AD.ldap_search_base = "CN=Users,DC=alien,DC=moon,DC=mine";
     WP.enable = true;
+  };
+
+  programs.git = {
+    config = {
+      core.fsmonitor = true;
+    };
   };
 
   virtualisation.docker.enable = true;
@@ -44,6 +43,7 @@ in {
   services.clamav.updater.interval = "weekly";
 
   environment.variables = {
+    EDITOR = "nvim_for_u";
   };
   environment.interactiveShellInit = ''
   '';

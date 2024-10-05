@@ -1,10 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # home-manager = {
+    #   url = "github:nix-community/home-manager";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # disk config
     disko.url = "github:nix-community/disko";
@@ -18,11 +18,11 @@
     birdeeSystems.url = "github:BirdeeHub/birdeeSystems";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ... }@inputs: let
+  outputs = { self, nixpkgs, disko, ... }@inputs: let
     stateVersion = "24.05";
     common = import ./common { inherit inputs; };
     inherit (common { overlaysList = true; }) overlays;
-    inherit (common { homeManager = true; }) home-modules;
+    # inherit (common { homeManager = true; }) home-modules;
     inherit (common { nixos = true; }) system-modules;
     forAllSys = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
     username = "pluto";
@@ -34,28 +34,31 @@
       nixosConfigurations = {
         ${hostname} = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit stateVersion self inputs system-modules home-modules username hostname;
+            inherit stateVersion self inputs system-modules username hostname;
+            # inherit home-modules;
           };
           inherit system;
           modules = [
-            home-manager.nixosModules.home-manager
             disko.nixosModules.disko
             ./disko/sda_swap.nix
             ./systems/vmware
-            (
-              { pkgs, lib, stateVersion, self, inputs, username, hostname, system-modules, ... }:
-              {
-                nixpkgs.overlays = overlays;
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users.${username} = import ./homes/main-home.nix;
-                home-manager.backupFileExtension = "hm-bkp";
-                home-manager.verbose = true;
-                home-manager.extraSpecialArgs = {
-                  inherit stateVersion self inputs hostname username home-modules;
-                };
-              }
-            )
+            ({ ... }:{
+              nixpkgs.overlays = overlays;
+            })
+            # inputs.home-manager.nixosModules.home-manager
+            # (
+            #   { pkgs, lib, stateVersion, self, inputs, username, hostname, system-modules, ... }:
+            #   {
+            #     home-manager.useGlobalPkgs = true;
+            #     home-manager.useUserPackages = true;
+            #     home-manager.users.${username} = import ./homes/main-home.nix;
+            #     home-manager.backupFileExtension = "hm-bkp";
+            #     home-manager.verbose = true;
+            #     home-manager.extraSpecialArgs = {
+            #       inherit stateVersion self inputs hostname username home-modules;
+            #     };
+            #   }
+            # )
           ];
         };
         installer = nixpkgs.lib.nixosSystem {
