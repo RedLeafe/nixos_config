@@ -46,7 +46,7 @@ nixos_config
 │   ├── build
 │   └── isoInstaller
 │
-├── common <- flake imports this, passes the results to system and home manager configs
+├── common <- flake imports this, passes the results to system config (and also home manager if we had it)
 │   ├── default.nix <- in charge of exporting the contents of /common as an easy to use set
 │   ├── modules
 │   │   ├── AD
