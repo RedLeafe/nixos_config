@@ -21,18 +21,14 @@ Once it is done, run `reboot`.
 
 Start it back up, log in,
 
-`alt+enter` to open the terminal
-
 first run `sudo chown -R pluto:users /home/pluto/nixos_config`
 so that it is no longer owned by root
 
-Then run `sudo adcli join -D <YOUR_AD_DOMAIN> -U <YOUR_AD_USERNAME>` and enter your password at the prompt.
+Then run `sudo net ads join -U Administrator` and enter your password at the prompt.
 
 (AD apparently only half works right now... It will get there...)
 
 `cd nixos_config` and check it out!
-
-`alt+f2` for chromium, `alt+d` for dmenu app launcher, view other keybinds in the [i3 config](./common/modules/i3/config)
 
 To rebuild any changes from within your vm, navigate to the config and run `./scripts/build`
 
@@ -73,15 +69,11 @@ nixos_config
 │   └── ... other disko modules
 │
 │   # Below this point, are the configurations for
-│   # the systems and home manager configs output by the flake
+│   # the systems output by the flake
 │   # They import the modules and overlays from the common directory.
 │   # and set some options for them, as well as containing other
 │   # misc system or user config that didnt make sense to abstract
 │   # into their own modules.
-│
-├── homes <- the directory for home manager configurations
-│   ├── main-home.nix <- the only one that exists rn
-│   └── ... other home manager configs
 │
 └── systems
     ├── installer <- the full config for the installer image
@@ -102,7 +94,7 @@ nixos_config
 - [language reference](https://nix.dev/manual/nix/2.18/language/)
 - [nix packages search](https://search.nixos.org/packages)
 - [nixos module options search](https://search.nixos.org/options)
-- [home-manager module options search](https://mipmip.github.io/home-manager-option-search/)
+- [home-manager module options search](https://mipmip.github.io/home-manager-option-search/) <- not installed in this config anymore
 - [nix command docs](https://nix.dev/manual/nix/2.22/command-ref/new-cli/nix)
 - [builtins and lib docs](https://teu5us.github.io/nix-lib.html)
 - [flake inputs docs](https://nix.dev/manual/nix/2.22/command-ref/new-cli/nix3-flake#flake-references)
