@@ -1,38 +1,50 @@
 # nix.moon.mine
 
-to build the installer, run `./scripts/isoInstaller`
+## Build the installer:
 
-create a VMWare box, with minimum 2gb memory, 2 cores, and 35gb disk space (still testing what the actual minimum is)
+to build the installer, clone the repo, navigate to it, and run ./scripts/isoInstaller
 
-for system type choose other linux 5 or 6+ 64bit
+This will build a vmware specific installer iso.
 
-It requires `BIOS` boot.
+Make a machine and boot from the iso.
 
-run the installer iso in the vmware box
+## Machine requirements:
 
-it will open a terminal.
-Run the `SPACEOS` command in it.
+IT REQUIRES BIOS BOOT. Give it about 16 GB disk size
 
-At the end of the `SPACEOS` command,
-it will ask you to set a password for root,
-and then for the user.
+You could get away with 2 cores 2-3gb ram for initial build. If it freezes you can shut it down and run SPACEOS-install to pick up more or less where it left off when its back up
 
-Once it is done, run `reboot`.
+I just make it 4 core and 4 GB and it builds in a sane amount of time with 0 risk of freezing. Its not worth waiting longer when you dont need to.
+
+There is a way to do the install and building on a separate machine to get around this issue. I didnt do it for this box.
+
+Reduce it to 1 core 2gb ram after.
+
+This should handle running nixos-rebuild while still keeping the services running after the machine has been built the first time.
+
+## Running the installer:
+
+When you boot into the installer, you can log in with no password.
+
+You will see a terminal. Run the `SPACEOS` command in it.
+
+At the end of the `SPACEOS` command, it will ask you to set a password for root, and then for the user.
+
+Once it is done, run reboot.
 
 Start it back up, log in as pluto.
 
 first run `ssh-keygen` to get some keys so you can ssh in as the pluto user
 
-then run `sudo chown -R pluto:users /home/pluto/nixos_config`
-so that it is no longer owned by root
+then run `sudo chown -R pluto:users /home/pluto/nixos_config` so that it is no longer owned by root
 
 Then run `sudo net ads join -U Administrator` and enter your password at the prompt.
 
 Afterwards, reboot the machine again.
 
-`cd nixos_config` and check it out!
+Log into wordpress, log into AD in wordpress ldap plugin, and import the page stuff, I havent figured this out yet
 
-To rebuild any changes from within your vm, navigate to the config and run `./scripts/build`
+To rebuild any changes to the nix config from within your vm, navigate to the config and run `./scripts/build`
 
 when you add or remove files, be sure to run `git add` or nix wont reflect the changes. Although, currently the config provisioned by the installer isn't a git repo so this doesn't apply until it is one.
 
