@@ -5,7 +5,7 @@
 in {
   options = {
     ${moduleNamespace}.WP = with lib.types; {
-      enable = lib.mkEnableOption "AD stuff";
+      enable = lib.mkEnableOption "WordPress stuff";
     };
   };
 
