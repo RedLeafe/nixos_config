@@ -69,13 +69,10 @@ in {
           domains = ${ad_d}
           config_file_version = 2
           services = nss, pam, ssh
-          debug_level = 6
 
           [nss]
-          debug_level = 6
 
           [pam]
-          debug_level = 6
 
           [domain/${ad_d}]
           # default_shell = ${pkgs.zsh}/bin/zsh
@@ -90,13 +87,12 @@ in {
           # fallback_homedir = /Users/%u
           ad_domain = ${ad_d}
           use_fully_qualified_names = false
-          ldap_id_mapping = false
+          ldap_id_mapping = true
           auth_provider = ad
           access_provider = ad
           chpass_provider = ad
           ad_gpo_access_control = permissive
           enumerate = true
-          debug_level = 6
         '';
       };
     };
@@ -157,12 +153,12 @@ in {
     systemd.services.samba-smbd.enable = lib.mkDefault false;
     services.samba = {
       enable = true;
-      enableNmbd = lib.mkDefault false;
-      enableWinbindd = lib.mkDefault false;
+      nmbd.enable = lib.mkDefault false;
+      winbindd.enable = lib.mkDefault false;
       package = pkgs.samba4Full;
-      securityType = "ads";
       settings = {
         global = {
+          security = "ads";
           realm = AD_D;
           workgroup = AD_S;
           "password server" = AD_D;
