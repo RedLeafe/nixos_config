@@ -1,11 +1,6 @@
 # NOTE:
 # run the following to join AD:
-# sudo adcli join -D alien.moon.mine -U Administrator
-# source:
-# https://www.reddit.com/r/NixOS/comments/1fin29x/successful_active_directory_client_example/
-
-# TODO:
-# Make it able to login with AD users.
+# net ads join -U Administrator
 
 { moduleNamespace, ... }: # <- a function
 # that returns a module
