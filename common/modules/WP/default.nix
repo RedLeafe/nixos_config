@@ -15,7 +15,7 @@ in {
       version = "5.1.5";
       src = pkgs.fetchzip {
         url = "https://downloads.wordpress.org/plugin/${name}.${version}.zip";
-        hash = "";
+        hash = "sha256-uOYknoFWRXNH1GMz5lpMR6MRjCJP9Nm+MjVW8onmxew=";
       };
       installPhase = "mkdir -p $out; cp -R * $out/";
     };
