@@ -13,7 +13,7 @@
               type = "EF02";
             };
             root = {
-              end = "-5G";
+              end = "-3G";
               content = {
                 type = "filesystem";
                 format = "ext4";
