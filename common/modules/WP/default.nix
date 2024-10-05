@@ -14,15 +14,18 @@ in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
         listenAddresses = [ "0.0.0.0" ];
-        hostName = "nix.alien.moon.mine";
+        hostName = "*";
       };
       database = {
         host = "localhost";
       };
-      poolConfig = {
-        "listen.owner" = "root";
-        "listen.group" = "root";
-      };
+      # poolConfig = {
+      #   "listen.owner" = "root";
+      #   "listen.group" = "root";
+      # };
+    };
+    services.mysql.settings.mysqld = {
+      bind-address = "0.0.0.0";
     };
   });
 }
