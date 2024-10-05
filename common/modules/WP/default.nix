@@ -10,7 +10,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable (let
-    ldap-plugin = pkgs.stdenv.mkDerivation rec {
+    ldap-login-for-intranet-sites = pkgs.stdenv.mkDerivation rec {
       name = "ldap-login-for-intranet-sites";
       version = "5.1.5";
       src = pkgs.fetchzip {
@@ -28,9 +28,9 @@ in {
       database = {
         host = "localhost";
       };
-      plugins = [
-        ldap-plugin
-      ];
+      plugins = {
+        inherit ldap-login-for-intranet-sites;
+      };
       # poolConfig = {
       #   "listen.owner" = "root";
       #   "listen.group" = "root";
