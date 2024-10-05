@@ -31,6 +31,7 @@ in {
   };
 
   programs.git = {
+    enable = true;
     config = {
       core.fsmonitor = true;
     };
@@ -244,7 +245,6 @@ in {
     unzip
     xclip
     xsel
-    git
     ntfs3g
   ];
 
