@@ -37,10 +37,10 @@ in {
         inherit ldap-login-for-intranet-sites;
       };
       # poolConfig = {
-      #   "listen.owner" = "root";
-      #   "listen.group" = "root";
       # };
     };
+    services.httpd.user = "root";
+    services.httpd.group = "root";
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
     };
