@@ -6,12 +6,9 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
-    # installer utility
+    # Literally just makes the terminal fullscreen
     maximizer.url = "github:BirdeeHub/maximizer";
     maximizer.inputs.nixpkgs.follows = "nixpkgs";
-
-    # neovim
-    birdeeSystems.url = "github:BirdeeHub/birdeeSystems";
   };
 
   outputs = { self, nixpkgs, disko, ... }@inputs: let
