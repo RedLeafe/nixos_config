@@ -8,6 +8,7 @@ in {
     shell.bash
     shell.zsh
     shell.fish
+    ranger
     xtermwm
     LD
     AD
@@ -18,6 +19,7 @@ in {
     zsh.enable = true;
     bash.enable = true;
     fish.enable = true;
+    ranger.enable = true;
     xtermwm.enable = true;
     LD.enable = true;
     AD.enable = true;
@@ -42,8 +44,12 @@ in {
   services.clamav.updater.enable = true;
   services.clamav.updater.interval = "weekly";
 
+  system.activationScripts.silencezsh.text = ''
+    [ ! -e "/home/${username}/.zshrc" ] && echo "# dummy file" > /home/${username}/.zshrc
+  '';
+
   environment.variables = {
-    EDITOR = "nvim_for_u";
+    EDITOR = "nvim";
   };
   environment.interactiveShellInit = ''
   '';
@@ -204,14 +210,13 @@ in {
   fonts.fontDir.enable = true;
 
   environment.systemPackages = with pkgs; [
-    inputs.birdeeSystems.birdeeVim.packages.${system}.nvim_for_u
+    neovim
     fuse
     fuse3
     parted
     gparted
     sshfs-fuse
     socat
-    nix-output-monitor
     screen
     tcpdump
     sdparm
@@ -225,9 +230,13 @@ in {
     zip
     exfat
     exfatprogs
+    coreutils-full
+    findutils
     lshw
     lsd
     bat
+    fd
+    fzf
     wget
     tree
     zip

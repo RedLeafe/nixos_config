@@ -24,9 +24,6 @@ in {
       fi
     '';
   in {
-    system.activationScripts.silencezsh.text = ''
-      [ ! -e "/home/nixos/.zshrc" ] && echo "# dummy file" > /home/nixos/.zshrc
-    '';
 
     services.xserver.enable = true;
     services.displayManager.defaultSession = "xterm-installer";

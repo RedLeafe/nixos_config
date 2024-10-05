@@ -16,12 +16,7 @@ in
   LD = import (systemOnly ./LD) args;
   WP = import (systemOnly ./WP) args;
   AD = import (systemOnly ./AD) args;
-  NFS = import (systemOnly ./NFS) args;
   xtermwm = import (systemOnly ./xtermwm) args;
-  lightdm = import (systemOnly ./lightdm) args;
-  i3 = import (systemOnly ./i3) args;
-  thunar = import (homeOnly ./thunar) args;
   ranger = import ./ranger args;
-  alacritty = import ./alacritty args;
   shell = import ./shell args;
 }
