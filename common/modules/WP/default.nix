@@ -19,6 +19,8 @@ in {
       };
       installPhase = "mkdir -p $out; cp -R * $out/";
     };
+    # TODO: figure out what to do with this.
+    cfg_for_wp_ldap = ./miniorange-ldap-config.json;
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
