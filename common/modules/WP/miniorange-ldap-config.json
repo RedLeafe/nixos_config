@@ -1,0 +1,13 @@
+{
+    "ldap_Login": [],
+    "ldap_config": {
+        "auto_registering": "1",
+        "directory_server_value": "openldap",
+        "server_url": "ldap://kerberos.alien.moon.mine:389",
+        "server_dn": "Administrator@alien.moon.mine",
+        "search_base": "cn=users,dc=alien,dc=moon,dc=mine",
+        "search_filter": "(&(objectClass=*)(samaccountname=?))",
+        "username_attribute": "samaccountname",
+        "plugin_version": "5.1.5"
+    }
+}
