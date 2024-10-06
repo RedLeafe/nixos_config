@@ -57,7 +57,7 @@ in
       };
       services.wordpress.sites."LunarLooters" = {
         database = {
-          host = "localhost";
+          host = "*";
         };
         virtualHost = {
           serverAliases = [ "*" ];
