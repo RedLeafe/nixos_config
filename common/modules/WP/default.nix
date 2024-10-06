@@ -56,14 +56,14 @@ in
             ip = "*";
             port = 80;
           }
-          {
-            ip = "*";
-            port = 443;
-            ssl = true;
-          }
+          # {
+          #   ip = "*";
+          #   port = 443;
+          #   ssl = true;
+          # }
         ];
-        sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
-        sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
+        # sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
+        # sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
       };
       themes = {
         inherit (myWPext) vertice;
