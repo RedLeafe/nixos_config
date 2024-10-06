@@ -54,8 +54,6 @@ in
       # write to php.ini
       services.httpd.phpOptions = /*ini*/ ''
       '';
-      services.httpd.user = "root";
-      services.httpd.group = "root";
       services.mysql.settings.mysqld = {
         bind-address = "0.0.0.0";
       };
@@ -90,6 +88,10 @@ in
           ];
           # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
           # sslServerKey = "/home/pluto/.cert/MyKey.key";
+        };
+        poolConfig = {
+          "listen.owner" = "root";
+          "listen.group" = "root";
         };
         # https://developer.wordpress.org/apis/wp-config-php
         settings = {
