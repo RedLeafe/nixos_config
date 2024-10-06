@@ -51,7 +51,7 @@ in {
   in {
 
     # system.activationScripts.loginAD.text = ''
-    #   sudo adcli join -D ${ad_d} --user=${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
+    #   sudo net ads join -U ${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
     # '';
 
     services = {
@@ -125,6 +125,12 @@ in {
       };
     };
 
+    # realmd relies on many static paths to programs.
+    # while that is not super hard to fix,
+    # at runtime, realmd changes config files.
+    # those config files are provisioned by nix.
+    # Thus, realmd cant change them.
+    # Thus, making realmd run without errors is mostly a pointless exercise.
     # systemd.services.realmd = {
     #   description = "Realm Discovery Service";
     #   wantedBy = [ "multi-user.target" ];
@@ -138,12 +144,6 @@ in {
     # };
 
     programs.oddjobd.enable = true;
-
-    # services.samba.enable = true;
-    # services.samba.package = pkgs.sambaFull;
-    # services.samba.smbd.enable = true;
-    # services.samba.nsswins = true;
-    # services.samba.winbindd.enable = true;
 
     systemd.services.samba-smbd.enable = lib.mkDefault false;
     services.samba = {
