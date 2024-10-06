@@ -54,6 +54,8 @@ in
       # write to php.ini
       services.httpd.phpOptions = /*ini*/ ''
       '';
+      services.httpd.user = "root";
+      services.httpd.group = "root";
       services.mysql.settings.mysqld = {
         bind-address = "0.0.0.0";
       };
