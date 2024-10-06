@@ -26,19 +26,6 @@
         "url": "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip"
       }
     },
-    "WPplugins-next-active-directory-integration": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1726244178,
-        "narHash": "sha256-LO/hQ9rGzdLNssvZAPmkUq9qLx87s/eaIAsb1JB11qg=",
-        "type": "tarball",
-        "url": "https://downloads.wordpress.org/plugin/next-active-directory-integration.3.1.6.zip"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://downloads.wordpress.org/plugin/next-active-directory-integration.3.1.6.zip"
-      }
-    },
     "WPplugins-vertice": {
       "flake": false,
       "locked": {
@@ -112,7 +99,6 @@
       "inputs": {
         "WPplugins-kubio": "WPplugins-kubio",
         "WPplugins-ldap-login-for-intranet-sites": "WPplugins-ldap-login-for-intranet-sites",
-        "WPplugins-next-active-directory-integration": "WPplugins-next-active-directory-integration",
         "WPplugins-vertice": "WPplugins-vertice",
         "disko": "disko",
         "maximizer": "maximizer",
