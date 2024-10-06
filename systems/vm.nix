@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, stateVersion, username, hostname, system-modules, ... }: let
+{ config, pkgs, lib, inputs, stateVersion, username, hostname, system-modules, ... }: let
 in {
   imports = with system-modules; [
     shell.bash
@@ -79,7 +79,7 @@ in {
     packages = let
       dbpkg = config.services.mysql.package;
       adjoin = pkgs.writeShellScriptBin "adjoin" ''
-        sudo adcli join -U Administrator "$@"
+        sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
       '';
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
         outfile="''${1:-./dump.sql}"
@@ -94,16 +94,27 @@ in {
       dumpDBall
       restoreDBall
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
+        if [[ "$USER" != "${username}" ]]; then
+          echo "Error: script must be run as the user ${username}"
+          exit 1
+        fi
+        export PATH="$PATH:${lib.makeBinPath (with pkgs; [
+          git
+          openssh
+          coreutils
+        ])}"
         WPDBDUMP="$(realpath "$1")"
         ADPASSFILE="$(realpath "$2")"
-        mkdir -p /home/pluto/.ssh
-        if [[ ! -f /home/pluto/.ssh/id_ed25519 ]]; then
-          ssh-keygen -q -f /home/pluto/.ssh/id_ed25519 -N ""
+        mkdir -p /home/${username}/.ssh
+        if [[ ! -f /home/${username}/.ssh/id_ed25519 ]]; then
+          ssh-keygen -q -f /home/${username}/.ssh/id_ed25519 -N ""
         else
           echo "SSH key already exists, skipping key generation."
         fi
         echo "fixing nixos config permissions"
-        sudo chown -R pluto:users /home/pluto/nixos_config
+        sudo chown -R ${username}:users /home/${username}/nixos_config
+        cd /home/${username}/nixos_config && git init && \
+        git add . && git commit -m "first commit"
         echo "joining AD"
         if [[ ! -f "$ADPASSFILE" ]]; then
           ${adjoin}/bin/adjoin
