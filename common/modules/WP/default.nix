@@ -96,6 +96,8 @@ in
           define('ABSPATH', dirname(__FILE__) . '/');
         /* $_SERVER['HTTPS']='on'; */
         # TODO: The nix wiki is outdated. How do I activate a plugin in wp-config.php?
+        # If I restore from the db, do I even need to activate the plugin?
+        # or will it remember the previous state then?
       '';
     };
     environment.systemPackages = let
