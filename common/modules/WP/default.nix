@@ -93,7 +93,7 @@ in
         if ( !defined('ABSPATH') )
           define('ABSPATH', dirname(__FILE__) . '/');
           require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-          /* activate_plugin( 'static-mail-sender-configurator/static-mail-sender-configurator.php' ); */
+          activate_plugin( 'static-mail-sender-configurator/static-mail-sender-configurator.php' );
       '';
     };
     environment.systemPackages = [
