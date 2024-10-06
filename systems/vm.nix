@@ -89,10 +89,15 @@ in {
         infile="''${1:-./dump.sql}"
         sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
       '';
+      pluto_trash = pkgs.writeShellScriptBin "pluto_trash" ''
+        nix-collect-garbage --delete-old
+        sudo nix-collect-garbage --delete-old
+      '';
     in [
       adjoin
       dumpDBall
       restoreDBall
+      pluto_trash
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
         if [[ "$USER" != "${username}" ]]; then
           echo "Error: script must be run as the user ${username}"
