@@ -16,15 +16,17 @@ in {
   };
 
   config = lib.mkIf cfg.enable (let
-    ldap-login-for-intranet-sites = myWPext.ldap-login-for-intranet-sites.overrideAttrs (prev: let
-      # TODO: figure out what to do with this.
-      cfg_ldap = ./miniorange-ldap-config.json;
-    in {
-      # TODO: do something with cfg_ldap
-      # instead of just overriding installPhase
-      # with the same exact string it already had
-      installPhase = "mkdir -p $out; cp -R * $out/";
-    });
+    finalWPplugins = myWPext // {
+      ldap-login-for-intranet-sites = myWPext.ldap-login-for-intranet-sites.overrideAttrs (prev: let
+        # TODO: figure out what to do with this.
+        cfg_ldap = ./miniorange-ldap-config.json;
+      in {
+        # TODO: do something with cfg_ldap
+        # instead of just overriding installPhase
+        # with the same exact string it already had
+        installPhase = "mkdir -p $out; cp -R * $out/";
+      });
+    };
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
@@ -34,9 +36,7 @@ in {
       database = {
         host = "localhost";
       };
-      plugins = {
-        inherit ldap-login-for-intranet-sites;
-      };
+      plugins = finalWPplugins;
     };
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
