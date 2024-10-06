@@ -51,8 +51,8 @@ in {
             ssl = true;
           }
         ];
-        # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
-        # sslServerKey = "/home/pluto/.cert/MyKey.key";
+        sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
+        sslServerKey = "/home/pluto/.cert/MyKey.key";
       };
       # settings = {
       #   FORCE_SSL_ADMIN = true;
