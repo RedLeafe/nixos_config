@@ -87,14 +87,11 @@ in
         # '';
       };
       services.httpd.enablePHP = true;
-      services.httpd.phpPackage = pkgs.php.withExtensions (
-        exts:
-        with exts;
-        [
-        ]
-      );
-      services.httpd.phpOptions = # ini
-        '''';
+      services.httpd.phpPackage = pkgs.php.withExtensions
+        (exts: with exts; [
+        ]);
+      services.httpd.phpOptions = /*ini*/ ''
+      '';
       services.mysql.settings.mysqld = {
         bind-address = "0.0.0.0";
       };
