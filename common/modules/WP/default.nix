@@ -28,8 +28,12 @@
 in
 {
   options = {
-    ${moduleNamespace}.WP = with lib.types; {
-      enable = lib.mkEnableOption "WordPress stuff";
+    ${moduleNamespace}.WP = with lib; {
+      enable = mkEnableOption "WordPress stuff";
+      siteName = mkOption {
+        default = "LunarLooters";
+        type = types.str;
+      };
     };
   };
 
@@ -45,7 +49,7 @@ in
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
     };
-    services.wordpress.sites."LunarLooters" = {
+    services.wordpress.sites.${cfg.siteName} = {
       database = {
         host = "localhost";
       };
@@ -62,8 +66,8 @@ in
           #   ssl = true;
           # }
         ];
-        # sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
-        # sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
+        # sslServerCert = "/.${cfg.siteName}/${cfg.siteName}.crt"; # <-- wwwrun needs to be able to read it
+        # sslServerKey = "/.${cfg.siteName}/${cfg.siteName}.key"; # <-- wwwrun needs to be able to read it
       };
       themes = {
         inherit (myWPext) vertice;
@@ -81,26 +85,34 @@ in
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {
         WP_DEFAULT_THEME = "vertice";
-        WP_MAIL_FROM = "noreply@alien.moon.mine";
+        WP_MAIL_FROM = "noreply@${cfg.siteName}";
         # FORCE_SSL_ADMIN = true;
       };
       # https://codex.wordpress.org/Editing_wp-config.php
       # This file writes to $out/share/wordpress/wp-config.php
       # ABSPATH is the directory where wp-config.php resides
       extraConfig = /*php*/'' /* <?php */
-        /* $_SERVER['HTTPS']='on'; */
         if ( !defined('ABSPATH') )
           define('ABSPATH', dirname(__FILE__) . '/');
-          # TODO: The nix wiki is outdated. How do I activate a plugin in wp-config.php?
+        /* $_SERVER['HTTPS']='on'; */
+        # TODO: The nix wiki is outdated. How do I activate a plugin in wp-config.php?
       '';
     };
-    environment.systemPackages = [
-      (pkgs.writeShellScriptBin "genLunarLootersCert" ''
-        mkdir -p ./certs && \
-        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
-        sudo mv -f ./certs / && \
-        sudo chmod 740 /certs && \
-        sudo chown -R wwwrun:root /certs
+    environment.systemPackages = let
+      dbpkg = config.services.mysql.package;
+      dbuser = config.services.wordpress.sites.${cfg.siteName}.database.user;
+      dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
+        outfile="''${1:-./dump.sql}"
+        ${dbpkg}/bin/mysqldump -u "${dbuser}" -p --all-databases > "$outfile"
+      '';
+    in [
+      dumpDBall
+      (pkgs.writeShellScriptBin "gen_${cfg.siteName}_cert" ''
+        mkdir -p ./.${cfg.siteName} && \
+        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./.${cfg.siteName}/${cfg.siteName}.crt -keyout ./.${cfg.siteName}/${cfg.siteName}.key && \
+        sudo mv -f ./.${cfg.siteName} / && \
+        sudo chmod 740 /.${cfg.siteName} && \
+        sudo chown -R wwwrun:root /.${cfg.siteName}
       '')
     ];
   };
