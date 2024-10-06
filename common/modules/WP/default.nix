@@ -112,11 +112,11 @@ in
         ${dbpkg}/bin/mysql -u "${dbuser}" -p < "$infile"
       '';
       gencerts = pkgs.writeShellScriptBin "gen_${cfg.siteName}_cert" ''
-        mkdir -p ./.${cfg.siteName} && \
-        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./.${cfg.siteName}/${cfg.siteName}.crt -keyout ./.${cfg.siteName}/${cfg.siteName}.key && \
-        sudo mv -f ./.${cfg.siteName} / && \
-        sudo chmod 740 /.${cfg.siteName} && \
-        sudo chown -R wwwrun:root /.${cfg.siteName}
+        mkdir -p "./.${cfg.siteName}" && \
+        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out "./.${cfg.siteName}/${cfg.siteName}.crt" -keyout "./.${cfg.siteName}/${cfg.siteName}.key" && \
+        sudo mv -f "./.${cfg.siteName}" / && \
+        sudo chmod 740 "/.${cfg.siteName}" && \
+        sudo chown -R wwwrun:root "/.${cfg.siteName}"
       '';
     in [
       restoreDBall
