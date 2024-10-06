@@ -1,4 +1,4 @@
-{ config, pkgs, self, stateVersion, system-modules, hostname, username, inputs, ... }: let
+{ config, pkgs, stateVersion, system-modules, hostname, username, inputs, ... }: let
   login_shell = "zsh";
   nerd_font_string = "FiraMono";
 in {
@@ -59,7 +59,7 @@ in {
   };
 
   isoImage.contents = [
-    { source = "${self}"; target = "/nixos_config";}
+    { source = "${inputs.self}"; target = "/nixos_config";}
   ];
 
   environment.systemPackages = with pkgs; [

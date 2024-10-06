@@ -34,7 +34,7 @@
       nixosConfigurations = {
         ${hostname} = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit stateVersion self inputs system-modules username hostname;
+            inherit stateVersion inputs system-modules username hostname;
           };
           inherit system;
           modules = [
@@ -46,7 +46,7 @@
         };
         installer = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit self inputs system-modules stateVersion username hostname;
+            inherit stateVersion inputs system-modules username hostname;
           };
           inherit system;
           modules = [

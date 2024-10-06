@@ -1,6 +1,6 @@
 { moduleNamespace, homeManager, ... }: # <- a function
 # that returns a module
-{ config, pkgs, self, inputs, lib, ... }: let
+{ config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.ranger;
 in {
   _file = ./default.nix;
