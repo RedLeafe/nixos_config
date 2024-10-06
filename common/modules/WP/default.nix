@@ -54,12 +54,12 @@ in {
         sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
         sslServerKey = "/home/pluto/.cert/MyKey.key";
       };
-      settings = {
-        FORCE_SSL_ADMIN = true;
-      };
-      extraConfig = /*php*/''
-        $_SERVER['HTTPS']='on';
-      '';
+      # settings = {
+      #   FORCE_SSL_ADMIN = true;
+      # };
+      # extraConfig = /*php*/''
+      #   $_SERVER['HTTPS']='on';
+      # '';
     };
     services.httpd.enablePHP = true;
     services.httpd.phpPackage = pkgs.php.withExtensions (exts: with exts; [
