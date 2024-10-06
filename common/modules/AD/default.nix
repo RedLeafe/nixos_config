@@ -51,7 +51,7 @@ in {
   in {
 
     # system.activationScripts.loginAD.text = ''
-    #   sudo net ads join -U ${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
+    #   sudo adcli join -D ${ad_d} -U ${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
     # '';
 
     services = {
@@ -108,6 +108,8 @@ in {
 
     security.pam.krb5.enable = true;
 
+    programs.oddjobd.enable = true;
+
     security.krb5 = {
       enable = true;
       settings = {
@@ -124,26 +126,6 @@ in {
         };
       };
     };
-
-    # realmd relies on many static paths to programs.
-    # while that is not super hard to fix,
-    # at runtime, realmd changes config files.
-    # those config files are provisioned by nix.
-    # Thus, realmd cant change them.
-    # Thus, making realmd run without errors is mostly a pointless exercise.
-    # systemd.services.realmd = {
-    #   description = "Realm Discovery Service";
-    #   wantedBy = [ "multi-user.target" ];
-    #   after = [ "network.target" ];
-    #   serviceConfig = {
-    #     Type = "dbus";
-    #     BusName = "org.freedesktop.realmd";
-    #     ExecStart = "${pkgs.realmd}/libexec/realmd";
-    #     User = "root";
-    #   };
-    # };
-
-    programs.oddjobd.enable = true;
 
     systemd.services.samba-smbd.enable = lib.mkDefault false;
     services.samba = {
@@ -172,6 +154,24 @@ in {
       krb5          # MIT Kerberos 5
       # realmd  # DBus service for configuring Kerberos and other
     ];
+
+    # realmd relies on many static paths to programs.
+    # while that is not super hard to fix,
+    # at runtime, realmd changes config files.
+    # those config files are provisioned by nix.
+    # Thus, realmd cant change them.
+    # Thus, making realmd run without errors is mostly a pointless exercise.
+    # systemd.services.realmd = {
+    #   description = "Realm Discovery Service";
+    #   wantedBy = [ "multi-user.target" ];
+    #   after = [ "network.target" ];
+    #   serviceConfig = {
+    #     Type = "dbus";
+    #     BusName = "org.freedesktop.realmd";
+    #     ExecStart = "${pkgs.realmd}/libexec/realmd";
+    #     User = "root";
+    #   };
+    # };
 
   });
 }
