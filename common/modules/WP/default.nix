@@ -82,6 +82,8 @@ in
           WP_DEFAULT_THEME = "vertice";
           # FORCE_SSL_ADMIN = true;
         };
+        # This file writes to $out/share/wordpress/wp-config.php
+        # ABSPATH is the directory where wp-config.php resides
         extraConfig = /*php*/'' /* <?php */
           if ( !defined('ABSPATH') )
             define('ABSPATH', dirname(__FILE__) . '/');
