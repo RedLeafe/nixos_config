@@ -45,11 +45,11 @@ in {
             ip = "0.0.0.0";
             port = 80;
           }
-          # {
-          #   ip = "0.0.0.0";
-          #   port = 443;
-          #   ssl = true;
-          # }
+          {
+            ip = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
         # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
         # sslServerKey = "/home/pluto/.cert/MyKey.key";
