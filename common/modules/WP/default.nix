@@ -8,17 +8,33 @@
 }:
 let
   cfg = config.${moduleNamespace}.WP;
-  # myWPext contains built versions of flake inputs
-  # matching WPplugins-<pluginname>
-  # in a set myWPext.<pluginname>
-  myWPext =
-    let
+  myWPext = let
+    autobuilt = let
       newpkgs = import inputs.nixpkgs {
         inherit (pkgs) system;
-        overlays = [ ((import ./utils.nix).mkplugs inputs) ];
+        overlays = [
+          # turns inputs named WPplugins-<pluginname>
+          # in a set pkgs.myWPext.<pluginname>
+          ((import ./utils.nix).mkplugs inputs)
+        ];
       };
-    in
-    newpkgs.myWPext;
+    in newpkgs.myWPext;
+  in autobuilt // {
+    # a place to put overrides:
+    ldap-login-for-intranet-sites = autobuilt.ldap-login-for-intranet-sites.overrideAttrs (
+      prev:
+      let
+        # TODO: figure out what to do with this.
+        cfg_ldap = ./miniorange-ldap-config.json;
+      in
+      {
+        # TODO: do something with cfg_ldap
+        # instead of just overriding installPhase
+        # with the same exact string it already had
+        # installPhase = "mkdir -p $out; cp -R * $out/";
+      }
+    );
+  };
 in
 {
   options = {
@@ -27,25 +43,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable (
-    let
-      finalWPplugins = myWPext // {
-        ldap-login-for-intranet-sites = myWPext.ldap-login-for-intranet-sites.overrideAttrs (
-          prev:
-          let
-            # TODO: figure out what to do with this.
-            cfg_ldap = ./miniorange-ldap-config.json;
-          in
-          {
-            # TODO: do something with cfg_ldap
-            # instead of just overriding installPhase
-            # with the same exact string it already had
-            # installPhase = "mkdir -p $out; cp -R * $out/";
-          }
-        );
-      };
-    in
-    {
+  config = lib.mkIf cfg.enable ({
       services.httpd.enablePHP = true;
       services.httpd.phpPackage = pkgs.php.withExtensions
         (exts: with exts; [
@@ -55,25 +53,11 @@ in
       services.httpd.phpOptions = /*ini*/ ''
       '';
       services.mysql.settings.mysqld = {
-        listen.user = "root";
-        listen.group = "root";
         bind-address = "0.0.0.0";
       };
       services.wordpress.sites."LunarLooters" = {
         database = {
           host = "localhost";
-        };
-        themes = {
-          inherit (finalWPplugins) vertice;
-        };
-        plugins = {
-          inherit (finalWPplugins)
-            kubio
-            ldap-login-for-intranet-sites
-            ;
-          inherit (pkgs.wordpressPackages.plugins)
-            wordpress-seo
-            ;
         };
         virtualHost = {
           serverAliases = [ "*" ];
@@ -92,8 +76,18 @@ in
           # sslServerKey = "/home/pluto/.cert/MyKey.key";
         };
         poolConfig = {
-          "listen.owner" = "root";
-          "listen.group" = "root";
+        };
+        themes = {
+          inherit (myWPext) vertice;
+        };
+        plugins = {
+          inherit (myWPext)
+            kubio
+            ldap-login-for-intranet-sites
+            ;
+          inherit (pkgs.wordpressPackages.plugins)
+            wordpress-seo
+            ;
         };
         # https://developer.wordpress.org/apis/wp-config-php
         settings = {
