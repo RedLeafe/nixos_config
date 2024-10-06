@@ -95,7 +95,7 @@ in
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "genLunarLootersCert" ''
         mkdir -p ./certs && \
-        ${pkgs.openssl}/bin/openssl -- req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
+        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
         sudo cp -rf ./certs / && \
         sudo chown -R wwwrun:root /certs
       '')
