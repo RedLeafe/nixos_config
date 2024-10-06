@@ -54,6 +54,7 @@ in {
     };
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
+      ssl-mode = "require";
     };
   });
 }
