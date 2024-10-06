@@ -82,7 +82,7 @@ in
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {
         WP_DEFAULT_THEME = "vertice";
-        WP_MAIL_FROM = "noreply@LunarLooters.alien.moon.mine";
+        WP_MAIL_FROM = "noreply@alien.moon.mine";
         # FORCE_SSL_ADMIN = true;
       };
       # https://codex.wordpress.org/Editing_wp-config.php
@@ -93,7 +93,7 @@ in
         if ( !defined('ABSPATH') )
           define('ABSPATH', dirname(__FILE__) . '/');
           require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-          activate_plugin( 'static-mail-sender-configurator/static-mail-sender-configurator.php' );
+          /* activate_plugin( 'static-mail-sender-configurator/static-mail-sender-configurator.php' ); */
       '';
     };
     environment.systemPackages = [
