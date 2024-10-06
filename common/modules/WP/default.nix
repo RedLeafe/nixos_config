@@ -49,10 +49,15 @@ in {
         inherit (finalWPplugins) vertice;
       };
       plugins = {
-        inherit (finalWPplugins) kubio ldap-login-for-intranet-sites;
+        inherit (finalWPplugins) kubio;
+        inherit (finalWPplugins) next-active-directory-integration;
+        # inherit (finalWPplugins) ldap-login-for-intranet-sites;
       };
     };
     services.httpd.phpOptions = /*ini*/''
+      ; required by *NADI*
+      extension=${pkgs.phpExtensions.ldap}/lib/php/extensions/ldap.so
+      extension=${pkgs.phpExtensions.openssl}/lib/php/extensions/openssl.so
     '';
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";

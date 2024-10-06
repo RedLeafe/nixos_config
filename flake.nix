@@ -18,6 +18,10 @@
       url = "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip";
       flake = false;
     };
+    WPplugins-next-active-directory-integration = {
+      url = "https://downloads.wordpress.org/plugin/next-active-directory-integration.3.1.6.zip";
+      flake = false;
+    };
     WPplugins-kubio = {
       url = "https://downloads.wordpress.org/plugin/kubio.2.3.3.zip";
       flake = false;
