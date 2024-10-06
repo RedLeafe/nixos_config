@@ -72,8 +72,8 @@ in
               ssl = true;
             }
           ];
-          sslServerCert = "/certs/MyCertificate.crt";
-          sslServerKey = "/certs/MyKey.key";
+          sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
+          sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
         };
         themes = {
           inherit (myWPext) vertice;
@@ -90,17 +90,26 @@ in
         # https://developer.wordpress.org/apis/wp-config-php
         settings = {
           WP_DEFAULT_THEME = "vertice";
-          # FORCE_SSL_ADMIN = true;
+          FORCE_SSL_ADMIN = true;
         };
         # https://codex.wordpress.org/Editing_wp-config.php
         # This file writes to $out/share/wordpress/wp-config.php
         # ABSPATH is the directory where wp-config.php resides
         extraConfig = /*php*/'' /* <?php */
+          $_SERVER['HTTPS']='on';
           if ( !defined('ABSPATH') )
             define('ABSPATH', dirname(__FILE__) . '/');
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         '';
       };
+      environment.systemPackages = [
+        (pkgs.writeShellScriptBin "genLunarLootersCert" ''
+          mkdir -p ./certs && \
+          nix run nixpkgs\#openssl -- req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
+          sudo cp -rf ./certs / && \
+          sudo chown -R wwwrun:root /certs
+        '')
+      ];
     }
   );
 }
