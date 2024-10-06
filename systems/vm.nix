@@ -241,6 +241,7 @@ in {
     fzf
     wget
     tree
+    nix-tree
     zip
     _7zz
     unzip
