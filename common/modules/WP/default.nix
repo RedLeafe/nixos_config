@@ -91,10 +91,8 @@ in
         /* $_SERVER['HTTPS']='on'; */
         if ( !defined('ABSPATH') )
           define('ABSPATH', dirname(__FILE__) . '/');
-          /* require_once(ABSPATH . 'wp-admin/includes/plugin.php'); */
-          /* activate_plugin( 'static-mail-sender-configurator/static-mail-sender-configurator.php' ); */
+          # TODO: The nix wiki is outdated. How do I activate a plugin in wp-config.php?
       '';
-      # NOTE: The wiki is outdated. How do I activate a plugin in wp-config.php?
     };
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "genLunarLootersCert" ''
