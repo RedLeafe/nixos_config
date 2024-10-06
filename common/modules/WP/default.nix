@@ -57,17 +57,17 @@ in
       };
       services.wordpress.sites."LunarLooters" = {
         database = {
-          host = "*";
+          host = "localhost";
         };
         virtualHost = {
           serverAliases = [ "*" ];
           listen = [
             {
-              ip = "0.0.0.0";
+              ip = "*";
               port = 80;
             }
             {
-              ip = "0.0.0.0";
+              ip = "*";
               port = 443;
               ssl = true;
             }
