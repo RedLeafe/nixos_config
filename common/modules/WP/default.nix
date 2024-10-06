@@ -29,19 +29,6 @@ in {
     };
   in {
     services.wordpress.sites."LunarLooters" = {
-      virtualHost = {
-        listenAddresses = [ "0.0.0.0" ];
-        serverAliases = [ "*" ];
-        # onlySSL = true;
-        # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
-        # sslServerKey = "/home/pluto/.cert/MyKey.key";
-      };
-      # settings = {
-      #   FORCE_SSL_ADMIN = true;
-      # };
-      # extraConfig = /*php*/''
-      #   $_SERVER['HTTPS']='on';
-      # '';
       database = {
         host = "localhost";
       };
@@ -51,6 +38,28 @@ in {
       plugins = {
         inherit (finalWPplugins) kubio ldap-login-for-intranet-sites;
       };
+      virtualHost = {
+        serverAliases = [ "*" ];
+        listen = [
+          {
+            ip = "*";
+            port = 80;
+          }
+          {
+            ip = "*";
+            port = 443;
+            ssl = true;
+          }
+        ];
+        sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
+        sslServerKey = "/home/pluto/.cert/MyKey.key";
+      };
+      settings = {
+        FORCE_SSL_ADMIN = true;
+      };
+      extraConfig = /*php*/''
+        $_SERVER['HTTPS']='on';
+      '';
     };
     services.httpd.enablePHP = true;
     services.httpd.phpPackage = pkgs.php.withExtensions (exts: with exts; [
