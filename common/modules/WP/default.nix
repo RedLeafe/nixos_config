@@ -75,8 +75,6 @@ in
           # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
           # sslServerKey = "/home/pluto/.cert/MyKey.key";
         };
-        poolConfig = {
-        };
         themes = {
           inherit (myWPext) vertice;
         };
