@@ -9,6 +9,12 @@
     # Literally just makes the terminal fullscreen
     maximizer.url = "github:BirdeeHub/maximizer";
     maximizer.inputs.nixpkgs.follows = "nixpkgs";
+
+    # wordpress plugins
+    WPplugins-ldap-login-for-intranet-sites = {
+      url = "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, disko, ... }@inputs: let

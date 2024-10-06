@@ -2,6 +2,10 @@
 # that returns a module
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.WP;
+  myWPext = let
+    # grabs inputs matching WPplugins-pluginname and puts them in pkgs.myWPext.pluginname
+    newpkgs = import inputs.nixpkgs { inherit (pkgs) system; overlays = [ ((import ./utils.nix).mkplugs inputs) ]; };
+  in newpkgs.myWPext;
 in {
   options = {
     ${moduleNamespace}.WP = with lib.types; {
@@ -11,19 +15,8 @@ in {
 
   config = lib.mkIf cfg.enable (let
     # TODO: figure out what to do with this.
+    # likely override the path to it into ldap-login-for-intranet-sites plugin somewhere
     cfg_for_wp_ldap = ./miniorange-ldap-config.json;
-
-    ldap-login-for-intranet-sites = pkgs.stdenv.mkDerivation (let
-      name = "ldap-login-for-intranet-sites";
-      version = "5.1.5";
-    in {
-      inherit name version;
-      src = pkgs.fetchzip {
-        url = "https://downloads.wordpress.org/plugin/${name}.${version}.zip";
-        hash = "sha256-uOYknoFWRXNH1GMz5lpMR6MRjCJP9Nm+MjVW8onmxew=";
-      };
-      installPhase = "mkdir -p $out; cp -R * $out/";
-    });
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
@@ -34,7 +27,7 @@ in {
         host = "localhost";
       };
       plugins = {
-        inherit ldap-login-for-intranet-sites;
+        inherit (myWPext) ldap-login-for-intranet-sites;
       };
     };
     services.mysql.settings.mysqld = {
