@@ -51,7 +51,7 @@ in {
   in {
 
     # system.activationScripts.loginAD.text = ''
-    #   sudo adcli join -D ${ad_d} -U ${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
+    #   ${pkgs.adcli}/bin/adcli join -D ${ad_d} -U ${cfg.aduser} --stdin-password <<< "$(cat '${cfg.keyfile_path}')"
     # '';
 
     services = {
