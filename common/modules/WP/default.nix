@@ -55,6 +55,8 @@ in
       services.httpd.phpOptions = /*ini*/ ''
       '';
       services.mysql.settings.mysqld = {
+        listen.user = "root";
+        listen.group = "root";
         bind-address = "0.0.0.0";
       };
       services.wordpress.sites."LunarLooters" = {
