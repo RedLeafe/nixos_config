@@ -253,8 +253,7 @@ in {
   };
   fonts.fontDir.enable = true;
 
-  environment.systemPackages = with pkgs; let
-  in [
+  environment.systemPackages = with pkgs; [
     neovim
     fuse
     fuse3
