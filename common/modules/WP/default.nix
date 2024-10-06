@@ -105,11 +105,11 @@ in
       dbuser = config.services.${config.services.wordpress.webserver}.user;
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
         outfile="''${1:-./dump.sql}"
-        ${dbpkg}/bin/mysqldump -u "${dbuser}" -p --all-databases > "$outfile"
+        sudo ${dbpkg}/bin/mysqldump -u "${dbuser}" -p --all-databases > "$outfile"
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
         infile="''${1:-./dump.sql}"
-        ${dbpkg}/bin/mysql -u "${dbuser}" -p < "$infile"
+        sudo ${dbpkg}/bin/mysql -u "${dbuser}" -p < "$infile"
       '';
       gencerts = pkgs.writeShellScriptBin "gen_${cfg.siteName}_cert" ''
         mkdir -p "./.${cfg.siteName}" && \
@@ -122,7 +122,7 @@ in
         USER="${dbuser}"
         PASSWORD="''${1:-""}"
         # drop all databases except system ones
-        ${dbpkg}/bin/mysql -u$USER -p -e 'SHOW DATABASES;SELECT CONCAT("DROP DATABASE `", SCHEMA_NAME, "`;") FROM information_schema.SCHEMATA WHERE SCHEMA_NAME NOT IN ("mysql", "information_schema", "performance_schema", "sys");'
+        sudo ${dbpkg}/bin/mysql -u$USER -p -e 'SHOW DATABASES;SELECT CONCAT("DROP DATABASE `", SCHEMA_NAME, "`;") FROM information_schema.SCHEMATA WHERE SCHEMA_NAME NOT IN ("mysql", "information_schema", "performance_schema", "sys");'
       '';
     in [
       restoreDBall
