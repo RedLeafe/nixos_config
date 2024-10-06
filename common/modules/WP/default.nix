@@ -48,7 +48,7 @@ in
     {
       services.wordpress.sites."LunarLooters" = {
         database = {
-          host = "localhost";
+          host = "0.0.0.0";
         };
         themes = {
           inherit (finalWPplugins) vertice;
@@ -100,9 +100,6 @@ in
       # write to php.ini
       services.httpd.phpOptions = /*ini*/ ''
       '';
-      services.mysql.settings.mysqld = {
-        bind-address = "0.0.0.0";
-      };
     }
   );
 }
