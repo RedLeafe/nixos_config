@@ -30,6 +30,7 @@ in {
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
+        listenAddresses = [ "0.0.0.0" ];
         serverAliases = [ "*" ];
         onlySSL = true;
         sslServerCert = "/home/pluto/.cert/MYCSR.csr";
