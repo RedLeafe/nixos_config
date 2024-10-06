@@ -33,73 +33,72 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable ({
-      services.httpd.enablePHP = true;
-      services.httpd.phpPackage = pkgs.php.withExtensions
-        (exts: with exts; [
-          # download php extensions from nixpkgs here from exts variable
-        ]);
-      # write to php.ini
-      services.httpd.phpOptions = /*ini*/ ''
+  config = lib.mkIf cfg.enable {
+    services.httpd.enablePHP = true;
+    services.httpd.phpPackage = pkgs.php.withExtensions
+      (exts: with exts; [
+        # download php extensions from nixpkgs here from exts variable
+      ]);
+    # write to php.ini
+    services.httpd.phpOptions = /*ini*/ ''
+    '';
+    services.mysql.settings.mysqld = {
+      bind-address = "0.0.0.0";
+    };
+    services.wordpress.sites."LunarLooters" = {
+      database = {
+        host = "localhost";
+      };
+      virtualHost = {
+        serverAliases = [ "*" ];
+        listen = [
+          {
+            ip = "*";
+            port = 80;
+          }
+          # {
+          #   ip = "*";
+          #   port = 443;
+          #   ssl = true;
+          # }
+        ];
+        # sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
+        # sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
+      };
+      themes = {
+        inherit (myWPext) vertice;
+      };
+      plugins = {
+        inherit (myWPext)
+          kubio
+          ldap-login-for-intranet-sites
+          ;
+        inherit (pkgs.wordpressPackages.plugins)
+          wordpress-seo
+          ;
+      };
+      # https://developer.wordpress.org/apis/wp-config-php
+      settings = {
+        WP_DEFAULT_THEME = "vertice";
+        # FORCE_SSL_ADMIN = true;
+      };
+      # https://codex.wordpress.org/Editing_wp-config.php
+      # This file writes to $out/share/wordpress/wp-config.php
+      # ABSPATH is the directory where wp-config.php resides
+      extraConfig = /*php*/'' /* <?php */
+        /* $_SERVER['HTTPS']='on'; */
+        if ( !defined('ABSPATH') )
+          define('ABSPATH', dirname(__FILE__) . '/');
+          require_once(ABSPATH . 'wp-admin/includes/plugin.php');
       '';
-      services.mysql.settings.mysqld = {
-        bind-address = "0.0.0.0";
-      };
-      services.wordpress.sites."LunarLooters" = {
-        database = {
-          host = "localhost";
-        };
-        virtualHost = {
-          serverAliases = [ "*" ];
-          listen = [
-            {
-              ip = "*";
-              port = 80;
-            }
-            # {
-            #   ip = "*";
-            #   port = 443;
-            #   ssl = true;
-            # }
-          ];
-          # sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
-          # sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
-        };
-        themes = {
-          inherit (myWPext) vertice;
-        };
-        plugins = {
-          inherit (myWPext)
-            kubio
-            ldap-login-for-intranet-sites
-            ;
-          inherit (pkgs.wordpressPackages.plugins)
-            wordpress-seo
-            ;
-        };
-        # https://developer.wordpress.org/apis/wp-config-php
-        settings = {
-          WP_DEFAULT_THEME = "vertice";
-          # FORCE_SSL_ADMIN = true;
-        };
-        # https://codex.wordpress.org/Editing_wp-config.php
-        # This file writes to $out/share/wordpress/wp-config.php
-        # ABSPATH is the directory where wp-config.php resides
-        extraConfig = /*php*/'' /* <?php */
-          /* $_SERVER['HTTPS']='on'; */
-          if ( !defined('ABSPATH') )
-            define('ABSPATH', dirname(__FILE__) . '/');
-            require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        '';
-      };
-      environment.systemPackages = [
-        (pkgs.writeShellScriptBin "genLunarLootersCert" ''
-          mkdir -p ./certs && \
-          nix run nixpkgs\#openssl -- req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
-          sudo cp -rf ./certs / && \
-          sudo chown -R wwwrun:root /certs
-        '')
-      ];
-    }
-  );
+    };
+    environment.systemPackages = [
+      (pkgs.writeShellScriptBin "genLunarLootersCert" ''
+        mkdir -p ./certs && \
+        nix run nixpkgs\#openssl -- req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
+        sudo cp -rf ./certs / && \
+        sudo chown -R wwwrun:root /certs
+      '')
+    ];
+  };
 }
