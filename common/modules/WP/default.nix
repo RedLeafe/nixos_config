@@ -18,6 +18,9 @@ in {
       # TODO: figure out what to do with this.
       cfg_for_wp_ldap = ./miniorange-ldap-config.json;
     in {
+      # TODO: do something with cfg_for_wp_ldap
+      # instead of just overriding installPhase
+      # with the same exact string it already had
       installPhase = "mkdir -p $out; cp -R * $out/";
     });
   in {
