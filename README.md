@@ -1,57 +1,5 @@
 # nix.moon.mine
 
-## Build the installer:
-
-to build the installer, clone the repo, navigate to it, and run `./scripts/isoInstaller`
-
-This will build a vmware specific installer iso.
-
-Make a machine and boot from the iso.
-
-## Machine requirements:
-
-IT REQUIRES BIOS BOOT. Give it about 16 GB disk size
-
-You could get away with 2 cores 2-3gb ram for initial build. If it freezes you can shut it down and run SPACEOS-install to pick up more or less where it left off when its back up
-
-I just make it 4 core and 4 GB and it builds in a sane amount of time with 0 risk of freezing. Its not worth waiting longer when you dont need to.
-
-There is a way to do the install and building on a separate machine to get around this issue. I didnt do it for this box.
-
-Reduce it to 1 core 2gb ram after.
-
-This should handle running nixos-rebuild while still keeping the services running after the machine has been built the first time.
-
-## Running the installer:
-
-When you boot into the installer, you can log in with no password.
-
-You will see a terminal. Run the `SPACEOS` command in it.
-
-At the end of the `SPACEOS` command, it will ask you to set a password for root, and then for the user.
-
-Once it is done, run `reboot`.
-
-Start it back up, log in as `pluto` user.
-
-obtain the database dump file in some manner.
-
-run `initial_post_installation_script $DUMPFILEPATH $ADPASSFILE` in the command line.
-
-where `$DUMPFILEPATH` is the path to the dump file you just obtained,
-
-and `$ADPASSFILE` is a path to a file containing the password you set for the Administrator AD user.
-
-If `$ADPASSFILE` is not set, it will be prompted for.
-
-The command will prompt you to enter the current password for the root user for the database as well.
-
-Afterwards, `reboot` the machine again.
-
-To rebuild any changes to the nix config from within your vm, navigate to the config and run `./scripts/build`
-
-when you add or remove files, be sure to run `git add` or nix wont reflect the changes. Although, currently the config provisioned by the installer isn't a git repo so this doesn't apply until it is one.
-
 ## Structure:
 
 ```
@@ -106,6 +54,7 @@ nixos_config
     └── ... other systems
 ```
 
+## Helpful references:
 - [flakes](https://nixos.wiki/wiki/Flakes)
 - [modules](https://nixos.wiki/wiki/NixOS_modules)
 - [overlays](https://nixos.wiki/wiki/Overlays)
@@ -121,16 +70,3 @@ nixos_config
 - [nixos manual](https://nixos.org/manual/nixpkgs/stable/)
 - [overriding packages](https://ryantm.github.io/nixpkgs/using/overrides/)
 - [nix secrets rubrik](https://nixos.wiki/wiki/Comparison_of_secret_managing_schemes)
-
-#### TODOs:
-- make database not reachable via the internet.
-- make database not reachable via other interfaces.
-- make sure database has a password before this gets cloned.
-- finish adding https support.
-
-#### Maybes:
-- set up auditd module, and let that plus monitoring journalctl and maaaybe sending it somewhere be enough.
-- set database default password via nix config without putting passwords or hashes in the store/github because I keep forgetting to set it.
-- If you figure out how to include the DB password without including plaintext or hash,
-  may as well add the encrypted AD password and encrypted dump to the repo alongside it.
-  because then you could automate the install process completely!
