@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "WPplugins-kubio": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724869376,
+        "narHash": "sha256-Kc7S2ebD9NC3+BhPL0EBfe6cynHrUF/KGFe0zu1pCf0=",
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/plugin/kubio.2.3.3.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/plugin/kubio.2.3.3.zip"
+      }
+    },
     "WPplugins-ldap-login-for-intranet-sites": {
       "flake": false,
       "locked": {
@@ -84,6 +97,7 @@
     },
     "root": {
       "inputs": {
+        "WPplugins-kubio": "WPplugins-kubio",
         "WPplugins-ldap-login-for-intranet-sites": "WPplugins-ldap-login-for-intranet-sites",
         "WPplugins-vertice": "WPplugins-vertice",
         "disko": "disko",
