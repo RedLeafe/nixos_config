@@ -72,8 +72,8 @@ in
               ssl = true;
             }
           ];
-          sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
-          sslServerKey = "/home/pluto/.cert/MyKey.key";
+          sslServerCert = "/run/phpfpm/MyCertificate.crt";
+          sslServerKey = "/run/phpfpm/MyKey.key";
         };
         themes = {
           inherit (myWPext) vertice;
