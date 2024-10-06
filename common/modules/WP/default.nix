@@ -83,8 +83,8 @@ in
           # FORCE_SSL_ADMIN = true;
         };
         extraConfig = /*php*/'' /* <?php */
-          /* if ( !defined('ABSPATH') ) */
-          /*   define('ABSPATH', dirname(__FILE__) . '/'); */
+          if ( !defined('ABSPATH') )
+            define('ABSPATH', dirname(__FILE__) . '/');
           /* require_once(ABSPATH . 'wp-settings.php'); */
           /* require_once ABSPATH . 'wp-admin/includes/plugin.php'; */
           /* activate_plugin( 'ldap-login-for-intranet-sites/ldap-login-for-intranet-sites.php' ); */
