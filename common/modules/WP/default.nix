@@ -33,6 +33,12 @@ in {
         listenAddresses = [ "0.0.0.0" ];
         serverAliases = [ "*" ];
       };
+      settings = {
+        FORCE_SSL_ADMIN = true;
+      };
+      extraConfig = ''
+        $_SERVER['HTTPS']='on';
+      '';
       database = {
         host = "localhost";
       };
