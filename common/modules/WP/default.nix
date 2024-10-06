@@ -36,7 +36,12 @@ in {
       database = {
         host = "localhost";
       };
-      plugins = finalWPplugins;
+      themes = {
+        inherit (finalWPplugins) vertice;
+      };
+      plugins = {
+        inherit (finalWPplugins) ldap-login-for-intranet-sites;
+      };
     };
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
