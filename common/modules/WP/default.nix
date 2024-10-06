@@ -40,7 +40,7 @@ in {
         inherit (finalWPplugins) vertice;
       };
       plugins = {
-        inherit (finalWPplugins) ldap-login-for-intranet-sites;
+        inherit (finalWPplugins) kubio ldap-login-for-intranet-sites;
       };
     };
     services.mysql.settings.mysqld = {
