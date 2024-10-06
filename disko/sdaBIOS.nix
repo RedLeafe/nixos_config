@@ -9,7 +9,7 @@
           type = "gpt";
           partitions = {
             boot = {
-              size = "1G";
+              size = "500M";
               type = "EF02";
             };
             root = {
