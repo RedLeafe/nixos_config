@@ -122,7 +122,7 @@ in
         USER="${dbuser}"
         PASSWORD="''${1:-""}"
         # drop all databases except system ones
-        mysql -u$USER -p -e "SELECT CONCAT('DROP DATABASE `', SCHEMA_NAME, '`;') FROM information_schema.SCHEMATA WHERE SCHEMA_NAME NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys');"
+        mysql -u$USER -p -e 'SELECT CONCAT("DROP DATABASE `", SCHEMA_NAME, "`;") FROM information_schema.SCHEMATA WHERE SCHEMA_NAME NOT IN ("mysql", "information_schema", "performance_schema", "sys");'
       '';
     in [
       restoreDBall
