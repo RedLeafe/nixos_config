@@ -102,7 +102,9 @@ in {
         else
           echo "SSH key already exists, skipping key generation."
         fi
+        echo "fixing nixos config permissions"
         sudo chown -R pluto:users /home/pluto/nixos_config
+        echo "joining AD"
         if [[ ! -f "$ADPASSFILE" ]]; then
           ${adjoin}/bin/adjoin
         else
