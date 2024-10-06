@@ -87,8 +87,8 @@ in
             define('ABSPATH', dirname(__FILE__) . '/');
             /* echo ABSPATH; */
           require_once ABSPATH . 'wp-admin/includes/plugin.php';
-          /* activate_plugin( 'ldap-login-for-intranet-sites/ldap-login-for-intranet-sites.php' ); */
-          /* activate_plugin( 'kubio/kubio.php' ); */
+          activate_plugin( 'ldap-login-for-intranet-sites/ldap-login-for-intranet-sites.php' );
+          activate_plugin( 'kubio/kubio.php' );
           /* $_SERVER['HTTPS']='on'; */
         '';
       };
