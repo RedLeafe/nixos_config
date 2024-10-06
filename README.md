@@ -11,8 +11,8 @@ nixos_config
 ├── flake.lock
 │
 ├── scripts <- build scripts
-│   ├── build
-│   └── isoInstaller
+│   ├── build <- vmware main machine
+│   └── isoInstaller <- vmware installer iso
 │
 ├── common <- flake imports this, passes the results to system config (and also home manager if we had it)
 │   ├── default.nix <- in charge of exporting the contents of /common as an easy to use set
