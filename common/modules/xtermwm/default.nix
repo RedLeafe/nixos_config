@@ -34,7 +34,7 @@ in {
         # a tiny c program that uses libX11 to make xterm fullscreen.
         ${maximizer} xterm > /dev/null 2>&1 &
         # tmux launcher script
-        exec ${tx}/bin/tx
+        ${tx}/bin/tx
       '';
     in [
       { name = "xterm-installer";
