@@ -1,5 +1,7 @@
 # nix.moon.mine
 
+## TODO: set up self hosted git for config redundancy.
+
 ## Structure:
 
 ```
