@@ -28,8 +28,7 @@
     forAllSys = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
     username = "pluto";
     hostname = "nix";
-  in
-  {
+  in {
     diskoConfigurations.${hostname} = import ./disko/sdaBIOS.nix;
     legacyPackages = forAllSys (system: {
       nixosConfigurations = {
