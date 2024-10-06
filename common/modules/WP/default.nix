@@ -46,9 +46,6 @@ in
       };
     in
     {
-      services.mysql.settings.mysqld = {
-        bind-address = "0.0.0.0";
-      };
       services.httpd.enablePHP = true;
       services.httpd.phpPackage = pkgs.php.withExtensions
         (exts: with exts; [
@@ -57,6 +54,9 @@ in
       # write to php.ini
       services.httpd.phpOptions = /*ini*/ ''
       '';
+      services.mysql.settings.mysqld = {
+        bind-address = "0.0.0.0";
+      };
       services.wordpress.sites."LunarLooters" = {
         database = {
           host = "0.0.0.0";
