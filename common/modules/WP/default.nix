@@ -59,7 +59,7 @@ in
       };
       services.wordpress.sites."LunarLooters" = {
         database = {
-          host = "0.0.0.0";
+          host = "*";
         };
         themes = {
           inherit (finalWPplugins) vertice;
