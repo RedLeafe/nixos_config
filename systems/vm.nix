@@ -73,8 +73,47 @@ in {
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC43l4qRFhbaZRHbkbiuGJa9CmqBhF8ppnWk7yA4BbGEMWTXK8lnDak9jFVAQHk1UVpGJctR0u/E9Gxl2m7lIMV9fibcYYD34nmzm+ycod92uGq+g10mEWLgidl93+eE1NOt0x1jyfNiZ+tii6KFMQRSyLu68eD5SqOiT2V4Qh6GtFbIPWJQ6SXnOFCJG767ywB5wl+1sQFMkD1JJvi7KmuqekrvM5vvjFjQpHEezOXhn/cGx5ynk/xN/YaUYx93apGQ2blGm8ZIWuqegeR0nquhWa69fIpo7KfYqmxI016t7PZB6/RQmkJevr/d42WAS3kvp6nQ1cvidiiKx79mDMV operations@wrccdc.org"
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLEyyBJpJnaUHPNNOybf3ZiK0z3AkJ66fdzE+CMxlknY09mjcF6x2ZIkLeSgnnhNcoMF/7TCvNIt9g25nqX5V80oO7zkVZtisbRfx1hFnCrmYNFKdoh3dNY0D5qvl5kGl9SAnzI6SqPTbJzlVgqVeRPBB9pZXEnZ1bf8PxqfMvP+KJX1FHadAgP3twYFMBgKLeWz+a5gfEXFs2OJLSPaqvoR/7hq1Ovad6N3sn2hqf+Ke+50x7c0fwMTJTqbY8W3m0VZchPO/jReSl9bw1ZhtmpP06E2vlzkGsZbiQowESXGkhu9+700lDn76yeN+nf77+1bpHt6Wqqjf0gYImR6Xspb/dE2DZugs3zgcMFlr5/K5+oXKJ9CdICY5X1u/eV9nP/YUgHmaCb/uG96FCOBALV6a++JuuQttEQqkofVw+jeRc8RZvSWbDGFhP1rl5IAlYE4pQ4Y5zOtoiP+fyTrh3P6273Ql0VLr85e3Nzr+LPMRU9+5skxPQkehus8Ut2hc= marlowe@riomaggiore"
     ];
-    # this is packages for nixOS user config.
-    # packages = []; # empty because that is managed by home-manager
+    # NOTE: administration scripts
+    packages = let
+      dbpkg = config.services.mysql.package;
+      adjoin = pkgs.writeShellScriptBin "adjoin" ''
+        sudo adcli join -U Administrator "$@"
+      '';
+      dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
+        outfile="''${1:-./dump.sql}"
+        sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
+      '';
+      restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
+        infile="''${1:-./dump.sql}"
+        sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
+      '';
+    in [
+      adjoin
+      dumpDBall
+      restoreDBall
+      (pkgs.writeShellScriptBin "initial_post_installation_script" ''
+        ADPASSFILE="$(realpath "$1")"
+        WPDBDUMP="$(realpath "$2")"
+        if [[ ! -f "$ADPASSFILE" ]]; then
+          echo "Error: Arg 1 Active Directory password file not found."
+          exit 1
+        fi
+        if [[ ! -f "$WPDBDUMP" ]]; then
+          echo "Error: Arg 2 WordPress database dump file not found."
+          exit 1
+        fi
+        export HOME=/home/pluto
+        mkdir -p ~/.ssh
+        if [[ ! -f ~/.ssh/id_ed25519 ]]; then
+          ssh-keygen -q -f ~/.ssh/id_ed25519 -N ""
+        else
+          echo "SSH key already exists, skipping key generation."
+        fi
+        sudo chown -R pluto:users ~/nixos_config
+        ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
+        ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
+      '')
+    ];
   };
 
   networking.hostName = hostname; # Define your hostname.
@@ -211,7 +250,8 @@ in {
   };
   fonts.fontDir.enable = true;
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgs; let
+  in [
     neovim
     fuse
     fuse3

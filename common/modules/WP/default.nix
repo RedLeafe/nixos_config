@@ -14,16 +14,8 @@
       };
     in newpkgs.myWPext;
   in autobuilt // {
-    # a place to put overrides:
-    # ldap-login-for-intranet-sites = autobuilt.ldap-login-for-intranet-sites.overrideAttrs (prev: let
-    #   # TODO: figure out what to do with this.
-    #   cfg_ldap = ./miniorange-ldap-config.json;
-    # in {
-    #   # TODO: do something with cfg_ldap
-    #   # instead of just overriding installPhase
-    #   # with the same exact string it already had
-    #   # installPhase = "mkdir -p $out; cp -R * $out/";
-    # });
+    # you can do autobuilt.pluginname.overrideAttrs to override them
+    # and put the new replacement here.
   };
 in
 {
@@ -32,6 +24,10 @@ in
       enable = mkEnableOption "WordPress stuff";
       siteName = mkOption {
         default = "LunarLooters";
+        type = types.str;
+      };
+      siteUpperLD = mkOption {
+        default = "com";
         type = types.str;
       };
     };
@@ -85,7 +81,7 @@ in
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {
         WP_DEFAULT_THEME = "vertice";
-        WP_MAIL_FROM = "noreply@${cfg.siteName}";
+        WP_MAIL_FROM = "noreply@${lib.toLower cfg.siteName}.${cfg.siteUpperLD}";
         # FORCE_SSL_ADMIN = true;
       };
       # https://codex.wordpress.org/Editing_wp-config.php
@@ -95,39 +91,19 @@ in
         if ( !defined('ABSPATH') )
           define('ABSPATH', dirname(__FILE__) . '/');
         /* $_SERVER['HTTPS']='on'; */
-        # TODO: The nix wiki is outdated. How do I activate a plugin in wp-config.php?
-        # If I restore from the db, do I even need to activate the plugin?
-        # or will it remember the previous state then?
       '';
     };
-    environment.systemPackages = let
-      dbpkg = config.services.mysql.package;
-      dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
-        outfile="''${1:-./dump.sql}"
-        sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
-      '';
-      restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
-        infile="''${1:-./dump.sql}"
-        sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
-      '';
-      gencerts = pkgs.writeShellScriptBin "gen_${cfg.siteName}_cert" ''
-        mkdir -p "./.${cfg.siteName}" && \
-        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out "./.${cfg.siteName}/${cfg.siteName}.crt" -keyout "./.${cfg.siteName}/${cfg.siteName}.key" && \
-        sudo mv -f "./.${cfg.siteName}" / && \
-        sudo chmod 740 "/.${cfg.siteName}" && \
-        sudo chown -R wwwrun:root "/.${cfg.siteName}"
-      '';
-      bobby_tables = pkgs.writeShellScriptBin "bobby_tables" ''
-        USER="root"
-        PASSWORD="''${1:-""}"
-        # drop all databases except system ones
-        sudo ${dbpkg}/bin/mysql -u$USER -p -e 'SHOW DATABASES;SELECT CONCAT("DROP DATABASE `", SCHEMA_NAME, "`;") FROM information_schema.SCHEMATA WHERE SCHEMA_NAME NOT IN ("mysql", "information_schema", "performance_schema", "sys");'
-      '';
-    in [
-      restoreDBall
-      dumpDBall
-      gencerts
-      bobby_tables
+    environment.systemPackages = [
+      (pkgs.writeShellScriptBin "gen_${cfg.siteName}_cert" (let
+        SN = cfg.siteName;
+        webuser = config.services.${config.services.wordpress.webserver}.user;
+      in ''
+        mkdir -p "./.${SN}" && \
+        ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out "./.${SN}/${SN}.crt" -keyout "./.${SN}/${SN}.key" && \
+        sudo mv -f "./.${SN}" / && \
+        sudo chmod 740 "/.${SN}" && \
+        sudo chown -R ${webuser}:root "/.${SN}"
+      ''))
     ];
   };
 }
