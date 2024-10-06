@@ -33,12 +33,12 @@ in {
       # ADuser = lib.mkOption {
       #   default = "Administrator";
       #   type = str;
-      #   description = "AD user to use for sudo adcli join -D command";
+      #   description = "AD user to use for adcli join command";
       # };
       # keyfile_path = lib.mkOption {
-      #   default = "Administrator";
+      #   default = "/tmp/ADprovisionPass";
       #   type = str;
-      #   description = "AD user to use for sudo adcli join -D command";
+      #   description = "path containing the ADuser's password";
       # };
     };
   };
