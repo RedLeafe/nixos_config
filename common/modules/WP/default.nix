@@ -1,12 +1,6 @@
 { moduleNamespace, inputs, ... }: # <- a function
 # that returns a module
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-let
+{ config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.WP;
   myWPext = let
     autobuilt = let
@@ -21,19 +15,15 @@ let
     in newpkgs.myWPext;
   in autobuilt // {
     # a place to put overrides:
-    ldap-login-for-intranet-sites = autobuilt.ldap-login-for-intranet-sites.overrideAttrs (
-      prev:
-      let
-        # TODO: figure out what to do with this.
-        cfg_ldap = ./miniorange-ldap-config.json;
-      in
-      {
-        # TODO: do something with cfg_ldap
-        # instead of just overriding installPhase
-        # with the same exact string it already had
-        # installPhase = "mkdir -p $out; cp -R * $out/";
-      }
-    );
+    ldap-login-for-intranet-sites = autobuilt.ldap-login-for-intranet-sites.overrideAttrs (prev: let
+      # TODO: figure out what to do with this.
+      cfg_ldap = ./miniorange-ldap-config.json;
+    in {
+      # TODO: do something with cfg_ldap
+      # instead of just overriding installPhase
+      # with the same exact string it already had
+      # installPhase = "mkdir -p $out; cp -R * $out/";
+    });
   };
 in
 {
