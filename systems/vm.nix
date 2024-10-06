@@ -114,6 +114,7 @@ in {
           echo "Error: Arg 1: WordPress database dump file not found."
           exit 1
         fi
+        echo "enter the database root user's password:"
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
       '')
     ];
