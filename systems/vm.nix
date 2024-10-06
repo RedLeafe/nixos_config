@@ -92,25 +92,24 @@ in {
       dumpDBall
       restoreDBall
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
-        ADPASSFILE="$(realpath "$1")"
-        WPDBDUMP="$(realpath "$2")"
-        if [[ ! -f "$ADPASSFILE" ]]; then
-          echo "Error: Arg 1 Active Directory password file not found."
-          exit 1
-        fi
-        if [[ ! -f "$WPDBDUMP" ]]; then
-          echo "Error: Arg 2 WordPress database dump file not found."
-          exit 1
-        fi
-        export HOME=/home/pluto
-        mkdir -p ~/.ssh
-        if [[ ! -f ~/.ssh/id_ed25519 ]]; then
-          ssh-keygen -q -f ~/.ssh/id_ed25519 -N ""
+        WPDBDUMP="$(realpath "$1")"
+        ADPASSFILE="$(realpath "$2")"
+        mkdir -p /home/pluto/.ssh
+        if [[ ! -f /home/pluto/.ssh/id_ed25519 ]]; then
+          ssh-keygen -q -f /home/pluto/.ssh/id_ed25519 -N ""
         else
           echo "SSH key already exists, skipping key generation."
         fi
-        sudo chown -R pluto:users ~/nixos_config
-        ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
+        sudo chown -R pluto:users /home/pluto/nixos_config
+        if [[ ! -f "$ADPASSFILE" ]]; then
+          ${adjoin}/bin/adjoin
+        else
+          ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
+        fi
+        if [[ ! -f "$WPDBDUMP" ]]; then
+          echo "Error: Arg 1: WordPress database dump file not found."
+          exit 1
+        fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
       '')
     ];
