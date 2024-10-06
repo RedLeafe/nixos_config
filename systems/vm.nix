@@ -113,8 +113,7 @@ in {
         fi
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
-        cd /home/${username}/nixos_config && git init && \
-        git add . && git commit -m "first commit"
+        cd /home/${username}/nixos_config && git init && git add .
         echo "joining AD"
         if [[ ! -f "$ADPASSFILE" ]]; then
           ${adjoin}/bin/adjoin
@@ -127,6 +126,8 @@ in {
         fi
         echo "enter the database root user's password:"
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
+        echo "Initialization complete."
+        echo "please reboot the machine to authenticate logins with AD"
       '')
     ];
   };
