@@ -32,6 +32,7 @@ in {
       virtualHost = {
         listenAddresses = [ "0.0.0.0" ];
         serverAliases = [ "*" ];
+        forceSSL = true;
       };
       settings = {
         FORCE_SSL_ADMIN = true;
