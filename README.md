@@ -34,15 +34,17 @@ Once it is done, run reboot.
 
 Start it back up, log in as pluto.
 
-first run `ssh-keygen` to get some keys so you can ssh in as the pluto user
+obtain the database dump file.
 
-then run `sudo chown -R pluto:users /home/pluto/nixos_config` so that it is no longer owned by root
+run `initial_post_installation_script $DUMPFILEPATH $ADPASSWORD` in the command line.
 
-Then run `sudo net ads join -U Administrator` and enter your password at the prompt.
+where `$DUMPFILEPATH` is required and is the path to the dump file you just obtained,
+
+and `$ADPASSWORD` is a path to a file containing the password you set for the Administrator AD user.
+
+If `$ADPASSWORD` is not set, it will be prompted for.
 
 Afterwards, reboot the machine again.
-
-Log into wordpress, log into AD in wordpress ldap plugin, and import the page stuff, I havent figured this out yet
 
 To rebuild any changes to the nix config from within your vm, navigate to the config and run `./scripts/build`
 
