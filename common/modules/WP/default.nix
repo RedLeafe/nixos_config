@@ -72,8 +72,8 @@ in
               ssl = true;
             }
           ];
-          sslServerCert = "/run/phpfpm/MyCertificate.crt";
-          sslServerKey = "/run/phpfpm/MyKey.key";
+          sslServerCert = "/certs/MyCertificate.crt";
+          sslServerKey = "/certs/MyKey.key";
         };
         themes = {
           inherit (myWPext) vertice;
