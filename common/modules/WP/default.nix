@@ -75,7 +75,6 @@ in
           ;
         inherit (pkgs.wordpressPackages.plugins)
           wordpress-seo
-          jetpack
           static-mail-sender-configurator
           ;
       };
