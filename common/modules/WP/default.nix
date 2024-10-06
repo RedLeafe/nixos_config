@@ -56,14 +56,14 @@ in
             ip = "*";
             port = 80;
           }
-          # {
-          #   ip = "*";
-          #   port = 443;
-          #   ssl = true;
-          # }
+          {
+            ip = "*";
+            port = 443;
+            ssl = true;
+          }
         ];
-        # sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
-        # sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
+        sslServerCert = "/certs/LunarLooters.crt"; # <-- wwwrun needs to be able to read it
+        sslServerKey = "/certs/LunarLooters.key"; # <-- wwwrun needs to be able to read it
       };
       themes = {
         inherit (myWPext) vertice;
@@ -102,6 +102,8 @@ in
         mkdir -p ./certs && \
         ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
         sudo cp -rf ./certs / && \
+        sudo chmod 700 /certs && \
+        sudo chmod 600 /certs/* && \
         sudo chown -R wwwrun:root /certs
       '')
     ];
