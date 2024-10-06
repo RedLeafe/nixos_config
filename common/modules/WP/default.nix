@@ -100,7 +100,7 @@ in
     };
     environment.systemPackages = let
       dbpkg = config.services.mysql.package;
-      dbuser = config.services.wordpress.sites.${cfg.siteName}.database.user;
+      dbuser = config.services.${config.services.wordpress.webserver}.user;
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
         outfile="''${1:-./dump.sql}"
         ${dbpkg}/bin/mysqldump -u "${dbuser}" -p --all-databases > "$outfile"
