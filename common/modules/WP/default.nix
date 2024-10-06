@@ -90,7 +90,7 @@ in
         # https://developer.wordpress.org/apis/wp-config-php
         settings = {
           WP_DEFAULT_THEME = "vertice";
-          FORCE_SSL_ADMIN = true;
+          # FORCE_SSL_ADMIN = true;
         };
         # https://codex.wordpress.org/Editing_wp-config.php
         # This file writes to $out/share/wordpress/wp-config.php
