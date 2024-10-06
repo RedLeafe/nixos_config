@@ -121,12 +121,8 @@ in
       bobby_tables = pkgs.writeShellScriptBin "bobby_tables" ''
         USER="${dbuser}"
         PASSWORD="''${1:-""}"
-        # Get a list of all databases except system ones
-        databases=$(${dbpkg}/bin/mysql -u$USER -p$PASSWORD -e "SHOW DATABASES;" | ${pkgs.gnugrep}/bin/grep -Ev "(Database|mysql|information_schema|performance_schema|sys)")
-        for db in $databases; do
-            echo "Dropping database: $db"
-            mysql -u$USER -p -e "DROP DATABASE $db;"
-        done
+        # drop all databases except system ones
+        mysql -u$USER -p -e "SELECT CONCAT('DROP DATABASE `', SCHEMA_NAME, '`;') FROM information_schema.SCHEMATA WHERE SCHEMA_NAME NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys');"
       '';
     in [
       restoreDBall
