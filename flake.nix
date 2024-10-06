@@ -40,8 +40,8 @@
           modules = [
             disko.nixosModules.disko
             self.diskoConfigurations.${hostname}
-            ./systems/vmware
             { nixpkgs.overlays = overlays; }
+            ./systems/vmware
           ];
         };
         installer = nixpkgs.lib.nixosSystem {
