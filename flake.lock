@@ -13,6 +13,19 @@
         "url": "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip"
       }
     },
+    "WPplugins-vertice": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722357276,
+        "narHash": "sha256-iVYhcD8CPn8J3xjISlSzsyK+s5W7KnPU3v6XoAzSUWA=",
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/theme/vertice.1.0.25.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/theme/vertice.1.0.25.zip"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -72,6 +85,7 @@
     "root": {
       "inputs": {
         "WPplugins-ldap-login-for-intranet-sites": "WPplugins-ldap-login-for-intranet-sites",
+        "WPplugins-vertice": "WPplugins-vertice",
         "disko": "disko",
         "maximizer": "maximizer",
         "nixpkgs": "nixpkgs"
