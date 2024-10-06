@@ -16,9 +16,9 @@ in {
   config = lib.mkIf cfg.enable (let
     ldap-login-for-intranet-sites = myWPext.ldap-login-for-intranet-sites.overrideAttrs (prev: let
       # TODO: figure out what to do with this.
-      cfg_for_wp_ldap = ./miniorange-ldap-config.json;
+      cfg_ldap = ./miniorange-ldap-config.json;
     in {
-      # TODO: do something with cfg_for_wp_ldap
+      # TODO: do something with cfg_ldap
       # instead of just overriding installPhase
       # with the same exact string it already had
       installPhase = "mkdir -p $out; cp -R * $out/";
