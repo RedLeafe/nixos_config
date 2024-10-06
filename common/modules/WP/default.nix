@@ -118,10 +118,21 @@ in
         sudo chmod 740 "/.${cfg.siteName}" && \
         sudo chown -R wwwrun:root "/.${cfg.siteName}"
       '';
+      bobby_tables = pkgs.writeShellScriptBin "bobby_tables" ''
+        USER="${dbuser}"
+        PASSWORD="''${1:-""}"
+        # Get a list of all databases except system ones
+        databases=$(${dbpkg}/bin/mysql -u$USER -p$PASSWORD -e "SHOW DATABASES;" | ${pkgs.gnugrep}/bin/grep -Ev "(Database|mysql|information_schema|performance_schema|sys)")
+        for db in $databases; do
+            echo "Dropping database: $db"
+            mysql -u$USER -p$PASSWORD -e "DROP DATABASE $db;"
+        done
+      '';
     in [
       restoreDBall
       dumpDBall
       gencerts
+      bobby_tables
     ];
   };
 }
