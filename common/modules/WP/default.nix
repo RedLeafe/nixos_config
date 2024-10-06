@@ -32,17 +32,16 @@ in {
       virtualHost = {
         listenAddresses = [ "0.0.0.0" ];
         serverAliases = [ "*" ];
-        listen."*".ssl = true;
-        onlySSL = true;
-        sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
-        sslServerKey = "/home/pluto/.cert/MyKey.key";
+        # onlySSL = true;
+        # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
+        # sslServerKey = "/home/pluto/.cert/MyKey.key";
       };
-      settings = {
-        FORCE_SSL_ADMIN = true;
-      };
-      extraConfig = ''
-        $_SERVER['HTTPS']='on';
-      '';
+      # settings = {
+      #   FORCE_SSL_ADMIN = true;
+      # };
+      # extraConfig = /*php*/''
+      #   $_SERVER['HTTPS']='on';
+      # '';
       database = {
         host = "localhost";
       };
@@ -53,6 +52,8 @@ in {
         inherit (finalWPplugins) kubio ldap-login-for-intranet-sites;
       };
     };
+    services.httpd.phpOptions = /*ini*/''
+    '';
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
     };
