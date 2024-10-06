@@ -46,6 +46,17 @@ in
       };
     in
     {
+      services.mysql.settings.mysqld = {
+        bind-address = "0.0.0.0";
+      };
+      services.httpd.enablePHP = true;
+      services.httpd.phpPackage = pkgs.php.withExtensions
+        (exts: with exts; [
+          # download php extensions from nixpkgs here from exts variable
+        ]);
+      # write to php.ini
+      services.httpd.phpOptions = /*ini*/ ''
+      '';
       services.wordpress.sites."LunarLooters" = {
         database = {
           host = "0.0.0.0";
@@ -92,14 +103,6 @@ in
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         '';
       };
-      services.httpd.enablePHP = true;
-      services.httpd.phpPackage = pkgs.php.withExtensions
-        (exts: with exts; [
-          # download php extensions from nixpkgs here from exts variable
-        ]);
-      # write to php.ini
-      services.httpd.phpOptions = /*ini*/ ''
-      '';
     }
   );
 }
