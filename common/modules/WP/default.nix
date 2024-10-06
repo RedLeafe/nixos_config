@@ -2,8 +2,8 @@
 # that returns a module
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.WP;
+  # contains built versions of flake inputs matching WPplugins-pluginname
   myWPext = let
-    # grabs inputs matching WPplugins-pluginname and puts them in pkgs.myWPext.pluginname
     newpkgs = import inputs.nixpkgs { inherit (pkgs) system; overlays = [ ((import ./utils.nix).mkplugs inputs) ]; };
   in newpkgs.myWPext;
 in {
