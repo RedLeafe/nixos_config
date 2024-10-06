@@ -30,21 +30,23 @@ You will see a terminal. Run the `SPACEOS` command in it.
 
 At the end of the `SPACEOS` command, it will ask you to set a password for root, and then for the user.
 
-Once it is done, run reboot.
+Once it is done, run `reboot`.
 
-Start it back up, log in as pluto.
+Start it back up, log in as `pluto` user.
 
-obtain the database dump file.
+obtain the database dump file in some manner.
 
-run `initial_post_installation_script $DUMPFILEPATH $ADPASSWORD` in the command line.
+run `initial_post_installation_script $DUMPFILEPATH $ADPASSFILE` in the command line.
 
-where `$DUMPFILEPATH` is required and is the path to the dump file you just obtained,
+where `$DUMPFILEPATH` is the path to the dump file you just obtained,
 
-and `$ADPASSWORD` is a path to a file containing the password you set for the Administrator AD user.
+and `$ADPASSFILE` is a path to a file containing the password you set for the Administrator AD user.
 
-If `$ADPASSWORD` is not set, it will be prompted for.
+If `$ADPASSFILE` is not set, it will be prompted for.
 
-Afterwards, reboot the machine again.
+The command will prompt you to enter the current password for the root user for the database as well.
+
+Afterwards, `reboot` the machine again.
 
 To rebuild any changes to the nix config from within your vm, navigate to the config and run `./scripts/build`
 
