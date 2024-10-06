@@ -120,3 +120,17 @@ nixos_config
 - [nix cookbook (misc tips and tricks)](https://nixos.wiki/wiki/Nix_Cookbook)
 - [nixos manual](https://nixos.org/manual/nixpkgs/stable/)
 - [overriding packages](https://ryantm.github.io/nixpkgs/using/overrides/)
+- [nix secrets rubrik](https://nixos.wiki/wiki/Comparison_of_secret_managing_schemes)
+
+#### TODOs:
+- make database not reachable via the internet.
+- make database not reachable via other interfaces.
+- make sure database has a password before this gets cloned.
+- finish adding https support.
+
+#### Maybes:
+- set up auditd module, and let that plus monitoring journalctl and maaaybe sending it somewhere be enough.
+- set database default password via nix config without putting passwords or hashes in the store/github because I keep forgetting to set it.
+- If you figure out how to include the DB password without including plaintext or hash,
+  may as well add the encrypted AD password and encrypted dump to the repo alongside it.
+  because then you could automate the install process completely!
