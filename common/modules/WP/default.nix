@@ -14,9 +14,12 @@ in {
   };
 
   config = lib.mkIf cfg.enable (let
-    # TODO: figure out what to do with this.
-    # likely override the path to it into ldap-login-for-intranet-sites plugin somewhere
-    cfg_for_wp_ldap = ./miniorange-ldap-config.json;
+    ldap-login-for-intranet-sites = myWPext.ldap-login-for-intranet-sites.overrideAttrs (prev: let
+      # TODO: figure out what to do with this.
+      cfg_for_wp_ldap = ./miniorange-ldap-config.json;
+    in {
+      installPhase = "mkdir -p $out; cp -R * $out/";
+    });
   in {
     services.wordpress.sites."LunarLooters" = {
       virtualHost = {
@@ -27,7 +30,7 @@ in {
         host = "localhost";
       };
       plugins = {
-        inherit (myWPext) ldap-login-for-intranet-sites;
+        inherit ldap-login-for-intranet-sites;
       };
     };
     services.mysql.settings.mysqld = {
