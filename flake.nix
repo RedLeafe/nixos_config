@@ -11,6 +11,9 @@
     maximizer.inputs.nixpkgs.follows = "nixpkgs";
 
     # wordpress plugins
+    # name them WPplugins-<plugin-name>
+    # and a util grabs them and turns them into plugins
+    # in the WP module
     WPplugins-ldap-login-for-intranet-sites = {
       url = "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip";
       flake = false;
