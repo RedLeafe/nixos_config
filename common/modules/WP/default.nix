@@ -125,7 +125,7 @@ in
         databases=$(${dbpkg}/bin/mysql -u$USER -p$PASSWORD -e "SHOW DATABASES;" | ${pkgs.gnugrep}/bin/grep -Ev "(Database|mysql|information_schema|performance_schema|sys)")
         for db in $databases; do
             echo "Dropping database: $db"
-            mysql -u$USER -p$PASSWORD -e "DROP DATABASE $db;"
+            mysql -u$USER -p -e "DROP DATABASE $db;"
         done
       '';
     in [
