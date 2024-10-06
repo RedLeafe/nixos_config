@@ -24,7 +24,7 @@ in {
         # TODO: do something with cfg_ldap
         # instead of just overriding installPhase
         # with the same exact string it already had
-        installPhase = "mkdir -p $out; cp -R * $out/";
+        # installPhase = "mkdir -p $out; cp -R * $out/";
       });
     };
   in {
@@ -49,15 +49,12 @@ in {
         inherit (finalWPplugins) vertice;
       };
       plugins = {
-        inherit (finalWPplugins) kubio;
-        inherit (finalWPplugins) next-active-directory-integration;
-        # inherit (finalWPplugins) ldap-login-for-intranet-sites;
+        inherit (finalWPplugins) kubio ldap-login-for-intranet-sites;
       };
     };
+    services.httpd.enablePHP = true;
+    services.httpd.phpPackage = pkgs.php;
     services.httpd.phpOptions = /*ini*/''
-      ; required by *NADI*
-      extension=${pkgs.phpExtensions.ldap}/lib/php/extensions/ldap.so
-      extension=${pkgs.phpExtensions.openssl}/lib/php/extensions/openssl.so
     '';
     services.mysql.settings.mysqld = {
       bind-address = "0.0.0.0";
