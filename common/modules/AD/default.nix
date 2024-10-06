@@ -1,6 +1,6 @@
 # NOTE:
 # run the following to join AD:
-# net ads join -U Administrator
+# sudo adcli join -U Administrator
 
 { moduleNamespace, ... }: # <- a function
 # that returns a module
