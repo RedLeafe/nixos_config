@@ -33,6 +33,8 @@ in {
         listenAddresses = [ "0.0.0.0" ];
         serverAliases = [ "*" ];
         forceSSL = true;
+        sslServerCert = "/home/pluto/.cert/MYCSR.csr";
+        sslServerKey = "/home/pluto/.cert/PRIVATEKEY.key";
       };
       settings = {
         FORCE_SSL_ADMIN = true;
