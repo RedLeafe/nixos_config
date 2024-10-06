@@ -26,7 +26,7 @@ in
         default = "LunarLooters";
         type = types.str;
       };
-      siteUpperLD = mkOption {
+      siteTLDs = mkOption {
         default = "com";
         type = types.str;
       };
@@ -81,7 +81,7 @@ in
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {
         WP_DEFAULT_THEME = "vertice";
-        WP_MAIL_FROM = "noreply@${lib.toLower cfg.siteName}.${cfg.siteUpperLD}";
+        WP_MAIL_FROM = "noreply@${lib.toLower cfg.siteName}.${cfg.siteTLDs}";
         # FORCE_SSL_ADMIN = true;
       };
       # https://codex.wordpress.org/Editing_wp-config.php

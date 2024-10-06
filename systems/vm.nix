@@ -47,7 +47,9 @@ in {
   services.clamav.updater.interval = "weekly";
 
   system.activationScripts.silencezsh.text = ''
-    [ ! -e "/home/${username}/.zshrc" ] && echo "# dummy file" > /home/${username}/.zshrc
+    for homedir in /home/*; do
+      [ -d "$homedir" ] && [ ! -e "$homedir/.zshrc" ] && echo "# ssshhh" > "$homedir/.zshrc"
+    done
   '';
 
   environment.variables = {
