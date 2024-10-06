@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "WPplugins-ldap-login-for-intranet-sites": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1727275422,
+        "narHash": "sha256-uOYknoFWRXNH1GMz5lpMR6MRjCJP9Nm+MjVW8onmxew=",
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -58,6 +71,7 @@
     },
     "root": {
       "inputs": {
+        "WPplugins-ldap-login-for-intranet-sites": "WPplugins-ldap-login-for-intranet-sites",
         "disko": "disko",
         "maximizer": "maximizer",
         "nixpkgs": "nixpkgs"
