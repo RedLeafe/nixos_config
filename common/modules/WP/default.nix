@@ -45,14 +45,14 @@ in {
             ip = "*";
             port = 80;
           }
-          {
-            ip = "*";
-            port = 443;
-            ssl = true;
-          }
+          # {
+          #   ip = "*";
+          #   port = 443;
+          #   ssl = true;
+          # }
         ];
-        sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
-        sslServerKey = "/home/pluto/.cert/MyKey.key";
+        # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
+        # sslServerKey = "/home/pluto/.cert/MyKey.key";
       };
       # settings = {
       #   FORCE_SSL_ADMIN = true;
