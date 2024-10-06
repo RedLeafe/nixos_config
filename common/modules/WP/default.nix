@@ -103,7 +103,6 @@ in
         ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
         sudo mv -f ./certs / && \
         sudo chmod 700 /certs && \
-        sudo chmod 600 /certs/* && \
         sudo chown -R wwwrun:root /certs
       '')
     ];
