@@ -32,7 +32,7 @@ in {
       virtualHost = {
         listenAddresses = [ "0.0.0.0" ];
         serverAliases = [ "*" ];
-        forceSSL = true;
+        onlySSL = true;
         sslServerCert = "/home/pluto/.cert/MYCSR.csr";
         sslServerKey = "/home/pluto/.cert/PRIVATEKEY.key";
       };
