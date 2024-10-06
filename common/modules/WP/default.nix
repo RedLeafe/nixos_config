@@ -78,10 +78,12 @@ in
           # sslServerCert = "/home/pluto/.cert/MyCertificate.crt";
           # sslServerKey = "/home/pluto/.cert/MyKey.key";
         };
+        # https://developer.wordpress.org/apis/wp-config-php
         settings = {
           WP_DEFAULT_THEME = "vertice";
           # FORCE_SSL_ADMIN = true;
         };
+        # https://codex.wordpress.org/Editing_wp-config.php
         # This file writes to $out/share/wordpress/wp-config.php
         # ABSPATH is the directory where wp-config.php resides
         extraConfig = /*php*/'' /* <?php */
@@ -93,7 +95,9 @@ in
       services.httpd.enablePHP = true;
       services.httpd.phpPackage = pkgs.php.withExtensions
         (exts: with exts; [
+          # download php extensions from nixpkgs here from exts variable
         ]);
+      # write to php.ini
       services.httpd.phpOptions = /*ini*/ ''
       '';
       services.mysql.settings.mysqld = {
