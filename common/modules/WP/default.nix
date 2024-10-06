@@ -85,6 +85,7 @@ in
         extraConfig = /*php*/'' /* <?php */
           if ( !defined('ABSPATH') )
             define('ABSPATH', dirname(__FILE__) . '/');
+            require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         '';
       };
       services.httpd.enablePHP = true;
