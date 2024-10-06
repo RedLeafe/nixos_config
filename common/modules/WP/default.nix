@@ -102,7 +102,6 @@ in
     };
     environment.systemPackages = let
       dbpkg = config.services.mysql.package;
-      dbuser = config.services.${config.services.wordpress.webserver}.user;
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
         outfile="''${1:-./dump.sql}"
         sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
