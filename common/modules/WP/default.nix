@@ -102,7 +102,7 @@ in
         mkdir -p ./certs && \
         ${pkgs.openssl}/bin/openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out ./certs/LunarLooters.crt -keyout ./certs/LunarLooters.key && \
         sudo mv -f ./certs / && \
-        sudo chmod 700 /certs && \
+        sudo chmod 740 /certs && \
         sudo chown -R wwwrun:root /certs
       '')
     ];
