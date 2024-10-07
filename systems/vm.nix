@@ -3,6 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, lib, inputs, stateVersion, username, hostname, system-modules, authorized_keys, ... }: let
+  git_server_home_dir = "/var/lib/git-server";
 in {
   imports = with system-modules; [
     shell.bash
@@ -47,6 +48,7 @@ in {
       X11Forwarding = false;
       PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
+    git_home_dir = git_server_home_dir;
     git_shell_scripts = {
       # example = ''
       #   echo "example script"
@@ -227,12 +229,16 @@ in {
           echo "SSH key already exists, skipping key generation."
         fi
       '';
+      dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
+        sudo ${pkgs.zip}/bin/zip -r -9 "$1/repobackup.zip" "${git_server_home_dir}"
+      '';
     in [
       adjoin
       dumpDBall
       restoreDBall
       pluto_trash
       genAdminSSHkey
+      dumpGitRepos
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
         if [[ "$USER" != "${username}" ]]; then
           echo "Error: script must be run as the user ${username}"

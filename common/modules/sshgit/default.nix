@@ -39,6 +39,10 @@ in {
         default = {};
         type = types.attrsOf types.str;
       };
+      git_home_dir = mkOption {
+        default = "/var/lib/git-server";
+        type = types.str;
+      };
       extraSSHDconfig = mkOption {
         default = "";
         type = types.str;
@@ -50,7 +54,7 @@ in {
 
     users.users.git = let
       git = config.programs.git.package;
-      git-home = "/var/lib/git-server";
+      git-home = cfg.git_home_dir;
       default_git_shell_xtras = {
         new-remote = /*bash*/''
           export PATH="$PATH:${pkgs.coreutils}/bin"
