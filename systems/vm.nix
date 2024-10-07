@@ -221,6 +221,14 @@ in {
           sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
         fi
       '';
+      dumpALL = pkgs.writeShellScriptBin "dumpALL" ''
+        ${dumpDBall}/bin/dumpDBall "$1"
+        ${dumpGitRepos}/bin/dumpGitRepos "$2"
+      '';
+      restoreALL = pkgs.writeShellScriptBin "restoreALL" ''
+        ${restoreDBall}/bin/restoreDBall "$1"
+        ${restoreGitRepos}/bin/restoreGitRepos "$2"
+      '';
       yeet_trash = pkgs.writeShellScriptBin "pluto_trash" ''
         nix-collect-garbage --delete-old
         sudo nix-collect-garbage --delete-old
@@ -256,6 +264,8 @@ in {
       adjoin
       dumpDBall
       restoreDBall
+      dumpALL
+      restoreALL
       yeet_trash
       genAdminSSHkey
       dumpGitRepos
