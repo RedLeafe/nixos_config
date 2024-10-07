@@ -1,4 +1,3 @@
-
 { moduleNamespace, ... }: # <- a function
 # that returns a module
 { config, pkgs, lib, ... }: let
