@@ -21,10 +21,11 @@
     '';
   in stdenv.mkDerivation {
     name = "new-git-shell";
+    src = new-git-shell;
     passthru.shellPath = "/bin/new-git-shell";
     buildPhase = ''
       mkdir -p $out/bin
-      cp ${new-git-shell} $out/bin/new-git-shell
+      cp $src $out/bin/new-git-shell
     '';
   };
 
