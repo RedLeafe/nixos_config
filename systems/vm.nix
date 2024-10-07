@@ -189,6 +189,8 @@ in {
   };
   fonts.fontDir.enable = true;
 
+  users.users.root.openssh.authorizedKeys.keys = authorized_keys;
+
   users.users.${username} = {
     name = username;
     shell = pkgs.zsh;
