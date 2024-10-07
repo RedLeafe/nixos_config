@@ -16,6 +16,7 @@ in
   LD = import (systemOnly ./LD) args;
   WP = import (systemOnly ./WP) args;
   AD = import (systemOnly ./AD) args;
+  sshgit = import (systemOnly ./sshgit) args;
   xtermwm = import (systemOnly ./xtermwm) args;
   ranger = import ./ranger args;
   shell = import ./shell args;

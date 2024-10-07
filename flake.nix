@@ -30,9 +30,8 @@
 
   outputs = { self, nixpkgs, disko, ... }@inputs: let
     stateVersion = "24.05";
-    common = import ./common { inherit inputs; };
-    inherit (common { overlaysList = true; }) overlays;
-    inherit (common { nixos = true; }) system-modules;
+    common = import ./common { inherit inputs; } { overlaysList = true; nixos = true; keys = true; };
+    inherit (common) overlays system-modules authorized_keys;
     forAllSys = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
     username = "pluto";
     hostname = "nix";
@@ -42,7 +41,7 @@
       nixosConfigurations = {
         ${hostname} = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit stateVersion inputs system-modules username hostname;
+            inherit stateVersion inputs system-modules username hostname authorized_keys;
           };
           inherit system;
           modules = [
@@ -54,7 +53,7 @@
         };
         installer = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit stateVersion inputs system-modules username hostname;
+            inherit stateVersion inputs system-modules username hostname authorized_keys;
           };
           inherit system;
           modules = [

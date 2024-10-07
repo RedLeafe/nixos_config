@@ -16,6 +16,9 @@ nixos_config
 │
 ├── common <- flake imports this, passes the results to system config (and also home manager if we had it)
 │   ├── default.nix <- in charge of exporting the contents of /common as an easy to use set
+│   ├── auth_keys
+│   │   ├── operations@wrccdc.org
+│   │   └── ... other public keys, 1 per file
 │   ├── modules
 │   │   ├── AD
 │   │   │   └── default.nix

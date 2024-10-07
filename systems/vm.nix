@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, inputs, stateVersion, username, hostname, system-modules, ... }: let
+{ config, pkgs, lib, inputs, stateVersion, username, hostname, system-modules, authorized_keys, ... }: let
 in {
   imports = with system-modules; [
     shell.bash
@@ -13,23 +13,78 @@ in {
     LD
     AD
     WP
+    sshgit
   ];
 
-  moon_mods = {
-    zsh.enable = true;
-    bash.enable = true;
-    fish.enable = true;
-    ranger.enable = true;
-    xtermwm.enable = true;
-    xtermwm.fontName = "FiraMono Nerd Font";
-    LD.enable = true;
-    AD.enable = true;
-    AD.domain = "alien.moon.mine";
-    AD.domain_short = "alien";
-    AD.domain_controller = "kerberos.alien.moon.mine";
-    AD.ldap_search_base = "CN=Users,DC=alien,DC=moon,DC=mine";
-    WP.enable = true;
+  moon_mods.zsh.enable = true;
+  moon_mods.bash.enable = true;
+  moon_mods.fish.enable = true;
+  moon_mods.ranger.enable = true;
+  moon_mods.xtermwm = {
+    enable = true;
+    fontName = "FiraMono Nerd Font";
   };
+
+  moon_mods.LD.enable = true;
+
+  moon_mods.AD = {
+    enable = true;
+    domain = "alien.moon.mine";
+    domain_short = "alien";
+    domain_controller = "kerberos.alien.moon.mine";
+    ldap_search_base = "CN=Users,DC=alien,DC=moon,DC=mine";
+  };
+  moon_mods.WP.enable = true;
+
+  moon_mods.sshgit = {
+    enable = true;
+    AD_support = true;
+    authorized_keys = authorized_keys;
+    fail2ban = true;
+    settings = {
+      PasswordAuthentication = false;
+      UseDns = true;
+      X11Forwarding = false;
+      PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
+    };
+    git_shell_scripts = {
+      # example = ''
+      #   echo "example script"
+      # '';
+    };
+  };
+
+  networking.hostName = hostname; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Enable networking
+  # networking.networkmanager.enable = true;
+  # networking.networkmanager.insertNameservers = [ "192.168.220.254" ];
+  networking = {
+    dhcpcd.enable = false;
+    domain = "alien.moon.mine";
+    search = [ "alien.moon.mine" ];
+    interfaces.eth0.ipv4.addresses = [{
+      address = "192.168.220.44";
+      prefixLength = 24;
+    }];
+    defaultGateway = {
+      address = "192.168.220.2";
+      interface = "eth0";
+    };
+    nameservers = [ "192.168.220.254" ];
+  };
+
+  boot.kernelParams = [ "net.ifnames=0" "biosdevname=0" ];
+
+  # firewall.
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 80 443 3306 ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
 
   programs.git = {
     enable = true;
@@ -64,106 +119,6 @@ in {
     l  = "${pkgs.lsd}/bin/lsd -alh";
   };
 
-  users.users.${username} = {
-    name = username;
-    shell = pkgs.zsh;
-    isNormalUser = true;
-    description = "";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
-    initialPassword = "test";
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC43l4qRFhbaZRHbkbiuGJa9CmqBhF8ppnWk7yA4BbGEMWTXK8lnDak9jFVAQHk1UVpGJctR0u/E9Gxl2m7lIMV9fibcYYD34nmzm+ycod92uGq+g10mEWLgidl93+eE1NOt0x1jyfNiZ+tii6KFMQRSyLu68eD5SqOiT2V4Qh6GtFbIPWJQ6SXnOFCJG767ywB5wl+1sQFMkD1JJvi7KmuqekrvM5vvjFjQpHEezOXhn/cGx5ynk/xN/YaUYx93apGQ2blGm8ZIWuqegeR0nquhWa69fIpo7KfYqmxI016t7PZB6/RQmkJevr/d42WAS3kvp6nQ1cvidiiKx79mDMV operations@wrccdc.org"
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLEyyBJpJnaUHPNNOybf3ZiK0z3AkJ66fdzE+CMxlknY09mjcF6x2ZIkLeSgnnhNcoMF/7TCvNIt9g25nqX5V80oO7zkVZtisbRfx1hFnCrmYNFKdoh3dNY0D5qvl5kGl9SAnzI6SqPTbJzlVgqVeRPBB9pZXEnZ1bf8PxqfMvP+KJX1FHadAgP3twYFMBgKLeWz+a5gfEXFs2OJLSPaqvoR/7hq1Ovad6N3sn2hqf+Ke+50x7c0fwMTJTqbY8W3m0VZchPO/jReSl9bw1ZhtmpP06E2vlzkGsZbiQowESXGkhu9+700lDn76yeN+nf77+1bpHt6Wqqjf0gYImR6Xspb/dE2DZugs3zgcMFlr5/K5+oXKJ9CdICY5X1u/eV9nP/YUgHmaCb/uG96FCOBALV6a++JuuQttEQqkofVw+jeRc8RZvSWbDGFhP1rl5IAlYE4pQ4Y5zOtoiP+fyTrh3P6273Ql0VLr85e3Nzr+LPMRU9+5skxPQkehus8Ut2hc= marlowe@riomaggiore"
-    ];
-    # NOTE: administration scripts
-    packages = let
-      dbpkg = config.services.mysql.package;
-      adjoin = pkgs.writeShellScriptBin "adjoin" ''
-        sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
-      '';
-      dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
-        outfile="''${1:-./dump.sql}"
-        sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
-      '';
-      restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
-        infile="''${1:-./dump.sql}"
-        sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
-      '';
-      pluto_trash = pkgs.writeShellScriptBin "pluto_trash" ''
-        nix-collect-garbage --delete-old
-        sudo nix-collect-garbage --delete-old
-      '';
-    in [
-      adjoin
-      dumpDBall
-      restoreDBall
-      pluto_trash
-      (pkgs.writeShellScriptBin "initial_post_installation_script" ''
-        if [[ "$USER" != "${username}" ]]; then
-          echo "Error: script must be run as the user ${username}"
-          exit 1
-        fi
-        export PATH="$PATH:${lib.makeBinPath (with pkgs; [
-          git
-          openssh
-          coreutils
-        ])}"
-        WPDBDUMP="$(realpath "$1")"
-        ADPASSFILE="$(realpath "$2")"
-        mkdir -p /home/${username}/.ssh
-        if [[ ! -f /home/${username}/.ssh/id_ed25519 ]]; then
-          ssh-keygen -q -f /home/${username}/.ssh/id_ed25519 -N ""
-        else
-          echo "SSH key already exists, skipping key generation."
-        fi
-        echo "fixing nixos config permissions"
-        sudo chown -R ${username}:users /home/${username}/nixos_config
-        cd /home/${username}/nixos_config && git init && git add .
-        echo "joining AD"
-        if [[ ! -f "$ADPASSFILE" ]]; then
-          ${adjoin}/bin/adjoin
-        else
-          ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
-        fi
-        if [[ ! -f "$WPDBDUMP" ]]; then
-          echo "Error: Arg 1: WordPress database dump file not found."
-          exit 1
-        fi
-        echo "enter the database root user's password:"
-        ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
-        echo "Initialization complete."
-        echo "please reboot the machine to authenticate logins with AD"
-      '')
-    ];
-  };
-
-  networking.hostName = hostname; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  # networking.networkmanager.enable = true;
-  # networking.networkmanager.insertNameservers = [ "192.168.220.254" ];
-  networking = {
-    dhcpcd.enable = false;
-    domain = "alien.moon.mine";
-    search = [ "alien.moon.mine" ];
-    interfaces.eth0.ipv4.addresses = [{
-      address = "192.168.220.44";
-      prefixLength = 24;
-    }];
-    defaultGateway = {
-      address = "192.168.220.2";
-      interface = "eth0";
-    };
-    nameservers = [ "192.168.220.254" ];
-  };
-
-  boot.kernelParams = [ "net.ifnames=0" "biosdevname=0" ];
-
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -172,40 +127,6 @@ in {
     pinentryPackage = pkgs.pinentry-curses;
     enableSSHSupport = true;
   };
-
-  # List services that you want to enable:
-
-  programs.ssh.pubkeyAcceptedKeyTypes = [
-    "ssh-rsa"
-    "ssh-ed25519"
-  ];
-  programs.ssh.package = pkgs.opensshWithKerberos;
-
-  # Enable the OpenSSH daemon.
-  services.openssh = {
-    enable = true;
-    ports = [ 22 ];
-    package = pkgs.opensshWithKerberos;
-    settings = {
-      PasswordAuthentication = false;
-      AllowUsers = null; # Allows all users by default. Can be [ "user1" "user2" ]
-      UseDns = true;
-      X11Forwarding = false;
-      PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
-    };
-    extraConfig = ''
-      KerberosAuthentication yes
-      KerberosOrLocalPasswd yes
-      GSSAPIAuthentication yes
-      GSSAPICleanupCredentials yes
-    '';
-  };
-  services.fail2ban.enable = true;
-
-  # firewall.
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 3306 ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
 
   security = {
     pam = {
@@ -270,6 +191,86 @@ in {
     };
   };
   fonts.fontDir.enable = true;
+
+  users.users.${username} = {
+    name = username;
+    shell = pkgs.zsh;
+    isNormalUser = true;
+    description = "";
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    initialPassword = "test";
+    openssh.authorizedKeys.keys = authorized_keys;
+    # NOTE: administration scripts
+    packages = let
+      dbpkg = config.services.mysql.package;
+      adjoin = pkgs.writeShellScriptBin "adjoin" ''
+        sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
+      '';
+      dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
+        outfile="''${1:-./dump.sql}"
+        sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
+      '';
+      restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
+        infile="''${1:-./dump.sql}"
+        sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
+      '';
+      pluto_trash = pkgs.writeShellScriptBin "pluto_trash" ''
+        nix-collect-garbage --delete-old
+        sudo nix-collect-garbage --delete-old
+      '';
+      genAdminSSHkey = pkgs.writeShellScriptBin "genAdminSSHkey" ''
+        mkdir -p /home/${username}/.ssh
+        if [[ ! -f /home/${username}/.ssh/id_ed25519 ]]; then
+          ssh-keygen -q -f /home/${username}/.ssh/id_ed25519 -N ""
+          cp -f /home/${username}/.ssh/id_ed25519.pub /home/${username}/nixos_config/common/auth_keys/${username}.pub
+        else
+          echo "SSH key already exists, skipping key generation."
+        fi
+      '';
+    in [
+      adjoin
+      dumpDBall
+      restoreDBall
+      pluto_trash
+      genAdminSSHkey
+      (pkgs.writeShellScriptBin "initial_post_installation_script" ''
+        if [[ "$USER" != "${username}" ]]; then
+          echo "Error: script must be run as the user ${username}"
+          exit 1
+        fi
+        export PATH="$PATH:${lib.makeBinPath (with pkgs; [
+          git
+          openssh
+          coreutils
+        ])}"
+        WPDBDUMP="$(realpath "$1")"
+        ADPASSFILE="$(realpath "$2")"
+        ${genAdminSSHkey}/bin/genAdminSSHkey
+        echo "fixing nixos config permissions"
+        sudo chown -R ${username}:users /home/${username}/nixos_config
+        cd /home/${username}/nixos_config && git init && git add . && \
+        git commit -m "initial nixos config" && \
+        ssh git@localhost 'new-remote nixos_config' && \
+        git remote add origin git@localhost:nixos_config.git && \
+        git push -u origin master
+        echo "joining AD"
+        if [[ ! -f "$ADPASSFILE" ]]; then
+          ${adjoin}/bin/adjoin
+        else
+          ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
+        fi
+        if [[ ! -f "$WPDBDUMP" ]]; then
+          echo "Error: Arg 1: WordPress database dump file not found."
+          exit 1
+        fi
+        echo "enter the database root user's password:"
+        ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
+        /home/${username}/nixos_config/scripts/build
+        echo "Initialization complete."
+        echo "please reboot the machine to authenticate logins with AD"
+      '')
+    ];
+  };
 
   environment.systemPackages = with pkgs; [
     neovim
