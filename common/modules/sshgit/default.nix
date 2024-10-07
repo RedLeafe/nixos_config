@@ -4,21 +4,29 @@
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.sshgit;
 
-  mkGitShell = { xtras ? {}, git, writeShellScript, writeShellScriptBin, lib, ... }: let
+  mkNewGitShell = { xtras ? {}, git, stdenv, writeShellScript, writeShellScriptBin, lib, ... }: let
     extracmds = builtins.mapAttrs (name: value: writeShellScriptBin name value) xtras;
     cmds = builtins.concatStringsSep " " (builtins.map lib.escapeShellArg (builtins.attrNames extracmds));
     path = lib.makeBinPath ([ git ] ++ (builtins.attrValues extracmds));
-  in writeShellScript "git-shell" ''
-    cmd="$1"
-    export PATH="${path}"
-    [ -z "$cmd" ] && exec git-shell
-    found=false
-    for xtra in ${cmds}; do
-      [ "$xtra" == "$cmd" ] && found=true && break
-    done
-    [ $found ] && exec "$@"
-    [ ! $found ] && exec git-shell -c "$*"
-  '';
+    new-git-shell = writeShellScript "new-git-shell" ''
+      cmd="$1"
+      export PATH="${path}"
+      [ -z "$cmd" ] && exec git-shell
+      found=false
+      for xtra in ${cmds}; do
+        [ "$xtra" == "$cmd" ] && found=true && break
+      done
+      [ $found ] && exec "$@"
+      [ ! $found ] && exec git-shell -c "$*"
+    '';
+  in stdenv.mkDerivation {
+    name = "new-git-shell";
+    passthru.shellPath = "/bin/new-git-shell";
+    buildPhase = ''
+      mkdir -p $out/bin
+      cp ${new-git-shell} $out/bin/new-git-shell
+    '';
+  };
 
 in {
   options = {
@@ -76,7 +84,7 @@ in {
         '';
       };
       final_git_shell_scripts = default_git_shell_xtras // cfg.git_shell_scripts;
-      git-shell = pkgs.callPackage mkGitShell {
+      new-git-shell = pkgs.callPackage mkNewGitShell {
         xtras = final_git_shell_scripts;
         inherit git;
       };
@@ -85,8 +93,9 @@ in {
       group = "git";
       home = git-home;
       createHome = true;
-      shell = "${git-shell}";
+      shell = new-git-shell;
       openssh.authorizedKeys.keys = cfg.authorized_keys;
+      packages = [ new-git-shell ];
     };
 
     users.groups.git = {};
