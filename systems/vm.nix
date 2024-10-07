@@ -285,6 +285,7 @@ in {
         ${restoreGitRepos}/bin/restoreGitRepos "$REPOZIP"
         /home/${username}/nixos_config/scripts/build
         ssh git@localhost 'new-remote nixos_config' && \
+        cd /home/${username}/nixos_config && \
         git push -u origin master
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"
