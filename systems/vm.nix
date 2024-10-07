@@ -275,6 +275,7 @@ in {
         ADPASSFILE="$(realpath "$3" 2> /dev/null)"
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
+        sudo chown -R ${username}:users /home/${username}/restored_data
 
         ${genAdminSSHkey}/bin/genAdminSSHkey
         [ -e /home/${username}/nixos_config/.git ] && sudo rm -rf /home/${username}/nixos_config/.git
