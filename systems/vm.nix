@@ -247,7 +247,7 @@ in {
           tempdir=$(mktemp -d)
           ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
           mkdir -p "${git_server_home_dir}"
-          sudo cp -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
+          sudo cp --update=none -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
         fi
       '';
     in [
@@ -271,9 +271,9 @@ in {
         WPDBDUMP="$(realpath "$1" 2> /dev/null)"
         REPOZIP="$(realpath "$2" 2> /dev/null)"
         ADPASSFILE="$(realpath "$3" 2> /dev/null)"
-        ${genAdminSSHkey}/bin/genAdminSSHkey
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
+        ${genAdminSSHkey}/bin/genAdminSSHkey
         cd /home/${username}/nixos_config && git init && git add . && \
         git commit -m "initial nixos config" && git branch -M master && \
         git remote add origin git@localhost:nixos_config.git
@@ -284,11 +284,11 @@ in {
           ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
         fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
-        ${restoreGitRepos}/bin/restoreGitRepos "$REPOZIP"
         /home/${username}/nixos_config/scripts/build
         ssh git@localhost 'new-remote nixos_config' && \
         cd /home/${username}/nixos_config && \
         git push -u origin master
+        ${restoreGitRepos}/bin/restoreGitRepos "$REPOZIP"
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"
       '')
