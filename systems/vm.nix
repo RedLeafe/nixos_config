@@ -273,7 +273,9 @@ in {
         ADPASSFILE="$(realpath "$3" 2> /dev/null)"
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
+
         ${genAdminSSHkey}/bin/genAdminSSHkey
+        [ -e /home/${username}/nixos_config/.git ] && sudo rm -rf /home/${username}/nixos_config/.git
         cd /home/${username}/nixos_config && git init && git add . && \
         git commit -m "initial nixos config" && git branch -M master && \
         git remote add origin git@localhost:nixos_config.git
