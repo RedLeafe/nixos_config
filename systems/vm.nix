@@ -210,8 +210,12 @@ in {
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
         infile="''${1:-./dump.sql}"
-        echo "enter the database root user's password:"
-        sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
+        if [ ! -e "$infile" ]; then
+          echo "Error: $infile not found"
+        else
+          echo "enter the database root user's password:"
+          sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
+        fi
       '';
       yeet_trash = pkgs.writeShellScriptBin "pluto_trash" ''
         nix-collect-garbage --delete-old
@@ -233,10 +237,14 @@ in {
       # NOTE: Assumes zip was made with the above command
       restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
         repozip="''${1:-./repobackup.zip}"
-        tempdir=$(mktemp -d)
-        ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
-        mkdir -p "${git_server_home_dir}"
-        sudo cp -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
+        if [ ! -e "$repozip" ]; then
+          echo "Error: $repozip not found"
+        else
+          tempdir=$(mktemp -d)
+          ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
+          mkdir -p "${git_server_home_dir}"
+          sudo cp -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
+        fi
       '';
     in [
       adjoin
