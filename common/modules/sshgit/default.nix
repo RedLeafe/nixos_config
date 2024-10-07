@@ -4,21 +4,22 @@
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.sshgit;
 
-  mkNewGitShell = { xtras ? {}, git, stdenv, writeShellScript, writeShellScriptBin, lib, ... }: let
+  mkNewGitShell = { xtras ? {}, git, symlinkJoin, stdenv, writeShellScript, writeShellScriptBin, lib, ... }: let
     extracmds = builtins.mapAttrs (name: value: writeShellScriptBin name value) xtras;
-    cmds = builtins.concatStringsSep " " (builtins.map lib.escapeShellArg (builtins.attrNames extracmds));
-    path = lib.makeBinPath ([ git ] ++ (builtins.attrValues extracmds));
+    linked = symlinkJoin {
+      name = "git-shell-path";
+      paths = builtins.attrValues extracmds;
+    };
     new-git-shell = writeShellScript "new-git-shell" ''
-      [ "$1" != "-c" ] && exec git-shell
+      [ "$1" != "-c" ] && exec ${git}/bin/git-shell
       shift 1
       cmd="$1"
-      export PATH="${path}"
       found=false
-      for xtra in ${cmds}; do
-        [ "$xtra" == "$cmd" ] && found=true && break
+      for xtra in ${linked}/bin/*; do
+        [ "$(basename "$xtra")" == "$cmd" ] && found=true && break
       done
-      [ $found ] && exec "$@"
-      [ ! $found ] && exec git-shell -c "$*"
+      [ $found ] && shift 1 && exec "${linked}/bin/$cmd" "$@"
+      [ ! $found ] && exec ${git}/bin/git-shell -c "$*"
     '';
   in stdenv.mkDerivation {
     name = "new-git-shell";
