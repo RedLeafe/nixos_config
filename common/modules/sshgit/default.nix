@@ -9,9 +9,10 @@
     cmds = builtins.concatStringsSep " " (builtins.map lib.escapeShellArg (builtins.attrNames extracmds));
     path = lib.makeBinPath ([ git ] ++ (builtins.attrValues extracmds));
     new-git-shell = writeShellScript "new-git-shell" ''
+      [ "$1" != "-c" ] && exec git-shell
+      shift 1
       cmd="$1"
       export PATH="${path}"
-      [ -z "$cmd" ] && exec git-shell
       found=false
       for xtra in ${cmds}; do
         [ "$xtra" == "$cmd" ] && found=true && break

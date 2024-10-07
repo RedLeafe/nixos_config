@@ -267,10 +267,8 @@ in {
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
         cd /home/${username}/nixos_config && git init && git add . && \
-        git commit -m "initial nixos config" && \
-        ssh git@localhost 'new-remote nixos_config' && \
-        git remote add origin git@localhost:nixos_config.git && \
-        git push -u origin master
+        git commit -m "initial nixos config" && git branch -M master && \
+        git remote add origin git@localhost:nixos_config.git
         echo "joining AD"
         if [[ ! -f "$ADPASSFILE" ]]; then
           ${adjoin}/bin/adjoin
@@ -279,6 +277,8 @@ in {
         fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
         /home/${username}/nixos_config/scripts/build
+        ssh git@localhost 'new-remote nixos_config' && \
+        git push -u origin master
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"
       '')
