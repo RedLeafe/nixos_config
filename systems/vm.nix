@@ -40,6 +40,8 @@ in {
   moon_mods.sshgit = {
     enable = true;
     AD_support = true;
+    default_git_user = "pluto";
+    default_git_email = "pluto@lunarlooters.com";
     authorized_keys = authorized_keys;
     fail2ban = true;
     settings = {
@@ -87,13 +89,6 @@ in {
   networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 80 443 3306 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
-
-  programs.git = {
-    enable = true;
-    config = {
-      core.fsmonitor = true;
-    };
-  };
 
   virtualisation.docker.enable = true;
 
@@ -261,8 +256,9 @@ in {
           openssh
           coreutils
         ])}"
-        WPDBDUMP="$(realpath "$1")"
-        ADPASSFILE="$(realpath "$2")"
+        WPDBDUMP="$(realpath "$1" 2> /dev/null)"
+        REPOZIP="$(realpath "$2" 2> /dev/null)"
+        ADPASSFILE="$(realpath "$3" 2> /dev/null)"
         ${genAdminSSHkey}/bin/genAdminSSHkey
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
@@ -276,6 +272,7 @@ in {
           ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
         fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
+        ${restoreGitRepos}/bin/restoreGitRepos "$REPOZIP"
         /home/${username}/nixos_config/scripts/build
         ssh git@localhost 'new-remote nixos_config' && \
         git push -u origin master

@@ -4,33 +4,13 @@
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.sshgit;
 
-  mkNewGitShell = { xtras ? {}, git, symlinkJoin, stdenv, writeShellScript, writeShellScriptBin, lib, ... }: let
-    extracmds = builtins.mapAttrs (name: value: writeShellScriptBin name value) xtras;
-    linked = symlinkJoin {
-      name = "git-shell-path";
-      paths = builtins.attrValues extracmds;
-    };
-    new-git-shell = writeShellScript "new-git-shell" ''
-      [ "$1" != "-c" ] && exec ${git}/bin/git-shell
-      shift 1
-      cmd="$1"
-      found=false
-      for xtra in ${linked}/bin/*; do
-        [ "$(basename "$xtra")" == "$cmd" ] && found=true && break
-      done
-      [ $found ] && shift 1 && exec "${linked}/bin/$cmd" "$@"
-      [ ! $found ] && exec ${git}/bin/git-shell -c "$*"
-    '';
-  in stdenv.mkDerivation {
-    name = "new-git-shell";
-    src = new-git-shell;
-    passthru.shellPath = "/bin/new-git-shell";
-    dontUnpack = true;
-    buildPhase = ''
-      mkdir -p $out/bin
-      cp $src $out/bin/new-git-shell
-    '';
-  };
+  mkNewGitShell = { xtras ? {}, linkFarm, runCommandNoCC, writeShellScript, ... }: let
+    extracmds = builtins.mapAttrs (name: value: writeShellScript name value) xtras;
+    linked = linkFarm "git_shell_extend" extracmds;
+  in runCommandNoCC "git-shell-commands" {} ''
+    mkdir -p $out/git-shell-commands
+    cp -r ${linked}/* $out/git-shell-commands
+  '';
 
 in {
   options = {
@@ -51,6 +31,14 @@ in {
         default = {};
         type = types.attrsOf types.str;
       };
+      default_git_user = mkOption {
+        default = "user";
+        type = types.str;
+      };
+      default_git_email = mkOption {
+        default = "user@email.com";
+        type = types.str;
+      };
       git_home_dir = mkOption {
         default = "/var/lib/git-server";
         type = types.str;
@@ -62,14 +50,14 @@ in {
       };
     };
   };
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable (let
+    git-home = cfg.git_home_dir;
+  in {
 
-    users.users.git = let
-      git = config.programs.git.package;
-      git-home = cfg.git_home_dir;
+    system.activationScripts.git_shell_scripts.text = let
       default_git_shell_xtras = {
         new-remote = /*bash*/''
-          export PATH="$PATH:${pkgs.coreutils}/bin"
+          export PATH="$PATH:${lib.makeBinPath (with pkgs; [ coreutils ])}"
           logfile="${git-home}/creation_logs.txt"
           for name in "$@"; do
             echo "$(date): attempting to create repo: $name.git" | tee -a "$logfile"
@@ -78,7 +66,7 @@ in {
               echo "$(date): File already exists, skipping: $name.git" | tee -a "$logfile"
             else
               mkdir -p "$repo_path"
-              if ${git}/bin/git init --bare "$repo_path" 2>&1 | tee -a "$logfile"; then
+              if ${config.programs.git.package}/bin/git init --bare "$repo_path" 2>&1 | tee -a "$logfile"; then
                 echo "$(date): Created repo: git@PUT_HOST_HERE:$name.git" | tee -a "$logfile"
               else
                 echo "$(date): failed to create repo: $name.git" | tee -a "$logfile"
@@ -88,18 +76,30 @@ in {
         '';
       };
       final_git_shell_scripts = default_git_shell_xtras // cfg.git_shell_scripts;
-      new-git-shell = pkgs.callPackage mkNewGitShell {
+      custom_git_commands = pkgs.callPackage mkNewGitShell {
         xtras = final_git_shell_scripts;
-        inherit git;
       };
-    in {
+    in ''
+      ln -sf ${custom_git_commands}/git-shell-commands ${git-home}
+    '';
+
+    programs.git = {
+      enable = true;
+      config = {
+        core.fsmonitor = true;
+        init.defaultBranch = "master";
+        user.email = cfg.default_git_email;
+        user.name = cfg.default_git_user;
+      };
+    };
+
+    users.users.git = {
       isSystemUser = true;
       group = "git";
       home = git-home;
       createHome = true;
-      shell = new-git-shell;
+      shell = "${config.programs.git.package}/bin/git-shell";
       openssh.authorizedKeys.keys = cfg.authorized_keys;
-      packages = [ new-git-shell ];
     };
 
     users.groups.git = {};
@@ -127,5 +127,5 @@ in {
           X11Forwarding no
       '' + cfg.extraSSHDconfig;
     };
-  };
+  });
 }

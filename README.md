@@ -69,6 +69,7 @@ nixos_config
 - [home-manager module options search](https://mipmip.github.io/home-manager-option-search/) <- not installed in this config anymore
 - [nix command docs](https://nix.dev/manual/nix/2.22/command-ref/new-cli/nix)
 - [builtins and lib docs](https://teu5us.github.io/nix-lib.html)
+- [trivial builders](https://ryantm.github.io/nixpkgs/builders/trivial-builders/)
 - [flake inputs docs](https://nix.dev/manual/nix/2.22/command-ref/new-cli/nix3-flake#flake-references)
 - [nix-pills (walkthrough of derivations and stdenv)](https://nixos.org/guides/nix-pills/)
 - [nix cookbook (misc tips and tricks)](https://nixos.wiki/wiki/Nix_Cookbook)
