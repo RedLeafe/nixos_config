@@ -248,6 +248,7 @@ in {
           ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
           mkdir -p "${git_server_home_dir}"
           sudo cp --update=none -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
+          sudo chown -R git:git "${git_server_home_dir}"
         fi
       '';
     in [
