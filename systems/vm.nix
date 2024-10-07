@@ -216,7 +216,7 @@ in {
         infile="''${1:-./dump.sql}"
         sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
       '';
-      pluto_trash = pkgs.writeShellScriptBin "pluto_trash" ''
+      yeet_trash = pkgs.writeShellScriptBin "pluto_trash" ''
         nix-collect-garbage --delete-old
         sudo nix-collect-garbage --delete-old
       '';
@@ -236,7 +236,7 @@ in {
       adjoin
       dumpDBall
       restoreDBall
-      pluto_trash
+      yeet_trash
       genAdminSSHkey
       dumpGitRepos
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
