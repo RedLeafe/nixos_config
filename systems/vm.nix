@@ -45,9 +45,10 @@ in {
     authorized_keys = authorized_keys;
     fail2ban = true;
     settings = {
+      AllowUsers = null;
       PasswordAuthentication = false;
       UseDns = true;
-      X11Forwarding = false;
+      X11Forwarding = true;
       PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
     git_home_dir = git_server_home_dir;
