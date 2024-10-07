@@ -1,5 +1,5 @@
 # Provide a basic configuration for installation devices like CDs.
-{ config, pkgs, lib, modulesPath, ... }:
+{ config, pkgs, lib, authorized_keys, modulesPath, ... }:
 
 with lib;
 
@@ -25,6 +25,8 @@ with lib;
       extraGroups = [ "wheel" "networkmanager" "video" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
+      # Supply our authorized_keys for ssh access
+      openssh.authorizedKeys.keys = authorized_keys;
     };
 
     # Allow the user to log in as root without a password.

@@ -23,6 +23,7 @@
     name = "new-git-shell";
     src = new-git-shell;
     passthru.shellPath = "/bin/new-git-shell";
+    dontUnpack = true;
     buildPhase = ''
       mkdir -p $out/bin
       cp $src $out/bin/new-git-shell

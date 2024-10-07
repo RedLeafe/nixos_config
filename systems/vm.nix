@@ -210,10 +210,12 @@ in {
       '';
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
         outfile="''${1:-./dump.sql}"
+        echo "enter the database root user's password:"
         sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
         infile="''${1:-./dump.sql}"
+        echo "enter the database root user's password:"
         sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
       '';
       yeet_trash = pkgs.writeShellScriptBin "pluto_trash" ''
@@ -230,7 +232,16 @@ in {
         fi
       '';
       dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
-        sudo ${pkgs.zip}/bin/zip -r -9 "$1/repobackup.zip" "${git_server_home_dir}"
+        outfile="''${1:-./repobackup.zip}"
+        sudo ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
+      '';
+      # NOTE: Assumes zip was made with the above command
+      restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
+        repozip="''${1:-./repobackup.zip}"
+        tempdir=$(mktemp -d)
+        ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
+        mkdir -p "${git_server_home_dir}"
+        sudo cp -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
       '';
     in [
       adjoin
@@ -239,6 +250,7 @@ in {
       yeet_trash
       genAdminSSHkey
       dumpGitRepos
+      restoreGitRepos
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
         if [[ "$USER" != "${username}" ]]; then
           echo "Error: script must be run as the user ${username}"
@@ -265,11 +277,6 @@ in {
         else
           ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
         fi
-        if [[ ! -f "$WPDBDUMP" ]]; then
-          echo "Error: Arg 1: WordPress database dump file not found."
-          exit 1
-        fi
-        echo "enter the database root user's password:"
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
         /home/${username}/nixos_config/scripts/build
         echo "Initialization complete."
