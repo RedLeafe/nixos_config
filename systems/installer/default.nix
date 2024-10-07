@@ -41,7 +41,10 @@ in {
       umask 077
       sudo mkdir -p /mnt/home/$username
       sudo cp -rvL /home/nixos/nixos_config /mnt/home/$username/nixos_config
+      [ -d /home/nixos/restored_data ] && sudo cp -rvL /home/nixos/restored_data /mnt/home/$username/restored_data
       sudo chmod -R u+w /mnt/home/$username/nixos_config
+      sudo chown -R $username:users /mnt/home/$username/nixos_config
+      [ -d /mnt/home/$username/restored_data ] && sudo chown -R $username:users /mnt/home/$username/restored_data
     '';
   in {
     SPACEOS = "${pkgs.writeShellScript "SPACEOS" ''

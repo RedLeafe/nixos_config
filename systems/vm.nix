@@ -206,12 +206,13 @@ in {
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
       '';
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
-        outfile="''${1:-./dump.sql}"
+        outfile="''${1:-/home/${username}/restored_data/dump.sql}"
+        mkdir -p "$(dirname "$(readlink -f "$outfile")")"
         echo "enter the database root user's password:"
         sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
-        infile="''${1:-./dump.sql}"
+        infile="''${1:-/home/${username}/restored_data/dump.sql}"
         if [ ! -e "$infile" ]; then
           echo "Error: $infile not found"
         else
@@ -233,12 +234,13 @@ in {
         fi
       '';
       dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
-        outfile="''${1:-./repobackup.zip}"
+        outfile="''${1:-/home/${username}/restored_data/repobackup.zip}"
+        mkdir -p "$(dirname "$(readlink -f "$outfile")")"
         sudo ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
       '';
       # NOTE: Assumes zip was made with the above command
       restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
-        repozip="''${1:-./repobackup.zip}"
+        repozip="''${1:-/home/${username}/restored_data/repobackup.zip}"
         if [ ! -e "$repozip" ]; then
           echo "Error: $repozip not found"
         else
