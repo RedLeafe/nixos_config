@@ -4,6 +4,27 @@
 
 { config, pkgs, lib, inputs, stateVersion, username, hostname, system-modules, authorized_keys, ... }: let
   git_server_home_dir = "/var/lib/git-server";
+  sqldbpkg = config.services.mysql.package;
+  dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
+    outfile="''${1:-/home/${username}/restored_data/dump.sql}"
+    mkdir -p "$(dirname "$outfile")"
+    if [ "$USER" == "root" ]; then
+      ${sqldbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
+    else
+      sudo ${sqldbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
+    fi
+  '';
+  dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
+    outfile="''${1:-/home/${username}/restored_data/repobackup.zip}"
+    mkdir -p "$(dirname "$outfile")"
+    if [ "$USER" == "root" ]; then
+      ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
+      chown -R ${username}:users "$outfile"
+    else
+      sudo ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
+      sudo chown -R ${username}:users "$outfile"
+    fi
+  '';
 in {
   imports = with system-modules; [
     shell.bash
@@ -192,6 +213,61 @@ in {
 
   users.users.root.openssh.authorizedKeys.keys = authorized_keys;
 
+  systemd = let
+    servicename = "backup_runner";
+    servicescript = pkgs.writeShellScript "backup_runner-script" ''
+      export PATH="${lib.makeBinPath (with pkgs; [ sudo bash sqldbpkg coreutils-full ])}:$PATH";
+      echo "Running ${servicename} as $USER";
+
+      if [ -e /home/${username}/restored_data ]; then
+        mkdir -p /home/${username}/backupcache
+        if [ -e /home/${username}/restored_data/dump.sql ]; then
+          ${pkgs.zip}/bin/zip -9 /home/${username}/restored_data/dump.sql.zip /home/${username}/restored_data/dump.sql
+          rm -f /home/${username}/restored_data/dump.sql
+        fi
+        files=( /home/${username}/backupcache/* )
+        max=10
+        for (( i=$((''${#files[@]}-1)); i>=0; i-- )); do
+          file="''${files[$i]}"
+          [ '/home/${username}/backupcache/*' == "$file" ] && break
+          number="''${file##*[!0-9]}"
+          base="''${file%%[0-9]*}"
+          if [[ -n "$number" ]]; then
+            incremented_number=$((number + 1))
+          else
+            incremented_number=1
+          fi
+          new_path="$base$incremented_number"
+          if [ 1 -eq $(($incremented_number > $max)) ]; then
+            rm -rf "$file"
+          else
+            mv "$file" "$new_path"
+          fi
+        done
+        mv /home/${username}/restored_data /home/${username}/backupcache/restored_data1
+      fi
+      ${dumpDBall}/bin/dumpDBall
+      ${dumpGitRepos}/bin/dumpGitRepos
+      chown -R ${username}:users /home/${username}/restored_data
+    '';
+  in {
+    services.${servicename} = {
+      description = "Run ${servicename}";
+      serviceConfig = {
+        ExecStart = "${pkgs.bash}/bin/bash ${servicescript}";
+      };
+    };
+    timers."${servicename}-timer" = {
+      description = "Timer to run ${servicename} every hour";
+      timerConfig = {
+        OnCalendar = "hourly";
+        Persistent = true;
+        Unit = "${servicename}.service";
+      };
+      wantedBy = [ "timers.target" ];
+    };
+  };
+
   users.users.${username} = {
     name = username;
     shell = pkgs.zsh;
@@ -202,26 +278,33 @@ in {
     openssh.authorizedKeys.keys = authorized_keys;
     # NOTE: administration scripts
     packages = let
-      dbpkg = config.services.mysql.package;
       adjoin = pkgs.writeShellScriptBin "adjoin" ''
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
       '';
-      dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
-        outfile="''${1:-/home/${username}/restored_data/dump.sql}"
-        mkdir -p "$(dirname "$(readlink -f "$outfile")")"
-        sudo ${dbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
+      dumpALL = pkgs.writeShellScriptBin "dumpALL" ''
+        ${dumpGitRepos}/bin/dumpGitRepos "$1"
+        ${dumpDBall}/bin/dumpDBall "$2" "$3"
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
         infile="''${1:-/home/${username}/restored_data/dump.sql}"
         if [ ! -e "$infile" ]; then
           echo "Error: $infile not found"
         else
-          sudo ${dbpkg}/bin/mysql -u root --password="$2" < "$infile"
+          sudo ${sqldbpkg}/bin/mysql -u root --password="$2" < "$infile"
         fi
       '';
-      dumpALL = pkgs.writeShellScriptBin "dumpALL" ''
-        ${dumpGitRepos}/bin/dumpGitRepos "$1"
-        ${dumpDBall}/bin/dumpDBall "$2" "$3"
+      # NOTE: Assumes zip was made with the dumpGitRepos command
+      restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
+        repozip="''${1:-/home/${username}/restored_data/repobackup.zip}"
+        if [ ! -e "$repozip" ]; then
+          echo "Error: $repozip not found"
+        else
+          tempdir=$(mktemp -d)
+          ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
+          mkdir -p "${git_server_home_dir}"
+          sudo cp --update=none -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
+          sudo chown -R git:git "${git_server_home_dir}"
+        fi
       '';
       restoreALL = pkgs.writeShellScriptBin "restoreALL" ''
         ${restoreGitRepos}/bin/restoreGitRepos "$1"
@@ -238,25 +321,6 @@ in {
           cp -f /home/${username}/.ssh/id_ed25519.pub /home/${username}/nixos_config/common/auth_keys/${username}.pub
         else
           echo "SSH key already exists, skipping key generation."
-        fi
-      '';
-      dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
-        outfile="''${1:-/home/${username}/restored_data/repobackup.zip}"
-        mkdir -p "$(dirname "$(readlink -f "$outfile")")"
-        sudo ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
-        sudo chown -R ${username}:users "$outfile"
-      '';
-      # NOTE: Assumes zip was made with the above command
-      restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
-        repozip="''${1:-/home/${username}/restored_data/repobackup.zip}"
-        if [ ! -e "$repozip" ]; then
-          echo "Error: $repozip not found"
-        else
-          tempdir=$(mktemp -d)
-          ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
-          mkdir -p "${git_server_home_dir}"
-          sudo cp --update=none -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
-          sudo chown -R git:git "${git_server_home_dir}"
         fi
       '';
     in [
