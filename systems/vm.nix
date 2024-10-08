@@ -220,6 +220,7 @@ in {
     servicename = "backup_runner";
     servicescript = pkgs.writeShellScript "backup_runner-script" ''
       export PATH="${lib.makeBinPath (with pkgs; [ bash sqldbpkg coreutils-full ])}:$PATH";
+      umask 077
       if [ -e /home/${username}/restored_data ]; then
         mkdir -p /home/${username}/backupcache
         if [ -e /home/${username}/restored_data/dump.sql ]; then
@@ -298,6 +299,7 @@ in {
       # NOTE: Assumes zip was made with the dumpGitRepos command
       restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
         repozip="''${1:-/home/${username}/restored_data/repobackup.zip}"
+        umask 077
         if [ ! -e "$repozip" ]; then
           echo "Error: $repozip not found"
         else

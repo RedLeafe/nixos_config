@@ -66,6 +66,7 @@ in {
           #!${pkgs.bash}/bin/bash
           export PATH="$PATH:${lib.makeBinPath (with pkgs; [ coreutils ])}"
           logfile="${git-home}/creation_logs.txt"
+          umask 007
           is_safe_path () {
             local repo_path="$(realpath "$1")"
             # 1 == false; 0 == true
