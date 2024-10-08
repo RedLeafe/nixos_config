@@ -74,6 +74,7 @@ in {
     git_home_dir = git_server_home_dir;
     git_shell_scripts = {
       # example = ''
+      #   #!${pkgs.bash}/bin/bash
       #   echo "example script"
       # '';
     };
