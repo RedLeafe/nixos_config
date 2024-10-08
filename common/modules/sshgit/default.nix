@@ -2,19 +2,6 @@
 # that returns a module
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.sshgit;
-
-  mkNewGitShell = { xtras ? {}, symlinkJoin, writeTextFile, ... }: let
-    extracmds = builtins.attrValues (builtins.mapAttrs (name: value: writeTextFile {
-      inherit name;
-      text = value;
-      executable = true;
-      destination = "/git-shell-commands/" + name;
-    }) xtras);
-  in symlinkJoin {
-    name = "git-shell-commands";
-    paths = extracmds;
-  };
-
 in {
   options = {
     ${moduleNamespace}.sshgit = with lib; {
@@ -53,12 +40,24 @@ in {
       };
     };
   };
-  config = lib.mkIf cfg.enable (let
-    git-home = cfg.git_home_dir;
-  in {
+  config = lib.mkIf cfg.enable {
 
-    system.activationScripts.git_shell_scripts.text = let
-      default_git_shell_xtras = {
+    system.activationScripts.git_shell_scripts.text = lib.mkIf (config.users.users ? git) (let
+      mkNewGitShellCmds = { xtras ? {}, symlinkJoin, writeTextFile, ... }: let
+        extracmds = builtins.attrValues (builtins.mapAttrs (name: value: writeTextFile {
+          inherit name;
+          text = value;
+          executable = true;
+          destination = "/git-shell-commands/" + name;
+        }) xtras);
+      in symlinkJoin {
+        name = "git-shell-commands";
+        paths = extracmds;
+      };
+
+      default_git_shell_xtras = (let
+        git-home = config.users.users.git.home;
+      in {
         new-remote = /*bash*/''
           #!${pkgs.bash}/bin/bash
           export PATH="$PATH:${lib.makeBinPath (with pkgs; [ coreutils ])}"
@@ -78,14 +77,14 @@ in {
             fi
           done
         '';
-      };
+      });
       final_git_shell_scripts = default_git_shell_xtras // cfg.git_shell_scripts;
-      custom_git_commands = pkgs.callPackage mkNewGitShell {
+      custom_git_commands = pkgs.callPackage mkNewGitShellCmds {
         xtras = final_git_shell_scripts;
       };
     in ''
       ln -sf ${custom_git_commands}/git-shell-commands ${config.users.users.git.home}
-    '';
+    '');
 
     programs.git = {
       enable = true;
@@ -100,7 +99,7 @@ in {
     users.users.git = {
       isSystemUser = true;
       group = "git";
-      home = git-home;
+      home = cfg.git_home_dir;
       createHome = true;
       shell = "${config.programs.git.package}/bin/git-shell";
       openssh.authorizedKeys.keys = cfg.authorized_keys;
@@ -131,5 +130,5 @@ in {
           X11Forwarding no
       '' + cfg.extraSSHDconfig;
     };
-  });
+  };
 }
