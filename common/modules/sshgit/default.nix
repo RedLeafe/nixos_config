@@ -29,6 +29,10 @@ in {
         default = "user@email.com";
         type = types.str;
       };
+      repo_clone_hostname = mkOption {
+        default = "0.0.0.0";
+        type = types.str;
+      };
       git_home_dir = mkOption {
         default = "/var/lib/git-server";
         type = types.str;
@@ -77,7 +81,7 @@ in {
             else
               mkdir -p "$repo_path"
               if ${config.programs.git.package}/bin/git init --bare "$repo_path" 2>&1 | tee -a "$logfile"; then
-                echo "$(date): Created repo: git@PUT_HOST_HERE:$name.git" | tee -a "$logfile"
+                echo "$(date): Created repo: git@${cfg.repo_clone_hostname}:$name.git" | tee -a "$logfile"
               else
                 echo "$(date): failed to create repo: $name.git" | tee -a "$logfile"
               fi

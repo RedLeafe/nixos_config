@@ -62,6 +62,7 @@ in {
     AD_support = true;
     default_git_user = "pluto";
     default_git_email = "pluto@lunarlooters.com";
+    repo_clone_hostname = "10.100.136.44";
     authorized_keys = authorized_keys;
     fail2ban = true;
     settings = {
