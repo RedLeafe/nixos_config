@@ -62,11 +62,18 @@ in {
           #!${pkgs.bash}/bin/bash
           export PATH="$PATH:${lib.makeBinPath (with pkgs; [ coreutils ])}"
           logfile="${git-home}/creation_logs.txt"
+          is_safe_path () {
+            local repo_path="$(realpath "$1")"
+            # 1 == false; 0 == true
+            [ -e "$repo_path" ] && return 1 # Path exists
+            [[ "$repo_path" != "${git-home}/"* ]] && return 1 # Path is outside of git-home
+            return 0 # all cases passed
+          }
           for name in "$@"; do
             echo "$(date): attempting to create repo: $name.git" | tee -a "$logfile"
             repo_path="${git-home}/$name.git"
-            if [ -e "$repo_path" ]; then
-              echo "$(date): File already exists, skipping: $name.git" | tee -a "$logfile"
+            if ! is_safe_path "$repo_path"; then
+              echo "$(date): Bad file path, skipping: $name.git" | tee -a "$logfile"
             else
               mkdir -p "$repo_path"
               if ${config.programs.git.package}/bin/git init --bare "$repo_path" 2>&1 | tee -a "$logfile"; then
