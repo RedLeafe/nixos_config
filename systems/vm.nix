@@ -209,25 +209,23 @@ in {
       dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
         outfile="''${1:-/home/${username}/restored_data/dump.sql}"
         mkdir -p "$(dirname "$(readlink -f "$outfile")")"
-        echo "enter the database root user's password:"
-        sudo ${dbpkg}/bin/mysqldump -u root -p --all-databases > "$outfile"
+        sudo ${dbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
         infile="''${1:-/home/${username}/restored_data/dump.sql}"
         if [ ! -e "$infile" ]; then
           echo "Error: $infile not found"
         else
-          echo "enter the database root user's password:"
-          sudo ${dbpkg}/bin/mysql -u root -p < "$infile"
+          sudo ${dbpkg}/bin/mysql -u root --password="$2" < "$infile"
         fi
       '';
       dumpALL = pkgs.writeShellScriptBin "dumpALL" ''
-        ${dumpDBall}/bin/dumpDBall "$1"
-        ${dumpGitRepos}/bin/dumpGitRepos "$2"
+        ${dumpGitRepos}/bin/dumpGitRepos "$1"
+        ${dumpDBall}/bin/dumpDBall "$2" "$3"
       '';
       restoreALL = pkgs.writeShellScriptBin "restoreALL" ''
-        ${restoreDBall}/bin/restoreDBall "$1"
-        ${restoreGitRepos}/bin/restoreGitRepos "$2"
+        ${restoreGitRepos}/bin/restoreGitRepos "$1"
+        ${restoreDBall}/bin/restoreDBall "$2" "$3"
       '';
       yeet_trash = pkgs.writeShellScriptBin "pluto_trash" ''
         nix-collect-garbage --delete-old
@@ -246,6 +244,7 @@ in {
         outfile="''${1:-/home/${username}/restored_data/repobackup.zip}"
         mkdir -p "$(dirname "$(readlink -f "$outfile")")"
         sudo ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
+        sudo chown -R ${username}:users "$outfile"
       '';
       # NOTE: Assumes zip was made with the above command
       restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''

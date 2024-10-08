@@ -31,6 +31,8 @@ in {
       [ ! -d /home/nixos/nixos_config ] && cp -r /iso/nixos_config /home/nixos
       sudo disko --mode disko --flake /iso/nixos_config#$hostname
     '';
+    # if it gets stuck you can run just this one without running disko part
+    # so that it picks up more or less where it left off.
     installscript = pkgs.writeShellScript "install" ''
       hostname=''${1:-'${hostname}'}
       username=''${2:-'${username}'}

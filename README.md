@@ -1,6 +1,10 @@
 # nix.moon.mine
 
-## TODO: set up self hosted git for config redundancy.
+With the contents of this directory, plus the restored_data directory in the pluto's home directory, you can restore this machine from any state.
+
+Back them up! Clone this one from git@10.100.136.44:nixos_config.git to your local machine and also scp the restored_data directory to your local machine.
+
+A new backup of the database and git will be taken once per hour, so you may need to clean up the old ones if you are running out of disk space, along with running garbage collection.
 
 ## Structure:
 
