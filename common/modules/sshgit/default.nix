@@ -84,7 +84,7 @@ in {
         xtras = final_git_shell_scripts;
       };
     in ''
-      ln -sf ${custom_git_commands}/git-shell-commands ${git-home}
+      ln -sf ${custom_git_commands}/git-shell-commands ${config.users.users.git.home}
     '';
 
     programs.git = {
