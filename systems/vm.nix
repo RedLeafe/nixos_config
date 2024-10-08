@@ -1,7 +1,6 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, lib, inputs, stateVersion, username, hostname, system-modules, authorized_keys, ... }: let
   git_server_home_dir = "/var/lib/git-server";
   sqldbpkg = config.services.mysql.package;
@@ -216,9 +215,7 @@ in {
   systemd = let
     servicename = "backup_runner";
     servicescript = pkgs.writeShellScript "backup_runner-script" ''
-      export PATH="${lib.makeBinPath (with pkgs; [ sudo bash sqldbpkg coreutils-full ])}:$PATH";
-      echo "Running ${servicename} as $USER";
-
+      export PATH="${lib.makeBinPath (with pkgs; [ bash sqldbpkg coreutils-full ])}:$PATH";
       if [ -e /home/${username}/restored_data ]; then
         mkdir -p /home/${username}/backupcache
         if [ -e /home/${username}/restored_data/dump.sql ]; then
@@ -249,6 +246,7 @@ in {
       ${dumpDBall}/bin/dumpDBall
       ${dumpGitRepos}/bin/dumpGitRepos
       chown -R ${username}:users /home/${username}/restored_data
+      chown -R ${username}:users /home/${username}/backupcache
     '';
   in {
     services.${servicename} = {
