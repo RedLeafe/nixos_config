@@ -343,7 +343,7 @@ in {
         ])}"
         WPDBDUMP="$(realpath "$1" 2> /dev/null)"
         REPOZIP="$(realpath "$2" 2> /dev/null)"
-        ADPASSFILE="$(realpath "$3" 2> /dev/null)"
+        ADPASS="$3"
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
         sudo chown -R ${username}:users /home/${username}/restored_data
@@ -354,10 +354,10 @@ in {
         git commit -m "initial nixos config" && git branch -M master && \
         git remote add origin git@localhost:nixos_config.git
         echo "joining AD"
-        if [[ ! -f "$ADPASSFILE" ]]; then
+        if [[ -z "$ADPASS" ]]; then
           ${adjoin}/bin/adjoin
         else
-          ${adjoin}/bin/adjoin --stdin-password <<< "$(cat "$ADPASSFILE")"
+          ${adjoin}/bin/adjoin --stdin-password <<< "$ADPASS"
         fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
         /home/${username}/nixos_config/scripts/build
@@ -365,6 +365,7 @@ in {
         cd /home/${username}/nixos_config && \
         git push -u origin master
         ${restoreGitRepos}/bin/restoreGitRepos "$REPOZIP"
+        rm -f /home/${username}/.zsh_history
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"
       '')
