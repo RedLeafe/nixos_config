@@ -3,13 +3,17 @@
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.sshgit;
 
-  mkNewGitShell = { xtras ? {}, linkFarm, runCommandNoCC, writeShellScript, ... }: let
-    extracmds = builtins.mapAttrs (name: value: writeShellScript name value) xtras;
-    linked = linkFarm "git_shell_extend" extracmds;
-  in runCommandNoCC "git-shell-commands" {} ''
-    mkdir -p $out/git-shell-commands
-    cp -r ${linked}/* $out/git-shell-commands
-  '';
+  mkNewGitShell = { xtras ? {}, symlinkJoin, writeTextFile, ... }: let
+    extracmds = builtins.attrValues (builtins.mapAttrs (name: value: writeTextFile {
+      inherit name;
+      text = value;
+      executable = true;
+      destination = "/git-shell-commands/" + name;
+    }) xtras);
+  in symlinkJoin {
+    name = "git-shell-commands";
+    paths = extracmds;
+  };
 
 in {
   options = {
@@ -56,6 +60,7 @@ in {
     system.activationScripts.git_shell_scripts.text = let
       default_git_shell_xtras = {
         new-remote = /*bash*/''
+          #!${pkgs.bash}/bin/bash
           export PATH="$PATH:${lib.makeBinPath (with pkgs; [ coreutils ])}"
           logfile="${git-home}/creation_logs.txt"
           for name in "$@"; do
