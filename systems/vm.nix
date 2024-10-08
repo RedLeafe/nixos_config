@@ -226,7 +226,7 @@ in {
           rm -f /home/${username}/restored_data/dump.sql
         fi
         files=( /home/${username}/backupcache/* )
-        max=10
+        max=8
         for (( i=$((''${#files[@]}-1)); i>=0; i-- )); do
           file="''${files[$i]}"
           [ '/home/${username}/backupcache/*' == "$file" ] && break
@@ -238,7 +238,7 @@ in {
             incremented_number=1
           fi
           new_path="$base$incremented_number"
-          if [ 1 -eq $(($incremented_number > $max)) ]; then
+          if [ $incremented_number -gt $max ]; then
             rm -rf "$file"
           else
             mv "$file" "$new_path"
