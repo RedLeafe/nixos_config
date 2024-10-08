@@ -6,6 +6,7 @@
   sqldbpkg = config.services.mysql.package;
   dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
     outfile="''${1:-/home/${username}/restored_data/dump.sql}"
+    umask 077
     mkdir -p "$(dirname "$outfile")"
     if [ "$USER" == "root" ]; then
       ${sqldbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
@@ -15,6 +16,7 @@
   '';
   dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
     outfile="''${1:-/home/${username}/restored_data/repobackup.zip}"
+    umask 077
     mkdir -p "$(dirname "$outfile")"
     if [ "$USER" == "root" ]; then
       ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
