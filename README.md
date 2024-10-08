@@ -4,7 +4,9 @@ With the contents of this directory, plus the restored_data directory in the plu
 
 Back them up! Clone this one from git@10.100.136.44:nixos_config.git to your local machine and also scp the restored_data directory to your local machine.
 
-A new backup of the database and git will be taken once per hour, max 8 copies, so you may need to clean up the old ones if you are running out of disk space, along with running garbage collection.
+A new backup of the database and git will be taken once per hour, 1 main backup, and max 3 older versions,
+so you may need to clean up the old ones if you are running out of disk space, along with running garbage collection,
+and maybe decrease the max number of backups.
 
 ## Structure:
 

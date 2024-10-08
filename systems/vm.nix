@@ -223,7 +223,7 @@ in {
           rm -f /home/${username}/restored_data/dump.sql
         fi
         files=( /home/${username}/backupcache/* )
-        max=8
+        max=3
         for (( i=$((''${#files[@]}-1)); i>=0; i-- )); do
           file="''${files[$i]}"
           [ '/home/${username}/backupcache/*' == "$file" ] && break
