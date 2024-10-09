@@ -7,6 +7,10 @@ in {
   options = {
     ${moduleNamespace}.LD = with lib.types; {
       enable = lib.mkEnableOption "LD stuff";
+      extralibs = lib.mkOption {
+        default = [];
+        type = types.listOf types.package;
+      };
     };
   };
   config = lib.mkIf cfg.enable (let
@@ -18,7 +22,7 @@ in {
         # Add any missing global dynamic libraries for unpackaged programs here,
         # NOT in environment.systemPackages.
         # for use when wrapping the program with nix is infeasible
-      ];
+      ] ++ cfg.extralibs;
     };
   });
 }

@@ -7,6 +7,8 @@ in {
     ${moduleNamespace}.sshgit = with lib; {
       enable = mkEnableOption "sshd and git stuff";
       AD_support = mkEnableOption "ssh Active Directory support";
+      fail2ban = mkEnableOption "enable fail2ban";
+      enable_git_server = mkEnableOption "sshd and git stuff";
       authorized_keys = mkOption {
         default = [];
         type = types.listOf types.str;
@@ -16,7 +18,6 @@ in {
         type = types.raw;
         description = "maps to services.openssh.settings";
       };
-      fail2ban = mkEnableOption "enable fail2ban";
       git_shell_scripts = mkOption {
         default = {};
         type = types.attrsOf types.str;
@@ -46,7 +47,7 @@ in {
   };
   config = lib.mkIf cfg.enable {
 
-    system.activationScripts.git_shell_scripts.text = lib.mkIf (config.users.users ? git) (let
+    system.activationScripts.git_shell_scripts.text = lib.mkIf ((config.users.users ? git) && cfg.enable_git_server) (let
       mkNewGitShellCmds = { xtras ? {}, symlinkJoin, writeTextFile, ... }: let
         extracmds = builtins.attrValues (builtins.mapAttrs (name: value: writeTextFile {
           inherit name;
@@ -108,7 +109,7 @@ in {
       };
     };
 
-    users.users.git = {
+    users.users.git = lib.mkIf (! cfg.enable_git_server) {
       isSystemUser = true;
       group = "git";
       home = cfg.git_home_dir;
@@ -117,7 +118,7 @@ in {
       openssh.authorizedKeys.keys = cfg.authorized_keys;
     };
 
-    users.groups.git = {};
+    users.groups.git = lib.mkIf (! cfg.enable_git_server) {};
 
     services.fail2ban.enable = true;
 
@@ -133,14 +134,14 @@ in {
         KerberosOrLocalPasswd yes
         GSSAPIAuthentication yes
         GSSAPICleanupCredentials yes
-      '') + ''
+      '') + (lib.optionalString (cfg.enable_git_server) ''
         Match user git
           AllowTcpForwarding no
           AllowAgentForwarding no
           PasswordAuthentication no
           PermitTTY no
           X11Forwarding no
-      '' + cfg.extraSSHDconfig;
+      '') + cfg.extraSSHDconfig;
     };
   };
 }

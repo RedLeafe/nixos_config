@@ -1,6 +1,7 @@
-{ config, pkgs, stateVersion, system-modules, hostname, username, inputs, ... }: let
+{ config, pkgs, stateVersion, system-modules, hostconfig, inputs, ... }: let
   login_shell = "zsh";
   nerd_font_string = "FiraMono";
+  installuser = "nixos";
 in {
   imports = with system-modules; [
     ./minimal-graphical-base.nix
@@ -25,66 +26,26 @@ in {
 
   isoImage.isoBaseName = "space_dust_installer";
 
-  environment.shellAliases = let
-    diskoscript = pkgs.writeShellScript "disko" ''
-      hostname=''${1:-'${hostname}'}
-      [ ! -d /home/nixos/nixos_config ] && cp -r /iso/nixos_config /home/nixos
-      sudo disko --mode disko --flake /iso/nixos_config#$hostname
-    '';
-    # if it gets stuck you can run just this one without running disko part
-    # so that it picks up more or less where it left off.
-    installscript = pkgs.writeShellScript "install" ''
-      hostname=''${1:-'${hostname}'}
-      username=''${2:-'${username}'}
-      [ ! -d /home/nixos/nixos_config ] && cp -r /iso/nixos_config /home/nixos
-      sudo nixos-install --verbose --show-trace --flake /home/nixos/nixos_config#$hostname
-      echo "please set password for user $username"
-      sudo passwd --root /mnt $username
-      umask 077
-      sudo mkdir -p /mnt/home/$username
-      sudo cp -rvL /home/nixos/nixos_config /mnt/home/$username/nixos_config
-      [ -d /home/nixos/restored_data ] && sudo cp -rvL /home/nixos/restored_data /mnt/home/$username/restored_data
-      sudo chmod -R u+w /mnt/home/$username/nixos_config
-      sudo chown -R $username:users /mnt/home/$username/nixos_config
-      [ -d /mnt/home/$username/restored_data ] && sudo chown -R $username:users /mnt/home/$username/restored_data
-    '';
-  in {
-    SPACEOS = "${pkgs.writeShellScript "SPACEOS" ''
-      hostname=''${1:-'${hostname}'}
-      username=''${2:-'${username}'}
-      ${diskoscript} "$hostname"
-      ${installscript} "$hostname" "$username"
-    ''}";
-    SPACEOS-disko = "${diskoscript}";
-    SPACEOS-install = "${installscript}";
+  isoImage.contents = [
+    { source = "${inputs.self}"; target = "/nixos_config";}
+  ];
+
+  environment.shellAliases = {
     lsnc = "ls --color=never";
     la = "ls -a";
     ll = "ls -l";
     l  = "ls -alh";
   };
 
-  isoImage.contents = [
-    { source = "${inputs.self}"; target = "/nixos_config";}
-  ];
-
-  environment.systemPackages = with pkgs; [
-    inputs.disko.packages.${system}.default
-    neovim
-    git
-    findutils
-    coreutils
-    xclip
-  ];
-
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   services.libinput.enable = true;
   services.libinput.touchpad.disableWhileTyping = true;
+  system.stateVersion = stateVersion;
 
   users.defaultUserShell = pkgs.${login_shell};
-
   system.activationScripts.silencezsh.text = ''
-    [ ! -e "/home/nixos/.zshrc" ] && echo "# dummy file" > /home/nixos/.zshrc
+    [ ! -e "/home/${installuser}/.zshrc" ] && echo "# dummy file" > /home/${installuser}/.zshrc
   '';
 
   fonts.packages = with pkgs; [
@@ -100,6 +61,62 @@ in {
   };
   fonts.fontDir.enable = true;
 
-  system.stateVersion = stateVersion;
+  environment.systemPackages = (let
+
+    scriptsForHosts = let
+      listed = builtins.attrValues (builtins.mapAttrs (name: value: {
+        host = name;
+        inherit (value) admin;
+        postdisko = if value ? postdisko then value.postdisko else (_: "");
+        postinstall = if value ? postinstall then value.postinstall else (_: "");
+      }) hostconfig);
+      mkScriptsForHost = { host, admin, postdisko, postinstall }: let
+        diskoscript = pkgs.writeShellScriptBin "disko-${host}-script" ''
+          hostname=''${1:-'${host}'}
+          username=''${2:-'${admin}'}
+          shift 2
+          [ ! -d /home/${installuser}/nixos_config ] && cp -r /iso/nixos_config /home/${installuser}
+          sudo disko --mode disko --flake /iso/nixos_config#$hostname
+          postcmds () {
+            ${postdisko installuser}
+          }
+          postcmds "$hostname" "$username" "$@"
+        '';
+        # if it gets stuck you can run just this one without running disko part
+        # so that it picks up more or less where it left off.
+        installscript = pkgs.writeShellScriptBin "install-${host}-script" ''
+          hostname=''${1:-'${host}'}
+          username=''${2:-'${admin}'}
+          shift 2
+          [ ! -d /home/${installuser}/nixos_config ] && cp -r /iso/nixos_config /home/${installuser}
+          sudo nixos-install --verbose --show-trace --flake /home/${installuser}/nixos_config#$hostname
+          echo "please set password for user $username"
+          sudo passwd --root /mnt $username
+          umask 077
+          sudo mkdir -p /mnt/home/$username
+          sudo cp -rvL /home/${installuser}/nixos_config /mnt/home/$username/nixos_config
+          sudo chmod -R u+w /mnt/home/$username/nixos_config
+          postcmds () {
+            ${postinstall installuser}
+          }
+          postcmds "$hostname" "$username" "$@"
+        '';
+        fullinstall = pkgs.writeShellScriptBin "OS-${host}-full" ''
+          hostname=''${1:-'${host}'}
+          username=''${2:-'${admin}'}
+          ${diskoscript}/bin/disko-${host}-script "$hostname"
+          ${installscript}/bin/install-${host}-script "$hostname" "$username"
+        '';
+      in [ diskoscript installscript fullinstall ];
+    in builtins.concatLists (builtins.map mkScriptsForHost listed);
+
+  in with pkgs; [
+    inputs.disko.packages.${system}.default
+    neovim
+    git
+    findutils
+    coreutils
+    xclip
+  ] ++ scriptsForHosts);
 
 }

@@ -37,13 +37,15 @@
     common = import ./common { inherit inputs; } { overlaysList = true; nixos = true; keys = true; };
     inherit (common) overlays system-modules authorized_keys;
     forAllSys = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
-    username = "pluto";
-    hostname = "nix";
   in {
-    diskoConfigurations.${hostname} = import ./disko/sdaBIOS.nix;
+    diskoConfigurations.nix = import ./disko/sdaBIOS.nix;
+    diskoConfigurations.pandemonium = import ./disko/sdaBIOS.nix;
     legacyPackages = forAllSys (system: {
       nixosConfigurations = {
-        ${hostname} = nixpkgs.lib.nixosSystem {
+        nix = nixpkgs.lib.nixosSystem (let 
+          username = "pluto";
+          hostname = "nix";
+        in {
           specialArgs = {
             inherit stateVersion inputs system-modules username hostname authorized_keys;
           };
@@ -52,19 +54,51 @@
             disko.nixosModules.disko
             self.diskoConfigurations.${hostname}
             { nixpkgs.overlays = overlays; }
-            ./systems/vmware
+            ./systems/${hostname}
           ];
-        };
-        installer = nixpkgs.lib.nixosSystem {
+        });
+        pandemonium = nixpkgs.lib.nixosSystem (let
+          username = "dorsa";
+          hostname = "pandemonium";
+        in {
           specialArgs = {
             inherit stateVersion inputs system-modules username hostname authorized_keys;
+          };
+          inherit system;
+          modules = [
+            disko.nixosModules.disko
+            self.diskoConfigurations.${hostname}
+            { nixpkgs.overlays = overlays; }
+            ./systems/${hostname}
+          ];
+        });
+        installer = nixpkgs.lib.nixosSystem (let
+          hostconfig = {
+            nix = {
+              admin = "pluto";
+              postinstall = installuser: /*bash*/ ''
+                hostname="$1" # <- could change at call time
+                admin="$2" # <- could change at call time
+                # we also get the rest of the args passed to the install script
+                [ -d /home/${installuser}/restored_data ] && sudo cp -rvL /home/${installuser}/restored_data /mnt/home/$admin/restored_data
+              '';
+            };
+            pandemonium = {
+              admin = {
+                admin = "dorsa";
+              };
+            };
+          };
+        in {
+          specialArgs = {
+            inherit stateVersion inputs system-modules hostconfig authorized_keys;
           };
           inherit system;
           modules = [
             { nixpkgs.overlays = overlays; }
             ./systems/installer
           ];
-        };
+        });
       };
     });
   };

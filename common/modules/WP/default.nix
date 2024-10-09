@@ -22,6 +22,8 @@ in
   options = {
     ${moduleNamespace}.WP = with lib; {
       enable = mkEnableOption "WordPress stuff";
+      https = mkEnableOption "https support";
+      forcehttps = mkEnableOption "force https";
       siteName = mkOption {
         default = "LunarLooters";
         type = types.str;
@@ -54,16 +56,19 @@ in
         listen = [
           {
             ip = "*";
-            port = 80;
+            port = if cfg.https then 443 else 80;
+            ssl = cfg.https;
           }
-          # {
-          #   ip = "*";
-          #   port = 443;
-          #   ssl = true;
-          # }
-        ];
-        # sslServerCert = "/.${cfg.siteName}/${cfg.siteName}.crt"; # <-- wwwrun needs to be able to read it
-        # sslServerKey = "/.${cfg.siteName}/${cfg.siteName}.key"; # <-- wwwrun needs to be able to read it
+        ] ++ (lib.optionals (cfg.https && ! cfg.forcehttps)
+        [
+          {
+            ip = "*";
+            port = 443;
+            ssl = true;
+          }
+        ]);
+        sslServerCert = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.crt"; # <-- wwwrun needs to be able to read it
+        sslServerKey = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.key"; # <-- wwwrun needs to be able to read it
       };
       themes = {
         inherit (myWPext) vertice;
@@ -83,7 +88,7 @@ in
       settings = {
         WP_DEFAULT_THEME = "vertice";
         WP_MAIL_FROM = "${cfg.mailaddr}";
-        # FORCE_SSL_ADMIN = true;
+        FORCE_SSL_ADMIN = cfg.forcehttps;
       };
       # https://codex.wordpress.org/Editing_wp-config.php
       # This file writes to $out/share/wordpress/wp-config.php
@@ -91,7 +96,7 @@ in
       extraConfig = /*php*/'' /* <?php */
         if ( !defined('ABSPATH') )
           define('ABSPATH', dirname(__FILE__) . '/');
-        /* $_SERVER['HTTPS']='on'; */
+        ${if cfg.https then "$_SERVER['HTTPS']='on';" else ""}
       '';
     };
     environment.systemPackages = [
