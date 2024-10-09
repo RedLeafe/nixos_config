@@ -21,7 +21,6 @@ in {
     AD_support = true;
     default_git_user = "${username}";
     default_git_email = "${username}@alien.moon.mine";
-    authorized_keys = authorized_keys;
     fail2ban = true;
     settings = {
       AllowUsers = null;
