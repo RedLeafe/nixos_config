@@ -44,19 +44,14 @@ in {
     services.httpd.enable = true;
     services.httpd.virtualHosts.${cfg.domainname} = {
       serverAliases = [ "*" ];
-      listen = [
-        {
-          ip = "*";
-          port = 80;
-        }
-      ] ++ (lib.optionals cfg.https
+      listen = 
       [
         {
           ip = "*";
-          port = 443;
-          ssl = true;
+          port = if cfg.https then 443 else 80;
+          ssl = cfg.https;
         }
-      ]);
+      ];
       sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
       sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
       locations."/" = {
