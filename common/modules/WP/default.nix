@@ -27,7 +27,7 @@ in
         type = types.str;
       };
       mailaddr = mkOption {
-        default = "lunarlooters.com";
+        default = "noreply@lunarlooters.com";
         type = types.str;
       };
     };
@@ -82,7 +82,7 @@ in
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {
         WP_DEFAULT_THEME = "vertice";
-        WP_MAIL_FROM = "noreply@${lib.toLower cfg.mailaddr}";
+        WP_MAIL_FROM = "${cfg.mailaddr}";
         # FORCE_SSL_ADMIN = true;
       };
       # https://codex.wordpress.org/Editing_wp-config.php
