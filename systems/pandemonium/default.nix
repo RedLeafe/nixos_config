@@ -11,7 +11,7 @@ in {
 
   moon_mods.gitea = {
     enable = true;
-    domainname = "localhost";
+    domainname = "10.100.136.42";
     lfs = false;
     https = true;
   };
