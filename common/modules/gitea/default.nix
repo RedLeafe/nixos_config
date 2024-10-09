@@ -53,7 +53,7 @@ in {
     # write to php.ini
     services.httpd.phpOptions = /*ini*/ ''
     '';
-    services.httpd.virtualHost.${cfg.domainname} = {
+    services.httpd.virtualHosts.${cfg.domainname} = {
       serverAliases = [ "*" ];
       listen = [
         {
