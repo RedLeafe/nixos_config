@@ -45,6 +45,7 @@ in {
         });
       };
     };
+    services.httpd.enable = true;
     services.httpd.enablePHP = true;
     services.httpd.phpPackage = pkgs.php.withExtensions
       (exts: with exts; [
