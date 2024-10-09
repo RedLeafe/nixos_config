@@ -7,10 +7,6 @@ in {
     ${moduleNamespace}.gitea = with lib; {
       enable = mkEnableOption "gitea server";
       https = mkEnableOption "https support";
-      port = mkOption {
-        default = if cfg.https then 443 else 80;
-        type = types.int;
-      };
       domainname = mkOption {
         default = "localhost";
         type = types.str;
@@ -37,7 +33,7 @@ in {
       settings = {
         server = {
           DOMAIN = cfg.domainname;
-          HTTP_PORT = cfg.port;
+          HTTP_PORT = if cfg.https then 443 else 80;
           # PROTOCOL = if cfg.https then "https" else "http";
         } // (lib.optionalAttrs cfg.https {
           COOKIE_SECURE = true;
