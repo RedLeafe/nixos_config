@@ -167,6 +167,7 @@ in {
 
   environment.systemPackages = with pkgs; [
     neovim
+    lazygit
     fuse
     fuse3
     parted
