@@ -13,7 +13,7 @@ in {
     enable = true;
     domainname = "localhost";
     lfs = false;
-    https = false;
+    https = true;
   };
 
   moon_mods.sshgit = {
