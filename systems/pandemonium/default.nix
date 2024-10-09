@@ -61,7 +61,17 @@ in {
     initialPassword = "test";
     openssh.authorizedKeys.keys = authorized_keys;
     # TODO: add setup, save, restore scripts
-    packages = [
-    ];
+    packages = (let
+      adjoin = pkgs.writeShellScriptBin "adjoin" ''
+        sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
+      '';
+      yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
+        nix-collect-garbage --delete-old
+        sudo nix-collect-garbage --delete-old
+      '';
+    in [
+      adjoin
+      yeet_trash
+    ]);
   };
 }
