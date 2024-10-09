@@ -34,6 +34,7 @@ in {
     ranger
     xtermwm
     LD
+    gitea
     AD
     WP
     sshgit
@@ -59,6 +60,8 @@ in {
   };
 
   moon_mods.WP.enable = true;
+
+  moon_mods.gitea.enable = true;
 
   moon_mods.sshgit = {
     enable = true;
@@ -113,7 +116,7 @@ in {
 
   # firewall.
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 3306 ];
+  networking.firewall.allowedTCPPorts = [ 22 80 443 3000 3306 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
 
   virtualisation.docker.enable = true;

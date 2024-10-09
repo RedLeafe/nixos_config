@@ -20,4 +20,5 @@ in
   xtermwm = import (systemOnly ./xtermwm) args;
   ranger = import ./ranger args;
   shell = import ./shell args;
+  gitea = import ./gitea args;
 }
