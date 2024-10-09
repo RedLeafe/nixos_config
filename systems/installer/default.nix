@@ -67,16 +67,18 @@ in {
       listed = builtins.attrValues (builtins.mapAttrs (name: value: {
         host = name;
         inherit (value) admin;
+        flakepath = if value ? flakepath then value.flakepath else "/home/${installuser}/nixos_config";
+        isnewflakepath = value ? flakepath;
         postdisko = if value ? postdisko then value.postdisko else (_: "return 0");
         postinstall = if value ? postinstall then value.postinstall else (_: "return 0");
       }) hostconfig);
-      mkScriptsForHost = { host, admin, postdisko, postinstall }: let
+      mkScriptsForHost = { host, admin, flakepath, isnewflakepath, postdisko, postinstall }: let
         diskoscript = pkgs.writeShellScriptBin "disko-${host}-script" ''
           hostname=''${1:-'${host}'}
           username=''${2:-'${admin}'}
           shift 2
-          [ ! -d /home/${installuser}/nixos_config ] && cp -r /iso/nixos_config /home/${installuser}
-          sudo disko --mode disko --flake /iso/nixos_config#$hostname
+          [ ! -d /home/${installuser}/nixos_config ] && ${if isnewflakepath then "false" else "true"} && cp -r /iso/nixos_config /home/${installuser}
+          sudo disko --mode disko --flake "${flakepath}#$hostname"
           postcmds () {
             ${postdisko installuser}
           }
@@ -88,8 +90,8 @@ in {
           hostname=''${1:-'${host}'}
           username=''${2:-'${admin}'}
           shift 2
-          [ ! -d /home/${installuser}/nixos_config ] && cp -r /iso/nixos_config /home/${installuser}
-          sudo nixos-install --verbose --show-trace --flake /home/${installuser}/nixos_config#$hostname
+          [ ! -d /home/${installuser}/nixos_config ] && ${if isnewflakepath then "false" else "true"} && cp -r /iso/nixos_config /home/${installuser}
+          sudo nixos-install --verbose --show-trace --flake "${flakepath}#$hostname"
           echo "please set password for user $username"
           sudo passwd --root /mnt $username
           umask 077
