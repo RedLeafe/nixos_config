@@ -84,9 +84,7 @@
               '';
             };
             pandemonium = {
-              admin = {
-                admin = "dorsa";
-              };
+              admin = "dorsa";
             };
           };
         in {
