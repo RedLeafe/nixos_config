@@ -37,7 +37,7 @@ in {
       settings = {
         server = {
           DOMAIN = cfg.domainname;
-          HTTP_PORT = 3000;
+          HTTP_PORT = if cfg.https then 443 else 80;
           COOKIE_SECURE = cfg.https;
         };
       };
