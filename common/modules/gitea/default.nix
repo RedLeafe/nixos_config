@@ -37,7 +37,7 @@ in {
       settings = {
         server = {
           DOMAIN = cfg.domainname;
-          HTTP_PORT = if cfg.https then 443 else 80;
+          HTTP_PORT = 80;
           COOKIE_SECURE = cfg.https;
         };
       };
@@ -61,7 +61,7 @@ in {
       sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
       sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
       locations."/" = {
-        proxyPass = "http://127.0.0.1:3000/";
+        proxyPass = "http://127.0.0.1/";
       };
     };
     environment.systemPackages = [
