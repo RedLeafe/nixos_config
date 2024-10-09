@@ -38,7 +38,7 @@ in {
         server = {
           DOMAIN = cfg.domainname;
           HTTP_PORT = cfg.port;
-          PROTOCOL = if cfg.https then "https" else "http";
+          # PROTOCOL = if cfg.https then "https" else "http";
         } // (lib.optionalAttrs cfg.https {
           COOKIE_SECURE = true;
           REDIRECT_OTHER_PORT = true;
