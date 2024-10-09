@@ -39,6 +39,7 @@ in {
           DOMAIN = cfg.domainname;
           ROOT_URL = "${if cfg.https then "https" else "http"}://${cfg.domainname}/";
           HTTP_PORT = if cfg.https then 443 else 80;
+          PROTOCOL = if cfg.https then "https" else "http";
           COOKIE_SECURE = cfg.https;
           REDIRECT_OTHER_PORT = cfg.https;
           PORT_TO_REDIRECT = 80;
