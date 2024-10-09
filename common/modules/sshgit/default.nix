@@ -47,7 +47,7 @@ in {
   };
   config = lib.mkIf cfg.enable {
 
-    system.activationScripts.git_shell_scripts.text = lib.mkIf ((config.users.users ? git) && cfg.enable_git_server) (let
+    system.activationScripts.git_shell_scripts.text = lib.optionalString ((config.users.users ? git) && cfg.enable_git_server) (let
       mkNewGitShellCmds = { xtras ? {}, symlinkJoin, writeTextFile, ... }: let
         extracmds = builtins.attrValues (builtins.mapAttrs (name: value: writeTextFile {
           inherit name;
