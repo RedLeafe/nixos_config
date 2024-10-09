@@ -37,7 +37,6 @@ in {
       settings = {
         server = {
           DOMAIN = cfg.domainname;
-          HTTP_PORT = 3000;
           COOKIE_SECURE = cfg.https;
         };
       };
