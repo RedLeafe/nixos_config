@@ -67,8 +67,8 @@ in {
       listed = builtins.attrValues (builtins.mapAttrs (name: value: {
         host = name;
         inherit (value) admin;
-        postdisko = if value ? postdisko then value.postdisko else (_: "");
-        postinstall = if value ? postinstall then value.postinstall else (_: "");
+        postdisko = if value ? postdisko then value.postdisko else (_: "return 0");
+        postinstall = if value ? postinstall then value.postinstall else (_: "return 0");
       }) hostconfig);
       mkScriptsForHost = { host, admin, postdisko, postinstall }: let
         diskoscript = pkgs.writeShellScriptBin "disko-${host}-script" ''
