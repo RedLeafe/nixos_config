@@ -7,6 +7,10 @@ in {
     ${moduleNamespace}.gitea = with lib; {
       enable = mkEnableOption "gitea server";
       https = mkEnableOption "https support";
+      port = mkOption {
+        default = if cfg.https then 443 else 80;
+        type = types.int;
+      };
       domainname = mkOption {
         default = "localhost";
         type = types.str;
@@ -33,8 +37,7 @@ in {
       settings = {
         server = {
           DOMAIN = cfg.domainname;
-          HTTP_PORT = if cfg.https then 443 else 80;
-          # PROTOCOL = if cfg.https then "https" else "http";
+          HTTP_PORT = 3000;
         } // (lib.optionalAttrs cfg.https {
           COOKIE_SECURE = true;
           REDIRECT_OTHER_PORT = true;
@@ -63,6 +66,9 @@ in {
       ]);
       sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
       sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:3000/";
+      };
     };
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "gen_${cfg.domainname}_cert" (let
