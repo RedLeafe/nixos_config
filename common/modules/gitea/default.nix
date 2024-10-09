@@ -58,24 +58,24 @@ in {
     services.httpd.phpOptions = /*ini*/ ''
     '';
     services.httpd.virtualHost.${cfg.domainname} = {
-        serverAliases = [ "*" ];
-        listen = [
-          {
-            ip = "*";
-            port = 80;
-            ssl = cfg.https;
-          }
-        ] ++ (lib.optionals cfg.https
-        [
-          {
-            ip = "*";
-            port = 443;
-            ssl = true;
-          }
-        ]);
-        sslServerCert = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.crt"; # <-- wwwrun needs to be able to read it
-        sslServerKey = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.key"; # <-- wwwrun needs to be able to read it
-      };
+      serverAliases = [ "*" ];
+      listen = [
+        {
+          ip = "*";
+          port = 80;
+          ssl = cfg.https;
+        }
+      ] ++ (lib.optionals cfg.https
+      [
+        {
+          ip = "*";
+          port = 443;
+          ssl = true;
+        }
+      ]);
+      sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
+      sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
+    };
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "gen_${cfg.domainname}_cert" (let
         DN = cfg.domainname;
