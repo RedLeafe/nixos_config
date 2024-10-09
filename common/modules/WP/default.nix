@@ -16,9 +16,6 @@
   in autobuilt // {
     # you can do autobuilt.pluginname.overrideAttrs to override them
     # and put the new replacement here.
-    any-hostname = autobuilt.any-hostname.overrideAttrs {
-      # dontUnpack = true;
-    };
   };
 in
 {
