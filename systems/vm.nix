@@ -57,6 +57,7 @@ in {
     domain_controller = "kerberos.alien.moon.mine";
     ldap_search_base = "CN=Users,DC=alien,DC=moon,DC=mine";
   };
+
   moon_mods.WP.enable = true;
 
   moon_mods.sshgit = {
