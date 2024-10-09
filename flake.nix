@@ -22,6 +22,10 @@
       url = "https://downloads.wordpress.org/plugin/kubio.2.3.3.zip";
       flake = false;
     };
+    WPplugins-any-hostname = {
+      url = "github:dessibelle/any-hostname";
+      flake = false;
+    };
     WPplugins-vertice = {
       url = "https://downloads.wordpress.org/theme/vertice.1.0.25.zip";
       flake = false;

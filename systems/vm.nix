@@ -314,7 +314,7 @@ in {
         ${restoreGitRepos}/bin/restoreGitRepos "$1"
         ${restoreDBall}/bin/restoreDBall "$2" "$3"
       '';
-      yeet_trash = pkgs.writeShellScriptBin "pluto_trash" ''
+      yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
         nix-collect-garbage --delete-old
         sudo nix-collect-garbage --delete-old
       '';
