@@ -46,21 +46,12 @@ in {
       };
     };
     services.httpd.enable = true;
-    services.httpd.enablePHP = true;
-    services.httpd.phpPackage = pkgs.php.withExtensions
-      (exts: with exts; [
-        # download php extensions from nixpkgs here from exts variable
-      ]);
-    # write to php.ini
-    services.httpd.phpOptions = /*ini*/ ''
-    '';
     services.httpd.virtualHosts.${cfg.domainname} = {
       serverAliases = [ "*" ];
       listen = [
         {
           ip = "*";
           port = 80;
-          ssl = cfg.https;
         }
       ] ++ (lib.optionals cfg.https
       [
