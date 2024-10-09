@@ -12,7 +12,7 @@ in {
   moon_mods.gitea = {
     enable = true;
     domainname = "0.0.0.0";
-    lfs = true;
+    lfs = false;
     https = false;
   };
 

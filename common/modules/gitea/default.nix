@@ -39,15 +39,14 @@ in {
           DOMAIN = cfg.domainname;
           HTTP_PORT = cfg.port;
           PROTOCOL = if cfg.https then "https" else "http";
-        };
-        # } // (lib.optionalAttrs cfg.https {
-        #   COOKIE_SECURE = true;
-        #   REDIRECT_OTHER_PORT = true;
-        #   # Port the redirection service should listen on
-        #   PORT_TO_REDIRECT = 80;
-        #   CERT_FILE = "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- gitea needs to be able to read it
-        #   KEY_FILE = "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- gitea needs to be able to read it
-        # });
+        } // (lib.optionalAttrs cfg.https {
+          COOKIE_SECURE = true;
+          REDIRECT_OTHER_PORT = true;
+          # Port the redirection service should listen on
+          PORT_TO_REDIRECT = 80;
+          CERT_FILE = "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- gitea needs to be able to read it
+          KEY_FILE = "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- gitea needs to be able to read it
+        });
       };
     };
 
