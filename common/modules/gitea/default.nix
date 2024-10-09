@@ -38,7 +38,7 @@ in {
         server = {
           DOMAIN = cfg.domainname;
           HTTP_PORT = 3000;
-          # PROTOCOL = if cfg.https then "https" else "http";
+          PROTOCOL = if cfg.https then "https" else "http";
           COOKIE_SECURE = cfg.https;
         };
       };
