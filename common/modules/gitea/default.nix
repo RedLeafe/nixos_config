@@ -37,12 +37,12 @@ in {
       settings = {
         server = {
           DOMAIN = cfg.domainname;
-          ROOT_URL = "${if cfg.https then "https" else "http"}://${cfg.domainname}/";
-          HTTP_PORT = if cfg.https then 443 else 80;
-          PROTOCOL = if cfg.https then "https" else "http";
+          ROOT_URL = "http://${cfg.domainname}/";
+          # HTTP_PORT = if cfg.https then 443 else 80;
+          # PROTOCOL = if cfg.https then "https" else "http";
           COOKIE_SECURE = cfg.https;
-          REDIRECT_OTHER_PORT = cfg.https;
-          PORT_TO_REDIRECT = 80;
+          # REDIRECT_OTHER_PORT = cfg.https;
+          # PORT_TO_REDIRECT = 80;
         };
       };
     };
@@ -65,7 +65,7 @@ in {
       sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
       sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
       locations."/" = {
-        proxyPass = "${if cfg.https then "https" else "http"}://127.0.0.1/";
+        proxyPass = "http://127.0.0.1/";
       };
     };
     environment.systemPackages = [
