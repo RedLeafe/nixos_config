@@ -109,7 +109,7 @@ in {
       };
     };
 
-    users.users.git = lib.mkIf (! cfg.enable_git_server) {
+    users.users.git = lib.mkIf cfg.enable_git_server {
       isSystemUser = true;
       group = "git";
       home = cfg.git_home_dir;
@@ -118,7 +118,7 @@ in {
       openssh.authorizedKeys.keys = cfg.authorized_keys;
     };
 
-    users.groups.git = lib.mkIf (! cfg.enable_git_server) {};
+    users.groups.git = lib.mkIf cfg.enable_git_server {};
 
     services.fail2ban.enable = true;
 
