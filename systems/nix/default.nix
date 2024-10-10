@@ -11,18 +11,6 @@
       sudo ${sqldbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
     fi
   '';
-  dumpGitRepos = pkgs.writeShellScriptBin "dumpGitRepos" ''
-    outfile="''${1:-/home/${username}/restored_data/repobackup.zip}"
-    umask 077
-    mkdir -p "$(dirname "$outfile")"
-    if [ "$USER" == "root" ]; then
-      ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
-      chown -R ${username}:users "$outfile"
-    else
-      sudo ${pkgs.zip}/bin/zip -r -9 "$outfile" "${git_server_home_dir}"
-      sudo chown -R ${username}:users "$outfile"
-    fi
-  '';
 in {
   imports = with system-modules; [
     "${modulesPath}/virtualisation/vmware-guest.nix"
@@ -50,7 +38,6 @@ in {
       X11Forwarding = true;
       PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
-    enable_git_server = true;
   };
 
   networking = {
@@ -143,10 +130,6 @@ in {
       adjoin = pkgs.writeShellScriptBin "adjoin" ''
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
       '';
-      dumpALL = pkgs.writeShellScriptBin "dumpALL" ''
-        ${dumpGitRepos}/bin/dumpGitRepos "$1"
-        ${dumpDBall}/bin/dumpDBall "$2" "$3"
-      '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
         infile="''${1:-/home/${username}/restored_data/dump.sql}"
         if [ ! -e "$infile" ]; then
@@ -154,24 +137,6 @@ in {
         else
           sudo ${sqldbpkg}/bin/mysql -u root --password="$2" < "$infile"
         fi
-      '';
-      # NOTE: Assumes zip was made with the dumpGitRepos command
-      restoreGitRepos = pkgs.writeShellScriptBin "restoreGitRepos" ''
-        repozip="''${1:-/home/${username}/restored_data/repobackup.zip}"
-        umask 077
-        if [ ! -e "$repozip" ]; then
-          echo "Error: $repozip not found"
-        else
-          tempdir=$(mktemp -d)
-          ${pkgs.unzip}/bin/unzip -d "$tempdir" "$repozip"
-          mkdir -p "${git_server_home_dir}"
-          sudo cp --update=none -r $tempdir/${git_server_home_dir}/* "${git_server_home_dir}"
-          sudo chown -R git:git "${git_server_home_dir}"
-        fi
-      '';
-      restoreALL = pkgs.writeShellScriptBin "restoreALL" ''
-        ${restoreGitRepos}/bin/restoreGitRepos "$1"
-        ${restoreDBall}/bin/restoreDBall "$2" "$3"
       '';
       yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
         nix-collect-garbage --delete-old
@@ -190,12 +155,8 @@ in {
       adjoin
       dumpDBall
       restoreDBall
-      dumpALL
-      restoreALL
       yeet_trash
       genAdminSSHkey
-      dumpGitRepos
-      restoreGitRepos
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
         if [[ "$USER" != "${username}" ]]; then
           echo "Error: script must be run as the user ${username}"
@@ -212,12 +173,7 @@ in {
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
         sudo chown -R ${username}:users /home/${username}/restored_data
-
         ${genAdminSSHkey}/bin/genAdminSSHkey
-        [ -e /home/${username}/nixos_config/.git ] && sudo rm -rf /home/${username}/nixos_config/.git
-        cd /home/${username}/nixos_config && git init && git add . && \
-        git commit -m "initial nixos config" && git branch -M master && \
-        git remote add origin git@localhost:nixos_config.git
         echo "joining AD"
         if [[ -z "$ADPASS" ]]; then
           ${adjoin}/bin/adjoin
@@ -225,11 +181,6 @@ in {
           ${adjoin}/bin/adjoin --stdin-password <<< "$ADPASS"
         fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
-        /home/${username}/nixos_config/scripts/build
-        ssh git@localhost 'new-remote nixos_config' && \
-        cd /home/${username}/nixos_config && \
-        git push -u origin master
-        ${restoreGitRepos}/bin/restoreGitRepos "$REPOZIP"
         rm -f /home/${username}/.zsh_history
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"

@@ -31,7 +31,8 @@ in {
       enable = true;
       lfs.enable = cfg.lfs;
       dump.enable = true;
-      dump.interval = "*:0/1";
+      # dump.interval = "*:0/1";
+      dump.interval = "hourly";
       database = {
         port = cfg.dbport;
         type = cfg.dbtype;
