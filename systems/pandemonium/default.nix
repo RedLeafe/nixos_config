@@ -88,6 +88,7 @@ in {
           exit 1
         fi
         giteadirs=(
+          '${config.services.gitea.stateDir}'
           '${config.services.gitea.lfs.contentDir}'
           '${config.services.gitea.stateDir}/data'
           '${config.services.gitea.customDir}'
@@ -100,14 +101,15 @@ in {
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
         cd "$TEMPDIR" && {
           sudo mkdir -p "''${giteadirs[@]}" && \
-          [ -d data/lfs ] && sudo mv -f data/lfs/* "''${giteadirs[0]}" || echo "No lfs directory found"
-          [ -d data ] && sudo mv -f data/* "''${giteadirs[1]}" || echo "No data directory found"
-          [ -d custom ] && sudo mv -f custom/* "''${giteadirs[2]}" || echo "No custom directory found"
-          [ -d log ] && sudo mv -f log/* "''${giteadirs[3]}" || echo "No log directory found"
-          [ -d repos ] && sudo mv -f repos/* "''${giteadirs[4]}" || echo "No repos directory found"
-          sudo sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore failed"; exit 1; }
+          sudo chown -R ${username}:users "''${giteadirs[@]}"
+          [ -d data/lfs ] && mv -f data/lfs/* "''${giteadirs[1]}" || echo "No lfs directory found"
+          [ -d data ] && mv -f data/* "''${giteadirs[2]}" || echo "No data directory found"
+          [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
+          [ -d log ] && mv -f log/* "''${giteadirs[4]}" || echo "No log directory found"
+          [ -d repos ] && mv -f repos/* "''${giteadirs[5]}" || echo "No repos directory found"
+          sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore failed"; exit 1; }
         }
-        for dir in "${config.services.gitea.stateDir}" "''${giteadirs[@]}"; do
+        for dir in "''${giteadirs[@]}"; do
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
         done
         cd "$OGDIR" && rm -rf "$TEMPDIR"
