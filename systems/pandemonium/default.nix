@@ -106,7 +106,7 @@ in {
           [ -d repos ] && sudo mv -f repos/* "''${giteadirs[4]}" || echo "No repos directory found"
           sudo sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore failed"; exit 1; }
         }
-        for dir in "''${giteadirs[@]}"; do
+        for dir in "${config.services.gitea.stateDir}" "''${giteadirs[@]}"; do
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
         done
         cd "$OGDIR" && rm -rf "$TEMPDIR"
