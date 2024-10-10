@@ -1,12 +1,10 @@
 # nix.moon.mine
 
-With the contents of this directory, plus the restored_data directory in the pluto's home directory, you can restore this machine from any state.
+With the contents of this repo,
+plus the zip file dumps in the local admin's home dir, you can restore either nix or pandemonium hosts from any state. Back them up!
 
-Back them up! Clone this one from git@10.100.136.44:nixos_config.git to your local machine and also scp the restored_data directory to your local machine.
-
-A new backup of the database and git will be taken once per hour, 1 main backup, and max 3 older versions,
-so you may need to clean up the old ones if you are running out of disk space, along with running garbage collection,
-and maybe decrease the max number of backups.
+A new backup of the database will be taken once per hour
+so you may need to clean up the old ones if you are running out of disk space, along with running garbage collection.
 
 ## Structure:
 
@@ -17,8 +15,8 @@ nixos_config
 ├── flake.lock
 │
 ├── scripts <- build scripts
-│   ├── build <- vmware main machine
-│   └── isoInstaller <- vmware installer iso
+│   ├── build <- build <hostname> [up]
+│   └── isoInstaller <- builds vmware installer iso
 │
 ├── common <- flake imports this, passes the results to system config (and also home manager if we had it)
 │   ├── default.nix <- in charge of exporting the contents of /common as an easy to use set
@@ -53,15 +51,18 @@ nixos_config
 │   # into their own modules.
 │
 └── systems
-    ├── installer <- the full config for the installer image
+    ├── vm.nix <- a common AD-joined vm system config
+    │
+    ├── nix <- vmware specific entry point, flake calls this, and this calls vm.nix
+    │   ├── default.nix <- host specific config settings here
+    │   └── hardware-configuration.nix <- generated hardware config (nixos-generate-config --show-hardware-config --no-filesystems)
+    ├── pandemonium <- host specific entry point, flake calls this, and this calls vm.nix
+    │   ├── default.nix <- host specific config settings here
+    │   └── hardware-configuration.nix <- generated hardware config (nixos-generate-config --show-hardware-config --no-filesystems)
+    ├── installer <- the full config for the installer image for both machines
     │   ├── default.nix
     │   ├── installation-device.nix
     │   └── minimal-graphical-base.nix
-    │
-    ├── vm.nix <- a common vm system config
-    ├── vmware <- vmware specific entry point, flake calls this, and this calls vm.nix
-    │   ├── default.nix <- other vmware config
-    │   └── hardware-configuration.nix <- generated hardware config (nixos-generate-config --show-hardware-config --no-filesystems)
     └── ... other systems
 ```
 
