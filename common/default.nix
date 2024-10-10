@@ -4,7 +4,7 @@ let
   inherit (inputs.nixpkgs) lib;
   keys_from_path = keypath: builtins.attrValues (builtins.mapAttrs (n: v:
       if v == "regular"
-        then builtins.replaceStrings ["\n"] [""] (builtins.readFile "${keypath}/${n}")
+        then builtins.replaceStrings ["\r" "\n"] ["" ""] (builtins.readFile "${keypath}/${n}")
         else "")
       (builtins.readDir "${keypath}")
     );
