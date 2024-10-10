@@ -80,7 +80,7 @@ in {
         OGDIR="$(realpath .)" && \
         cd "${config.services.gitea.package}/bin" && \
         [ -z "$1" ] && {
-          sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin hooks regenerate
+          sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin regenerate hooks
         } || {
           sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini "$@"
         } && \
@@ -114,7 +114,7 @@ in {
           sudo chown -R ${username}:users "''${giteadirs[@]}"
           [ -d data/lfs ] && mv -f data/lfs/* "''${giteadirs[1]}" || echo "No lfs directory found"
           [ -d data ] && mv -f data/* "''${giteadirs[2]}" || echo "No data directory found"
-          # [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
+          [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
           [ -d log ] && mv -f log/* "''${giteadirs[4]}" || echo "No log directory found"
           [ -d repos ] && mv -f repos/* "''${giteadirs[5]}" || echo "No repos directory found"
           sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore possibly failed?"; }
@@ -123,6 +123,8 @@ in {
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
         done
         cd "$OGDIR" && rm -rf "$TEMPDIR"
+        ${GITEA_REGEN_HOOKS}/bin/GITEA_REGEN_HOOKS
+        sudo systemctl restart gitea
       '';
     in [
       GITEA_REGEN_HOOKS
