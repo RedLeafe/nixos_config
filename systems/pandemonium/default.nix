@@ -77,8 +77,13 @@ in {
         sudo chown ${username}:users "$FILENAME"
       '';
       GITEA_REGEN_HOOKS = pkgs.writeShellScriptBin "GITEA_REGEN_HOOKS" ''
-        OGDIR="$(realpath .)"
-        cd "${config.services.gitea.package}/bin" && sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin hooks regenerate
+        OGDIR="$(realpath .)" && \
+        cd "${config.services.gitea.package}/bin" && \
+        [ -z "$1" ] && {
+          sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin hooks regenerate
+        } || {
+          sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini "$@"
+        } && \
         cd "$OGDIR"
       '';
       RESTOREDUMP = pkgs.writeShellScriptBin "RESTORE_GIT_DUMP" ''
