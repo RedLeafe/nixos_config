@@ -77,7 +77,7 @@ in {
     servicename = "backup_runner";
     servicescript = pkgs.writeShellScript "backup_runner-script" ''
       export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
-      umask 007
+      umask 077
       if [ -e /home/${username}/dump.sql.zip ]; then
         mkdir -p /home/${username}/backupcache
         files=( /home/${username}/backupcache/* )
