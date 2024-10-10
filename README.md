@@ -53,7 +53,7 @@ nixos_config
 └── systems
     ├── vm.nix <- a common AD-joined vm system config
     │
-    ├── nix <- vmware specific entry point, flake calls this, and this calls vm.nix
+    ├── nix <- host specific entry point, flake calls this, and this calls vm.nix
     │   ├── default.nix <- host specific config settings here
     │   └── hardware-configuration.nix <- generated hardware config (nixos-generate-config --show-hardware-config --no-filesystems)
     ├── pandemonium <- host specific entry point, flake calls this, and this calls vm.nix
