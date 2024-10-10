@@ -76,6 +76,11 @@ in {
         sudo cp "${config.services.gitea.dump.backupDir}/$FILENAME" .
         sudo chown ${username}:users "$FILENAME"
       '';
+      GITEA_REGEN_HOOKS = pkgs.writeShellScriptBin "GITEA_REGEN_HOOKS" ''
+        OGDIR="$(realpath .)"
+        cd "${config.services.gitea.package}/bin" && ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin hooks regenerate
+        cd "$OGDIR"
+      '';
       RESTOREDUMP = pkgs.writeShellScriptBin "RESTORE_GIT_DUMP" ''
         PATH="${lib.makeBinPath (with pkgs; [ coreutils sqlite unzip ])}:$PATH"
         DUMPFILE="$1"
@@ -104,7 +109,7 @@ in {
           sudo chown -R ${username}:users "''${giteadirs[@]}"
           [ -d data/lfs ] && mv -f data/lfs/* "''${giteadirs[1]}" || echo "No lfs directory found"
           [ -d data ] && mv -f data/* "''${giteadirs[2]}" || echo "No data directory found"
-          [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
+          # [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
           [ -d log ] && mv -f log/* "''${giteadirs[4]}" || echo "No log directory found"
           [ -d repos ] && mv -f repos/* "''${giteadirs[5]}" || echo "No repos directory found"
           sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore failed"; exit 1; }
@@ -115,6 +120,7 @@ in {
         cd "$OGDIR" && rm -rf "$TEMPDIR"
       '';
     in [
+      GITEA_REGEN_HOOKS
       GETDUMP
       RESTOREDUMP
       adjoin
