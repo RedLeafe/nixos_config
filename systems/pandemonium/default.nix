@@ -94,6 +94,7 @@ in {
           '${config.services.gitea.repositoryRoot}'
           '${builtins.dirOf config.services.gitea.database.path}'
         )
+        DBPATH='${config.services.gitea.database.path}'
         sudo unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
         cd "$TEMPDIR" && {
@@ -103,7 +104,7 @@ in {
           [ -d custom ] && sudo mv -f custom/* "''${giteadirs[2]}" || echo "No custom directory found"
           [ -d log ] && sudo mv -f log/* "''${giteadirs[3]}" || echo "No log directory found"
           [ -d repos ] && sudo mv -f repos/* "''${giteadirs[4]}" || echo "No repos directory found"
-          sudo sqlite3 '${config.services.gitea.database.path}' <gitea-db.sql || { echo "Database restore failed"; exit 1; }
+          sudo sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore failed"; exit 1; }
         }
         for dir in "''${giteadirs[@]}"; do
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
