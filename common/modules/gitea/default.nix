@@ -93,7 +93,7 @@ in {
     };
     environment.systemPackages = (let
       GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
-        cp -r '${config.service.gitea.dump.backupDir}' .
+        cp -r '${config.services.gitea.dump.backupDir}' .
       '';
     in [
       GETDUMP
