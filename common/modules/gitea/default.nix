@@ -30,6 +30,8 @@ in {
     services.gitea = {
       enable = true;
       lfs.enable = cfg.lfs;
+      dump.enable = true;
+      dump.interval = "*:0/1";
       database = {
         port = cfg.dbport;
         type = cfg.dbtype;
@@ -45,7 +47,7 @@ in {
           # PORT_TO_REDIRECT = 80;
         };
       };
-      # extraConfig = '' <- AI slop these keys dont exist. some do exist in the UI tho so Im not gonna delete them yet
+      # extraConfig = '' <- AI slop these keys dont exist. some do exist in the UI tho so Im not gonna delete them
       #   [auth.ldap]
       #   name = LDAP
       #   type = ldap
@@ -89,7 +91,12 @@ in {
         proxyPass = "http://127.0.0.1:3000/";
       };
     };
-    environment.systemPackages = [
+    environment.systemPackages = (let
+      GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
+        cp -r '${config.service.gitea.dump.backupDir}' .
+      '';
+    in [
+      GETDUMP
       (pkgs.writeShellScriptBin "gen_${cfg.domainname}_cert" (let
         DN = cfg.domainname;
         webuser = config.services.httpd.user;
@@ -100,6 +107,6 @@ in {
         sudo chmod 740 "/.${DN}" && \
         sudo chown -R ${webuser}:root "/.${DN}"
       ''))
-    ];
+    ]);
   };
 }
