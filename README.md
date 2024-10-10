@@ -1,4 +1,4 @@
-# nix.moon.mine
+# pandemonium & nix @ moon.mine
 
 With the contents of this repo,
 plus the zip file dumps in the local admin's home dir, you can restore either nix or pandemonium hosts from any state. Back them up!
