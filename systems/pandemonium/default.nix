@@ -70,11 +70,12 @@ in {
         sudo nix-collect-garbage --delete-old
       '';
       GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
+        OUTDIR="''${1:-/home/${username}}"
         sudo systemctl restart gitea-dump.service
         FILENAME="$(sudo ls -1 '${config.services.gitea.dump.backupDir}' | sort -t '-' -k3 -nr | head -n 1)"
         umask 077
-        sudo cp "${config.services.gitea.dump.backupDir}/$FILENAME" .
-        sudo chown ${username}:users "$FILENAME"
+        sudo cp "${config.services.gitea.dump.backupDir}/$FILENAME" "$OUTDIR"
+        sudo chown ${username}:users "$OUTDIR/$FILENAME"
       '';
       GITEA_REGEN_HOOKS = pkgs.writeShellScriptBin "GITEA_REGEN_HOOKS" ''
         OGDIR="$(realpath .)" && \
