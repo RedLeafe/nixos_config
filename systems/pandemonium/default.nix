@@ -98,11 +98,11 @@ in {
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
         cd "$TEMPDIR" && {
           sudo mkdir -p "''${giteadirs[@]}" && \
-          [ -d data/lfs ] && sudo mv data/lfs/* "''${giteadirs[0]}" || echo "No lfs directory found"
-          [ -d data ] && sudo mv data/* "''${giteadirs[1]}" || echo "No data directory found"
-          [ -d custom ] && sudo mv custom/* "''${giteadirs[2]}" || echo "No custom directory found"
-          [ -d log ] && sudo mv log/* "''${giteadirs[3]}" || echo "No log directory found"
-          [ -d repos ] && sudo mv repos/* "''${giteadirs[4]}" || echo "No repos directory found"
+          [ -d data/lfs ] && sudo mv -f data/lfs/* "''${giteadirs[0]}" || echo "No lfs directory found"
+          [ -d data ] && sudo mv -f data/* "''${giteadirs[1]}" || echo "No data directory found"
+          [ -d custom ] && sudo mv -f custom/* "''${giteadirs[2]}" || echo "No custom directory found"
+          [ -d log ] && sudo mv -f log/* "''${giteadirs[3]}" || echo "No log directory found"
+          [ -d repos ] && sudo mv -f repos/* "''${giteadirs[4]}" || echo "No repos directory found"
           sudo sqlite3 '${config.services.gitea.database.path}' <gitea-db.sql || { echo "Database restore failed"; exit 1; }
         }
         for dir in "''${giteadirs[@]}"; do
