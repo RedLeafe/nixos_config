@@ -67,12 +67,13 @@ in {
       listed = builtins.attrValues (builtins.mapAttrs (name: value: {
         host = name;
         inherit (value) admin;
+        copyConfig = if value ? copyConfig then value.copyConfig else true;
         flakepath = if value ? flakepath then value.flakepath else "/home/${installuser}/nixos_config";
         isnewflakepath = value ? flakepath;
         postdisko = if value ? postdisko then value.postdisko else (_: "return 0");
         postinstall = if value ? postinstall then value.postinstall else (_: "return 0");
       }) hostconfig);
-      mkScriptsForHost = { host, admin, flakepath, isnewflakepath, postdisko, postinstall }: let
+      mkScriptsForHost = { host, admin, flakepath, isnewflakepath, postdisko, postinstall, copyConfig }: let
         diskoscript = pkgs.writeShellScriptBin "disko-${host}-script" ''
           hostname=''${1:-'${host}'}
           username=''${2:-'${admin}'}
@@ -95,9 +96,11 @@ in {
           echo "please set password for user $username"
           sudo passwd --root /mnt $username
           umask 077
-          sudo mkdir -p /mnt/home/$username
-          sudo cp -rvL /home/${installuser}/nixos_config /mnt/home/$username/nixos_config
-          sudo chmod -R u+w /mnt/home/$username/nixos_config
+          ${if copyConfig then "true" else "false"} && {
+            sudo mkdir -p /mnt/home/$username
+            sudo cp -rvL /home/${installuser}/nixos_config /mnt/home/$username/nixos_config
+            sudo chmod -R u+w /mnt/home/$username/nixos_config
+          }
           postcmds () {
             ${postinstall installuser}
           }

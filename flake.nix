@@ -76,6 +76,7 @@
           hostconfig = {
             nix = {
               admin = "pluto";
+              copyConfig = false;
               postinstall = installuser: /*bash*/ ''
                 hostname="$1" # <- could change at call time
                 admin="$2" # <- could change at call time
