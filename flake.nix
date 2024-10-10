@@ -81,7 +81,7 @@
                 hostname="$1" # <- could change at call time
                 admin="$2" # <- could change at call time
                 # we also get the rest of the args passed to the install script
-                [ -d /home/${installuser}/restored_data ] && sudo cp -rvL /home/${installuser}/restored_data /mnt/home/$admin/restored_data
+                [ -d /home/${installuser}/dump.sql.zip ] && sudo cp -rvL /home/${installuser}/dump.sql.zip /mnt/home/$admin
               '';
             };
             pandemonium = {
