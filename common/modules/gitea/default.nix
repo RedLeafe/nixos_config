@@ -46,7 +46,7 @@ in {
         };
       };
       extraConfig = ''
-        [auth.ldap]
+        [auth]
         name = LDAP
         type = ldap
         auth_source = 1
