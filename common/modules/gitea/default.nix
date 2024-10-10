@@ -48,27 +48,6 @@ in {
           # PORT_TO_REDIRECT = 80;
         };
       };
-      # extraConfig = '' <- AI slop these keys dont exist. some do exist in the UI tho so Im not gonna delete them yet
-      #   [auth.ldap]
-      #   name = LDAP
-      #   type = ldap
-      #   auth_source = 1
-      #   enabled = true
-      #   skip_verify = false
-      #   host = kerberos.alien.moon.mine
-      #   port = 389
-      #   user_search_base = CN=Users,DC=alien,DC=moon,DC=mine
-      #   # user_filter = (uid=%s) # For OpenLDAP
-      #   user_filter = (sAMAccountName=%s) # For Active Directory
-      #   admin_filter = (&(objectClass=group)(cn=admins))"
-      #   attribute_username = sAMAccountName # Active Directory
-      #   # attribute_username = uid # OpenLDAP
-      #   attribute_name = cn
-      #   attribute_surname = sn
-      #   attribute_mail = mail
-      #   search_page_size = 0
-      #   bind_dn = CN=Administrator,CN=Users,DC=alien,DC=moon,DC=mine
-      # '';
     };
     services.httpd.enable = true;
     services.httpd.virtualHosts.${cfg.domainname} = {
