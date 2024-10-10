@@ -145,7 +145,7 @@ in {
         else
           sudo mysql -u root --password="$2" < "$TEMPDIR/$(basename $infile .zip)"
         fi
-        sudo rm -rf "$TEMPDIR"
+        # sudo rm -rf "$TEMPDIR"
       '';
       yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
         nix-collect-garbage --delete-old
