@@ -26,6 +26,8 @@ nixos_config
 │   ├── modules
 │   │   ├── AD
 │   │   │   └── default.nix
+│   │   ├── xtermwm
+│   │   │   └── default.nix
 │   │   ├── ... other modules
 │   │   │
 │   │   │
