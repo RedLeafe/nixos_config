@@ -1,4 +1,4 @@
-{ pkgs, lib, modulesPath, inputs, stateVersion, username, authorized_keys, hostname, system-modules, nixpkgs, ... }: let
+{ config, pkgs, lib, modulesPath, inputs, stateVersion, username, authorized_keys, hostname, system-modules, nixpkgs, ... }: let
 in {
   imports = with system-modules; [
     "${modulesPath}/virtualisation/vmware-guest.nix"
@@ -69,7 +69,39 @@ in {
         nix-collect-garbage --delete-old
         sudo nix-collect-garbage --delete-old
       '';
+      GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
+        sudo systemctl restart gitea-dump.service
+        FILENAME="$(sudo ls -1 '${config.services.gitea.dump.backupDir}' | sort -t '-' -k3 -nr | head -n 1)"
+        umask 077
+        sudo cp "${config.services.gitea.dump.backupDir}$FILENAME" .
+        sudo chown ${username}:${username} "$FILENAME"
+      '';
+      RESTOREDUMP = pkgs.writeShellScriptBin "RESTORE_GIT_DUMP" ''
+        PATH="${lib.makeBinPath (with pkgs; [ coreutils sqlite unzip ])}:$PATH"
+        DUMPFILE="$1"
+        [ -z "$DUMPFILE" ] && DUMPFILE="$(ls -1 /home/${username}/gitea-dump-*.zip | sort -t '-' -k3 -nr | head -n 1)"
+        OGDIR="$(realpath .)"
+        TEMPDIR="$(mktemp -d)"
+        umask 007
+        if [ -z "$DUMPFILE" ]; then
+          echo "Usage: $0 <path_to_gitea_dump>"
+          exit 1
+        fi
+        unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
+        sudo chown -R ${username}:${username} "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
+        cd "$TEMPDIR" && {
+          [ -d data ] && sudo mv data/* '${config.services.gitea.stateDir}/data' || echo "No data directory found"
+          [ -d custom ] && sudo mv custom/* '${config.services.gitea.customDir}' || echo "No custom directory found"
+          [ -d log ] && sudo mv log/* '${config.services.gitea.settings.log.ROOT_PATH}' || echo "No log directory found"
+          [ -d repos ] && sudo mv repos/* '${config.services.gitea.repositoryRoot}' || echo "No repos directory found"
+          sudo sqlite3 '${config.services.gitea.database.path}' <gitea-db.sql || { echo "Database restore failed"; exit 1; }
+        } && \
+        sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' '${config.services.gitea.stateDir}' || { echo "Failed to change ownership back to ${config.services.gitea.user}"; exit 1; }
+        cd "$OGDIR" && rm -rf "$TEMPDIR"
+      '';
     in [
+      GETDUMP
+      RESTOREDUMP
       adjoin
       yeet_trash
     ]);

@@ -47,7 +47,7 @@ in {
           # PORT_TO_REDIRECT = 80;
         };
       };
-      # extraConfig = '' <- AI slop these keys dont exist. some do exist in the UI tho so Im not gonna delete them
+      # extraConfig = '' <- AI slop these keys dont exist. some do exist in the UI tho so Im not gonna delete them yet
       #   [auth.ldap]
       #   name = LDAP
       #   type = ldap
@@ -91,13 +91,7 @@ in {
         proxyPass = "http://127.0.0.1:3000/";
       };
     };
-    environment.systemPackages = (let
-      GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
-        sudo systemctl restart gitea-dump.service
-        sudo cp "${config.services.gitea.dump.backupDir}$(sudo ls -1 '${config.services.gitea.dump.backupDir}' | sort -t '-' -k3 -nr | head -n 1)" .
-      '';
-    in [
-      GETDUMP
+    environment.systemPackages = [
       (pkgs.writeShellScriptBin "gen_${cfg.domainname}_cert" (let
         DN = cfg.domainname;
         webuser = config.services.httpd.user;
@@ -108,6 +102,6 @@ in {
         sudo chmod 740 "/.${DN}" && \
         sudo chown -R ${webuser}:root "/.${DN}"
       ''))
-    ]);
+    ];
   };
 }
