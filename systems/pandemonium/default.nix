@@ -60,7 +60,6 @@ in {
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     initialPassword = "test";
     openssh.authorizedKeys.keys = authorized_keys;
-    # TODO: add setup, save, restore scripts
     packages = (let
       adjoin = pkgs.writeShellScriptBin "adjoin" ''
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
@@ -87,16 +86,28 @@ in {
           echo "Usage: $0 <path_to_gitea_dump>"
           exit 1
         fi
-        unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
+        giteadirs=(
+          '${config.services.gitea.contentDir}'
+          '${config.services.gitea.stateDir}/data'
+          '${config.services.gitea.customDir}'
+          '${config.services.gitea.settings.log.ROOT_PATH}'
+          '${config.services.gitea.repositoryRoot}'
+          "$(dirname '${config.services.gitea.database.path}')"
+        )
+        sudo unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
         cd "$TEMPDIR" && {
-          [ -d data ] && sudo mv data/* '${config.services.gitea.stateDir}/data' || echo "No data directory found"
-          [ -d custom ] && sudo mv custom/* '${config.services.gitea.customDir}' || echo "No custom directory found"
-          [ -d log ] && sudo mv log/* '${config.services.gitea.settings.log.ROOT_PATH}' || echo "No log directory found"
-          [ -d repos ] && sudo mv repos/* '${config.services.gitea.repositoryRoot}' || echo "No repos directory found"
+          sudo mkdir -p "''${giteadirs[@]}" && \
+          [ -d data/lfs ] && sudo mv data/lfs/* "''${giteadirs[0]}" || echo "No lfs directory found"
+          [ -d data ] && sudo mv data/* "''${giteadirs[1]}" || echo "No data directory found"
+          [ -d custom ] && sudo mv custom/* "''${giteadirs[2]}" || echo "No custom directory found"
+          [ -d log ] && sudo mv log/* "''${giteadirs[3]}" || echo "No log directory found"
+          [ -d repos ] && sudo mv repos/* "''${giteadirs[4]}" || echo "No repos directory found"
           sudo sqlite3 '${config.services.gitea.database.path}' <gitea-db.sql || { echo "Database restore failed"; exit 1; }
-        } && \
-        sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' '${config.services.gitea.stateDir}' || { echo "Failed to change ownership back to ${config.services.gitea.user}"; exit 1; }
+        }
+        for dir in "''${giteadirs[@]}"; do
+          sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
+        done
         cd "$OGDIR" && rm -rf "$TEMPDIR"
       '';
     in [
