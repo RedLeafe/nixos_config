@@ -43,7 +43,7 @@ in {
           COOKIE_SECURE = cfg.https;
           # REDIRECT_OTHER_PORT = cfg.https;
           # PORT_TO_REDIRECT = 80;
-        }; # CN=Users,DC=alien,DC=moon,DC=mine
+        };
       };
       extraConfig = ''
         [auth.ldap]
@@ -55,10 +55,11 @@ in {
         host = kerberos.alien.moon.mine
         port = 389
         user_search_base = CN=Users,DC=alien,DC=moon,DC=mine
-        # user_filter = (uid=%s) # For OpenLDAP
-        user_filter = (sAMAccountName=%s) # For Active Directory
+        user_filter = (uid=%s) # For OpenLDAP
+        # user_filter = (sAMAccountName=%s) # For Active Directory
         admin_filter = (&(objectClass=group)(cn=admins))"
-        attribute_username = sAMAccountName # Change this if you're using OpenLDAP, e.g., `uid`
+        # attribute_username = sAMAccountName # Active Directory
+        attribute_username = uid # OpenLDAP
         attribute_name = cn
         attribute_surname = sn
         attribute_mail = mail
