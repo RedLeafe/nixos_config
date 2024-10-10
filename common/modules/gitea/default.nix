@@ -93,7 +93,8 @@ in {
     };
     environment.systemPackages = (let
       GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
-        cp -r '${config.services.gitea.dump.backupDir}' .
+        sudo systemctl restart gitea-dump.service
+        cp "$(ls -1 '${config.services.gitea.dump.backupDir}' | sort -t '-' -k3 -nr | head -n 1)" .
       '';
     in [
       GETDUMP
