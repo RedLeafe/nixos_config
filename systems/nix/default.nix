@@ -1,13 +1,19 @@
 { config, pkgs, lib, modulesPath, inputs, stateVersion, username, hostname, system-modules, authorized_keys, nixpkgs, ... }: let
   sqldbpkg = config.services.mysql.package;
   dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
-    outfile="''${1:-/home/${username}/restored_data/dump.sql}"
+    export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils zip ])}:$PATH";
+    outfile="''${1:-/home/${username}/dump.sql.zip}"
     umask 077
+    TEMPFILE="$(mktemp)"
     mkdir -p "$(dirname "$outfile")"
     if [ "$USER" == "root" ]; then
-      ${sqldbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
+      mysqldump -u root --password="$2" --all-databases > "$TEMPFILE"
+      zip -9 "$outfile" "$TEMPFILE"
+      rm "$TEMPFILE"
     else
-      sudo ${sqldbpkg}/bin/mysqldump -u root --password="$2" --all-databases > "$outfile"
+      sudo mysqldump -u root --password="$2" --all-databases > "$TEMPFILE"
+      sudo zip -9 "$outfile" "$TEMPFILE"
+      sudo rm "$TEMPFILE"
     fi
   '';
 in {
@@ -64,16 +70,12 @@ in {
   systemd = let
     servicename = "backup_runner";
     servicescript = pkgs.writeShellScript "backup_runner-script" ''
-      export PATH="${lib.makeBinPath (with pkgs; [ bash sqldbpkg coreutils-full ])}:$PATH";
+      export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
       umask 077
-      if [ -e /home/${username}/restored_data ]; then
+      if [ -e /home/${username}/dump.sql.zip ]; then
         mkdir -p /home/${username}/backupcache
-        if [ -e /home/${username}/restored_data/dump.sql ]; then
-          ${pkgs.zip}/bin/zip -9 /home/${username}/restored_data/dump.sql.zip /home/${username}/restored_data/dump.sql
-          rm -f /home/${username}/restored_data/dump.sql
-        fi
         files=( /home/${username}/backupcache/* )
-        max=3
+        max=8 # NOTE: breaks at max=10
         for (( i=$((''${#files[@]}-1)); i>=0; i-- )); do
           file="''${files[$i]}"
           [ '/home/${username}/backupcache/*' == "$file" ] && break
@@ -91,10 +93,10 @@ in {
             mv "$file" "$new_path"
           fi
         done
-        mv /home/${username}/restored_data /home/${username}/backupcache/restored_data1
+        mv /home/${username}/dump.sql.zip /home/${username}/backupcache/dump.sql.zip.1
       fi
       ${dumpDBall}/bin/dumpDBall
-      chown -R ${username}:users /home/${username}/restored_data
+      chown ${username}:users /home/${username}/dump.sql.zip
       chown -R ${username}:users /home/${username}/backupcache
     '';
   in {
@@ -129,12 +131,16 @@ in {
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
       '';
       restoreDBall = pkgs.writeShellScriptBin "restoreDBall" ''
-        infile="''${1:-/home/${username}/restored_data/dump.sql}"
+        export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils unzip ])}:$PATH";
+        infile="''${1:-/home/${username}/dump.sql.zip}"
+        TEMPDIR="$(mktemp -d)"
+        sudo unzip -d "$TEMPDIR" "$infile"
         if [ ! -e "$infile" ]; then
           echo "Error: $infile not found"
         else
-          sudo ${sqldbpkg}/bin/mysql -u root --password="$2" < "$infile"
+          sudo mysql -u root --password="$2" < "$TEMPDIR/$(basename $infile .zip)"
         fi
+        sudo rm -rf "$TEMPDIR"
       '';
       yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
         nix-collect-garbage --delete-old
@@ -166,12 +172,9 @@ in {
           coreutils
         ])}"
         WPDBDUMP="$(realpath "$1" 2> /dev/null)"
-        REPOZIP="$(realpath "$2" 2> /dev/null)"
-        ADPASS="$3"
+        ADPASS="$2"
         echo "fixing nixos config permissions"
         sudo chown -R ${username}:users /home/${username}/nixos_config
-        sudo chown -R ${username}:users /home/${username}/restored_data
-        ${genAdminSSHkey}/bin/genAdminSSHkey
         echo "joining AD"
         if [[ -z "$ADPASS" ]]; then
           ${adjoin}/bin/adjoin
@@ -179,6 +182,7 @@ in {
           ${adjoin}/bin/adjoin --stdin-password <<< "$ADPASS"
         fi
         ${restoreDBall}/bin/restoreDBall "$WPDBDUMP"
+        ${genAdminSSHkey}/bin/genAdminSSHkey
         rm -f /home/${username}/.zsh_history
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"

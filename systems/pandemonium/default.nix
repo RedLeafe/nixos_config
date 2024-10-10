@@ -73,8 +73,8 @@ in {
         sudo systemctl restart gitea-dump.service
         FILENAME="$(sudo ls -1 '${config.services.gitea.dump.backupDir}' | sort -t '-' -k3 -nr | head -n 1)"
         umask 077
-        sudo cp "${config.services.gitea.dump.backupDir}$FILENAME" .
-        sudo chown ${username}:${username} "$FILENAME"
+        sudo cp "${config.services.gitea.dump.backupDir}/$FILENAME" .
+        sudo chown ${username}:users "$FILENAME"
       '';
       RESTOREDUMP = pkgs.writeShellScriptBin "RESTORE_GIT_DUMP" ''
         PATH="${lib.makeBinPath (with pkgs; [ coreutils sqlite unzip ])}:$PATH"
@@ -88,7 +88,7 @@ in {
           exit 1
         fi
         unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
-        sudo chown -R ${username}:${username} "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
+        sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
         cd "$TEMPDIR" && {
           [ -d data ] && sudo mv data/* '${config.services.gitea.stateDir}/data' || echo "No data directory found"
           [ -d custom ] && sudo mv custom/* '${config.services.gitea.customDir}' || echo "No custom directory found"
