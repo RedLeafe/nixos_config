@@ -3,7 +3,6 @@
   dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
     export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils zip ])}:$PATH";
     outfile="''${1:-/home/${username}/dump.sql.zip}"
-    umask 077
     OGDIR="$(realpath .)"
     TEMPDIR="$(mktemp -d)"
     TEMPFILE="$TEMPDIR/dump.sql"
@@ -13,11 +12,13 @@
       cd "$TEMPDIR"
       zip -9 "$outfile" "$(basename "$TEMPFILE")"
       rm "$TEMPFILE"
+      chmod 600 "$outfile"
     else
       sudo mysqldump -u root --password="$2" --all-databases > "$TEMPFILE"
       cd "$TEMPDIR"
       sudo zip -9 "$outfile" "$TEMPFILE"
       sudo rm "$TEMPFILE"
+      sudo chmod 600 "$outfile"
     fi
     cd "$OGDIR"
   '';
@@ -76,7 +77,7 @@ in {
     servicename = "backup_runner";
     servicescript = pkgs.writeShellScript "backup_runner-script" ''
       export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
-      umask 077
+      umask 007
       if [ -e /home/${username}/dump.sql.zip ]; then
         mkdir -p /home/${username}/backupcache
         files=( /home/${username}/backupcache/* )
@@ -139,13 +140,13 @@ in {
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils unzip ])}:$PATH";
         infile="''${1:-/home/${username}/dump.sql.zip}"
         TEMPDIR="$(mktemp -d)"
-        sudo unzip -d "$TEMPDIR" "$infile"
+        unzip -d "$TEMPDIR" "$infile"
         if [ ! -e "$infile" ]; then
           echo "Error: $infile not found"
         else
           sudo mysql -u root --password="$2" < "$TEMPDIR/$(basename $infile .zip)"
         fi
-        # sudo rm -rf "$TEMPDIR"
+        rm -rf "$TEMPDIR"
       '';
       yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
         nix-collect-garbage --delete-old
