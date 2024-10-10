@@ -110,6 +110,7 @@ in {
         sudo unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
         cd "$TEMPDIR" && {
+          sudo systemctl stop gitea.service && \
           sudo mkdir -p "''${giteadirs[@]}" && \
           sudo chown -R ${username}:users "''${giteadirs[@]}"
           [ -d data/lfs ] && mv -f data/lfs/* "''${giteadirs[1]}" || echo "No lfs directory found"
@@ -126,8 +127,6 @@ in {
         sudo systemctl restart gitea.service
         sleep 1
         ${GITEA_REGEN_HOOKS}/bin/GITEA_REGEN_HOOKS
-        sleep 1
-        sudo systemctl restart gitea.service
       '';
     in [
       GITEA_REGEN_HOOKS
