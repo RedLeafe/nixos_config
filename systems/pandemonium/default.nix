@@ -92,7 +92,7 @@ in {
           '${config.services.gitea.customDir}'
           '${config.services.gitea.settings.log.ROOT_PATH}'
           '${config.services.gitea.repositoryRoot}'
-          "$(dirname '${config.services.gitea.database.path}')"
+          '${builtins.dirOf config.services.gitea.database.path}'
         )
         sudo unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
