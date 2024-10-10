@@ -8,10 +8,12 @@
     mkdir -p "$(dirname "$outfile")"
     if [ "$USER" == "root" ]; then
       mysqldump -u root --password="$2" --all-databases > "$TEMPFILE"
-      zip -9 "$outfile" "$TEMPFILE"
+      cd "$(dirname "$TEMPFILE")"
+      zip -9 "$outfile" "$(basename "$TEMPFILE")"
       rm "$TEMPFILE"
     else
       sudo mysqldump -u root --password="$2" --all-databases > "$TEMPFILE"
+      cd "$(dirname "$TEMPFILE")"
       sudo zip -9 "$outfile" "$TEMPFILE"
       sudo rm "$TEMPFILE"
     fi
