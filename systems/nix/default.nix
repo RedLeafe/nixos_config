@@ -1,5 +1,4 @@
 { config, pkgs, lib, modulesPath, inputs, stateVersion, username, hostname, system-modules, authorized_keys, nixpkgs, ... }: let
-  git_server_home_dir = "/var/lib/git-server";
   sqldbpkg = config.services.mysql.package;
   dumpDBall = pkgs.writeShellScriptBin "dumpDBall" ''
     outfile="''${1:-/home/${username}/restored_data/dump.sql}"
@@ -95,7 +94,6 @@ in {
         mv /home/${username}/restored_data /home/${username}/backupcache/restored_data1
       fi
       ${dumpDBall}/bin/dumpDBall
-      ${dumpGitRepos}/bin/dumpGitRepos
       chown -R ${username}:users /home/${username}/restored_data
       chown -R ${username}:users /home/${username}/backupcache
     '';
