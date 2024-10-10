@@ -105,7 +105,7 @@ in {
           '${config.services.gitea.settings.log.ROOT_PATH}'
           '${config.services.gitea.repositoryRoot}'
           '${builtins.dirOf config.services.gitea.database.path}'
-        ) # TEST COMMENT PLEASE IGNORE
+        )
         DBPATH='${config.services.gitea.database.path}'
         sudo unzip -d "$TEMPDIR" "$DUMPFILE" || { echo "Failed to unzip $DUMPFILE"; exit 1; }
         sudo chown -R ${username}:users "$TEMPDIR" || { echo "Failed to change ownership of created directory"; exit 1; }
@@ -123,8 +123,11 @@ in {
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
         done
         cd "$OGDIR" && rm -rf "$TEMPDIR"
+        sudo systemctl restart gitea.service
+        sleep 1
         ${GITEA_REGEN_HOOKS}/bin/GITEA_REGEN_HOOKS
-        sudo systemctl restart gitea
+        sleep 1
+        sudo systemctl restart gitea.service
       '';
     in [
       GITEA_REGEN_HOOKS
@@ -132,6 +135,31 @@ in {
       RESTOREDUMP
       adjoin
       yeet_trash
+      (pkgs.writeShellScriptBin "initial_post_installation_script" ''
+        if [[ "$USER" != "${username}" ]]; then
+          echo "Error: script must be run as the user ${username}"
+          exit 1
+        fi
+        export PATH="$PATH:${lib.makeBinPath (with pkgs; [
+          git
+          openssh
+          coreutils
+        ])}"
+        TEADUMP="$(realpath "$1" 2> /dev/null)"
+        ADPASS="$2"
+        echo "fixing nixos config permissions"
+        sudo chown -R ${username}:users /home/${username}/nixos_config
+        echo "joining AD"
+        if [[ -z "$ADPASS" ]]; then
+          ${adjoin}/bin/adjoin
+        else
+          ${adjoin}/bin/adjoin --stdin-password <<< "$ADPASS"
+        fi
+        ${RESTOREDUMP}/bin/RESTORE_GIT_DUMP "$TEADUMP"
+        rm -f /home/${username}/.zsh_history
+        echo "Initialization complete."
+        echo "please reboot the machine to authenticate logins with AD"
+      '')
     ]);
   };
 }
