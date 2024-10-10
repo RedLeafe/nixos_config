@@ -60,6 +60,7 @@ in {
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     initialPassword = "test";
     openssh.authorizedKeys.keys = authorized_keys;
+    # NOTE: administration scripts
     packages = (let
       adjoin = pkgs.writeShellScriptBin "adjoin" ''
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
