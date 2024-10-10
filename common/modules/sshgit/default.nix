@@ -47,6 +47,51 @@ in {
   };
   config = lib.mkIf cfg.enable {
 
+    programs.git = {
+      enable = true;
+      config = {
+        core.fsmonitor = true;
+        init.defaultBranch = "master";
+        user.email = cfg.default_git_email;
+        user.name = cfg.default_git_user;
+      };
+    };
+
+    users.users.git = lib.mkIf cfg.enable_git_server {
+      isSystemUser = true;
+      group = "git";
+      home = cfg.git_home_dir;
+      createHome = true;
+      shell = "${config.programs.git.package}/bin/git-shell";
+      openssh.authorizedKeys.keys = cfg.authorized_keys;
+    };
+
+    users.groups.git = lib.mkIf cfg.enable_git_server {};
+
+    services.fail2ban.enable = true;
+
+    programs.ssh.package = if cfg.AD_support then pkgs.opensshWithKerberos else pkgs.openssh;
+
+    services.openssh = {
+      enable = true;
+      ports = [ 22 ];
+      package = if cfg.AD_support then pkgs.opensshWithKerberos else pkgs.openssh;
+      settings = cfg.settings;
+      extraConfig = (lib.optionalString (cfg.AD_support) ''
+        KerberosAuthentication yes
+        KerberosOrLocalPasswd yes
+        GSSAPIAuthentication yes
+        GSSAPICleanupCredentials yes
+      '') + (lib.optionalString (cfg.enable_git_server) ''
+        Match user git
+          AllowTcpForwarding no
+          AllowAgentForwarding no
+          PasswordAuthentication no
+          PermitTTY no
+          X11Forwarding no
+      '') + cfg.extraSSHDconfig;
+    };
+
     system.activationScripts.git_shell_scripts.text = lib.optionalString ((config.users.users ? git) && cfg.enable_git_server) (let
       mkNewGitShellCmds = { xtras ? {}, symlinkJoin, writeTextFile, ... }: let
         extracmds = builtins.attrValues (builtins.mapAttrs (name: value: writeTextFile {
@@ -98,50 +143,5 @@ in {
     in ''
       ln -sf ${custom_git_commands}/git-shell-commands ${config.users.users.git.home}
     '');
-
-    programs.git = {
-      enable = true;
-      config = {
-        core.fsmonitor = true;
-        init.defaultBranch = "master";
-        user.email = cfg.default_git_email;
-        user.name = cfg.default_git_user;
-      };
-    };
-
-    users.users.git = lib.mkIf cfg.enable_git_server {
-      isSystemUser = true;
-      group = "git";
-      home = cfg.git_home_dir;
-      createHome = true;
-      shell = "${config.programs.git.package}/bin/git-shell";
-      openssh.authorizedKeys.keys = cfg.authorized_keys;
-    };
-
-    users.groups.git = lib.mkIf cfg.enable_git_server {};
-
-    services.fail2ban.enable = true;
-
-    programs.ssh.package = if cfg.AD_support then pkgs.opensshWithKerberos else pkgs.openssh;
-
-    services.openssh = {
-      enable = true;
-      ports = [ 22 ];
-      package = if cfg.AD_support then pkgs.opensshWithKerberos else pkgs.openssh;
-      settings = cfg.settings;
-      extraConfig = (lib.optionalString (cfg.AD_support) ''
-        KerberosAuthentication yes
-        KerberosOrLocalPasswd yes
-        GSSAPIAuthentication yes
-        GSSAPICleanupCredentials yes
-      '') + (lib.optionalString (cfg.enable_git_server) ''
-        Match user git
-          AllowTcpForwarding no
-          AllowAgentForwarding no
-          PasswordAuthentication no
-          PermitTTY no
-          X11Forwarding no
-      '') + cfg.extraSSHDconfig;
-    };
   };
 }
