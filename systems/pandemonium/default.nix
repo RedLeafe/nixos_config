@@ -87,7 +87,7 @@ in {
           exit 1
         fi
         giteadirs=(
-          '${config.services.gitea.contentDir}'
+          '${config.services.gitea.lfs.contentDir}'
           '${config.services.gitea.stateDir}/data'
           '${config.services.gitea.customDir}'
           '${config.services.gitea.settings.log.ROOT_PATH}'
