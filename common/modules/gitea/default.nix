@@ -55,16 +55,16 @@ in {
         host = kerberos.alien.moon.mine
         port = 389
         user_search_base = CN=Users,DC=alien,DC=moon,DC=mine
-        user_filter = (uid=%s) # For OpenLDAP
-        # user_filter = (sAMAccountName=%s) # For Active Directory
+        # user_filter = (uid=%s) # For OpenLDAP
+        user_filter = (sAMAccountName=%s) # For Active Directory
         admin_filter = (&(objectClass=group)(cn=admins))"
-        # attribute_username = sAMAccountName # Active Directory
-        attribute_username = uid # OpenLDAP
+        attribute_username = sAMAccountName # Active Directory
+        # attribute_username = uid # OpenLDAP
         attribute_name = cn
         attribute_surname = sn
         attribute_mail = mail
         search_page_size = 0
-        bind_dn = CN=Users,DC=alien,DC=moon,DC=mine
+        bind_dn = CN=Administrator,CN=Users,DC=alien,DC=moon,DC=mine
       '';
     };
     services.httpd.enable = true;
