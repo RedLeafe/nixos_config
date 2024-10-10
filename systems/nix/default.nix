@@ -4,6 +4,7 @@
     export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils zip ])}:$PATH";
     outfile="''${1:-/home/${username}/dump.sql.zip}"
     umask 077
+    OGDIR="$(realpath .)"
     TEMPFILE="$(mktemp)"
     mkdir -p "$(dirname "$outfile")"
     if [ "$USER" == "root" ]; then
@@ -17,6 +18,7 @@
       sudo zip -9 "$outfile" "$TEMPFILE"
       sudo rm "$TEMPFILE"
     fi
+    cd "$OGDIR"
   '';
 in {
   imports = with system-modules; [
