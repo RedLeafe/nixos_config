@@ -78,7 +78,7 @@ in {
       '';
       GITEA_REGEN_HOOKS = pkgs.writeShellScriptBin "GITEA_REGEN_HOOKS" ''
         OGDIR="$(realpath .)"
-        cd "${config.services.gitea.package}/bin" && ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin hooks regenerate
+        cd "${config.services.gitea.package}/bin" && sudo -u gitea ./gitea -c ${config.services.gitea.customDir}/conf/app.ini admin hooks regenerate
         cd "$OGDIR"
       '';
       RESTOREDUMP = pkgs.writeShellScriptBin "RESTORE_GIT_DUMP" ''
