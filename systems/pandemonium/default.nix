@@ -117,7 +117,7 @@ in {
           # [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
           [ -d log ] && mv -f log/* "''${giteadirs[4]}" || echo "No log directory found"
           [ -d repos ] && mv -f repos/* "''${giteadirs[5]}" || echo "No repos directory found"
-          sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore failed"; exit 1; }
+          sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore possibly failed?"; }
         }
         for dir in "''${giteadirs[@]}"; do
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
