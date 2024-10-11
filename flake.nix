@@ -81,11 +81,19 @@
                 hostname="$1" # <- could change at call time
                 admin="$2" # <- could change at call time
                 # we also get the rest of the args passed to the install script
-                [ -d /home/${installuser}/dump.sql.zip ] && sudo cp -rvL /home/${installuser}/dump.sql.zip /mnt/home/$admin
+                DUMPFILE="''${3:-/home/${installuser}/dump.sql.zip}"
+                [ -d "$DUMPFILE" ] && sudo cp -vL "$DUMPFILE" /mnt/home/$admin
               '';
             };
             pandemonium = {
               admin = "dorsa";
+              postinstall = installuser: /*bash*/ ''
+                hostname="$1"
+                admin="$2"
+                DUMPFILE="$3"
+                [ -z "$DUMPFILE" ] && DUMPFILE="$(ls -1 /home/${installuser}/gitea-dump-*.zip | sort -t '-' -k3 -nr | head -n 1)"
+                [ -d "$DUMPFILE" ] && sudo cp -vL "$DUMPFILE" /mnt/home/$admin
+              '';
             };
           };
         in {
