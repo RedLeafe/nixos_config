@@ -1,10 +1,11 @@
 # pandemonium & nix @ moon.mine
 
-With the contents of this repo,
-plus the zip file dumps in the local admin's home dir, you can restore either nix or pandemonium hosts from any state. Back them up!
+Run the correct script installed to the local admin user to get the backup dumps on nix and pandemonium hosts.
+Save the files to your machine and clone this config.
 
-A new backup of the database will be taken once per hour
-so you may need to clean up the old ones if you are running out of disk space, along with running garbage collection.
+With those, you can restore either nix or pandemonium hosts from any state if you know what you are doing.
+
+The entire configuration for both machines are here, along with their installer.
 
 ## Structure:
 

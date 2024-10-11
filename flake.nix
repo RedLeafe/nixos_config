@@ -18,6 +18,10 @@
       url = "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip";
       flake = false;
     };
+    WPplugins-media-sync = {
+      url = "https://downloads.wordpress.org/plugin/media-sync.1.4.6.zip";
+      flake = false;
+    };
     WPplugins-kubio = {
       url = "https://downloads.wordpress.org/plugin/kubio.2.3.3.zip";
       flake = false;
@@ -42,7 +46,7 @@
     diskoConfigurations.pandemonium = import ./disko/sdaBIOS.nix;
     legacyPackages = forAllSys (system: {
       nixosConfigurations = {
-        nix = nixpkgs.lib.nixosSystem (let 
+        nix = nixpkgs.lib.nixosSystem (let # <-- wordpress host
           username = "pluto";
           hostname = "nix";
         in {
@@ -57,7 +61,7 @@
             ./systems/${hostname}
           ];
         });
-        pandemonium = nixpkgs.lib.nixosSystem (let
+        pandemonium = nixpkgs.lib.nixosSystem (let # <-- gitea host
           username = "dorsa";
           hostname = "pandemonium";
         in {
@@ -81,12 +85,13 @@
                 hostname="$1" # <- could change at call time
                 admin="$2" # <- could change at call time
                 # we also get the rest of the args passed to the install script
-                DUMPFILE="''${3:-/home/${installuser}/dump.sql.zip}"
+                DUMPFILE="''${3:-/home/${installuser}/wp-dump.tar.gz}"
                 [ -d "$DUMPFILE" ] && sudo cp -vL "$DUMPFILE" /mnt/home/$admin
               '';
             };
             pandemonium = {
               admin = "dorsa";
+              copyConfig = false;
               postinstall = installuser: /*bash*/ ''
                 hostname="$1"
                 admin="$2"

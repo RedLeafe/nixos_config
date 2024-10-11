@@ -42,6 +42,19 @@
         "url": "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip"
       }
     },
+    "WPplugins-media-sync": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722309666,
+        "narHash": "sha256-1yYn/+e/wch6xEd65g6HtcDEryl6fySnEqj9fy+ZC08=",
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/plugin/media-sync.1.4.6.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://downloads.wordpress.org/plugin/media-sync.1.4.6.zip"
+      }
+    },
     "WPplugins-vertice": {
       "flake": false,
       "locked": {
@@ -116,6 +129,7 @@
         "WPplugins-any-hostname": "WPplugins-any-hostname",
         "WPplugins-kubio": "WPplugins-kubio",
         "WPplugins-ldap-login-for-intranet-sites": "WPplugins-ldap-login-for-intranet-sites",
+        "WPplugins-media-sync": "WPplugins-media-sync",
         "WPplugins-vertice": "WPplugins-vertice",
         "disko": "disko",
         "maximizer": "maximizer",

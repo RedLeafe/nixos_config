@@ -84,6 +84,9 @@ in {
   environment.interactiveShellInit = ''
   '';
   environment.shellAliases = {
+    autorepl = ''${pkgs.writeShellScript "autorepl" ''
+      exec nix repl --show-trace --expr '{ pkgs = import ${inputs.nixpkgs.outPath} { system = "${pkgs.system}"; config.allowUnfree = true; }; }' "$@"
+    ''}'';
     lsnc = "${pkgs.lsd}/bin/lsd --color=never";
     la = "${pkgs.lsd}/bin/lsd -a";
     ll = "${pkgs.lsd}/bin/lsd -lh";

@@ -11,6 +11,7 @@ in {
 
   moon_mods.gitea = {
     enable = true;
+    PAM_support = true;
     domainname = "10.100.136.42";
     lfs = true;
   };
@@ -66,8 +67,17 @@ in {
         sudo ${pkgs.adcli}/bin/adcli join -U Administrator "$@"
       '';
       yeet_trash = pkgs.writeShellScriptBin "yeet_trash" ''
-        nix-collect-garbage --delete-old
         sudo nix-collect-garbage --delete-old
+        nix-collect-garbage --delete-old
+      '';
+      genAdminSSHkey = pkgs.writeShellScriptBin "genAdminSSHkey" ''
+        mkdir -p /home/${username}/.ssh
+        if [[ ! -f /home/${username}/.ssh/id_ed25519 ]]; then
+          ssh-keygen -q -f /home/${username}/.ssh/id_ed25519 -N ""
+          cp -f /home/${username}/.ssh/id_ed25519.pub /home/${username}/nixos_config/common/auth_keys/${username}.pub
+        else
+          echo "SSH key already exists, skipping key generation."
+        fi
       '';
       GETDUMP = pkgs.writeShellScriptBin "GET_GIT_DUMP" ''
         OUTDIR="''${1:-/home/${username}}"
@@ -119,7 +129,7 @@ in {
           [ -d custom ] && mv -f custom/* "''${giteadirs[3]}" || echo "No custom directory found"
           [ -d log ] && mv -f log/* "''${giteadirs[4]}" || echo "No log directory found"
           [ -d repos ] && mv -f repos/* "''${giteadirs[5]}" || echo "No repos directory found"
-          sqlite3 "$DBPATH" <gitea-db.sql || { echo "Database restore possibly failed?"; }
+          sqlite3 "$DBPATH" <gitea-db.sql || echo "Database restore possibly failed?";
         }
         for dir in "''${giteadirs[@]}"; do
           sudo chown -R '${config.services.gitea.user}:${config.services.gitea.user}' "$dir" || echo "failed to change ownership of $dir to ${config.services.gitea.user}"
@@ -135,6 +145,7 @@ in {
       RESTOREDUMP
       adjoin
       yeet_trash
+      genAdminSSHkey
       (pkgs.writeShellScriptBin "initial_post_installation_script" ''
         if [[ "$USER" != "${username}" ]]; then
           echo "Error: script must be run as the user ${username}"
@@ -148,7 +159,7 @@ in {
         TEADUMP="$(realpath "$1" 2> /dev/null)"
         ADPASS="$2"
         echo "fixing nixos config permissions"
-        sudo chown -R ${username}:users /home/${username}/nixos_config
+        sudo chown -R ${username}:users /home/${username}
         echo "joining AD"
         if [[ -z "$ADPASS" ]]; then
           ${adjoin}/bin/adjoin
@@ -156,6 +167,7 @@ in {
           ${adjoin}/bin/adjoin --stdin-password <<< "$ADPASS"
         fi
         ${RESTOREDUMP}/bin/RESTORE_GIT_DUMP "$TEADUMP"
+        ${genAdminSSHkey}/bin/genAdminSSHkey
         rm -f /home/${username}/.zsh_history
         echo "Initialization complete."
         echo "please reboot the machine to authenticate logins with AD"

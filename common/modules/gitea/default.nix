@@ -7,6 +7,7 @@ in {
     ${moduleNamespace}.gitea = with lib; {
       enable = mkEnableOption "gitea server";
       https = mkEnableOption "https support";
+      PAM_support = mkEnableOption "PAM support";
       port = mkOption {
         default = if cfg.https then 443 else 80;
         type = types.int;
@@ -24,11 +25,25 @@ in {
         default = 3303;
         type = types.int;
       };
+      backup_limit = mkOption {
+        default = 8;
+        type = types.int;
+      };
+      default_theme = mkOption {
+        default = "gitea-dark-protanopia-deuteranopia";
+        type = types.str;
+      };
     };
   };
   config = lib.mkIf cfg.enable {
     services.gitea = {
       enable = true;
+      package = if cfg.PAM_support then pkgs.gitea.overrideAttrs (prev: {
+        buildInputs = with pkgs; [ linux-pam ] ++ (lib.optionals (prev ? buildInputs) prev.buildInputs);
+        nativeBuildInputs = with pkgs; [ linux-pam ] ++ (lib.optionals (prev ? nativeBuildInputs) prev.nativeBuildInputs);
+        tags = [ "sqlite" "sqlite_unlock_notify" "pam" ];
+        doCheck = false;
+      }) else pkgs.gitea;
       lfs.enable = cfg.lfs;
       dump.enable = true;
       # dump.interval = "*:0/1";
@@ -46,6 +61,9 @@ in {
           COOKIE_SECURE = cfg.https;
           # REDIRECT_OTHER_PORT = cfg.https;
           # PORT_TO_REDIRECT = 80;
+        };
+        ui = {
+          DEFAULT_THEME = cfg.default_theme;
         };
       };
     };
@@ -71,6 +89,7 @@ in {
         proxyPass = "http://127.0.0.1:3000/";
       };
     };
+
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "gen_${cfg.domainname}_cert" (let
         DN = cfg.domainname;
@@ -83,5 +102,37 @@ in {
         sudo chown -R ${webuser}:root "/.${DN}"
       ''))
     ];
+
+    systemd = let
+      servicename = "clearOldDumps";
+      servicescript = let
+        scrfun = max: path: pkgs.writeShellScript "${servicename}-script" ''
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils ])}:$PATH"
+          [ ! -d "${path}" ] && { mkdir -p "${path}" && exit 0; }
+          to_delete=$(($(ls -1 '${path}' | wc -l) - ${builtins.toString max}))
+          [ "$to_delete" -gt 0 ] && {
+            for file in $(ls -1 '${path}' | sort -t '-' -k3 -n | head -n $to_delete); do
+              rm "${path}/$file"
+            done
+          } || exit 0
+        '';
+      in scrfun cfg.backup_limit "${config.services.gitea.dump.backupDir}";
+    in {
+      services.${servicename} = {
+        description = "Run ${servicename}";
+        serviceConfig = {
+          ExecStart = "${pkgs.bash}/bin/bash ${servicescript}";
+        };
+      };
+      timers."${servicename}-timer" = {
+        description = "Timer to run ${servicename} every 2 hours";
+        timerConfig = {
+          OnCalendar = "0/2:00:00";
+          Persistent = true;
+          Unit = "${servicename}.service";
+        };
+        wantedBy = [ "timers.target" ];
+      };
+    };
   };
 }
