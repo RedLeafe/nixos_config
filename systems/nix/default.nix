@@ -87,7 +87,7 @@ in {
       get_wp_dump = pkgs.writeShellScriptBin "get_wp_dump" ''
         OUTDIR="''${1:-/home/${username}}"
         sudo systemctl restart backup_runner.service
-        umask 077
+        sleep 1
         sudo cp ${backupDir}/wp-dump.tar.gz "$OUTDIR"
         sudo chown ${username}:users "$OUTDIR/wp-dump.tar.gz"
       '';
