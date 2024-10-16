@@ -87,7 +87,17 @@ in {
       get_wp_dump = pkgs.writeShellScriptBin "get_wp_dump" ''
         OUTDIR="''${1:-/home/${username}}"
         sudo systemctl restart backup_runner.service
-        [ "$?" == "1" ] && echo whoops, service failed.
+        while true; do
+          STATUS=$(sudo systemctl is-active backup_runner.service)
+          if [ "$STATUS" == "inactive" ]; then
+            echo "Service finished successfully."
+            break
+          elif [ "$STATUS" == "failed" ]; then
+            echo "Whoops, service failed."
+            exit 1
+          fi
+          sleep 1
+        done
         sudo cp ${backupDir}/wp-dump.tar.gz "$OUTDIR"
         sudo chown ${username}:users "$OUTDIR/wp-dump.tar.gz"
       '';
