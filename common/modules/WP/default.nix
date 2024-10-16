@@ -2,21 +2,24 @@
 # that returns a module
 { config, pkgs, lib, ... }: let
   cfg = config.${moduleNamespace}.WP;
-  myWPext = let
-    autobuilt = let
-      newpkgs = import inputs.nixpkgs {
-        inherit (pkgs) system;
-        overlays = [
-          # turns inputs named WPplugins-<pluginname>
-          # in a set pkgs.myWPext.<pluginname>
-          ((import ./utils.nix).mkplugs inputs)
-        ];
-      };
-    in newpkgs.myWPext;
-  in autobuilt // {
-    # you can do autobuilt.pluginname.overrideAttrs to override them
-    # and put the new replacement here.
-  };
+  autoWP = let
+    newpkgs = import inputs.nixpkgs {
+      inherit (pkgs) system;
+      overlays = [
+        # turns inputs named WPplugins-<pluginname>
+        # in a set pkgs.myWPext.<pluginname>
+        ((import ./utils.nix).mkplugs inputs)
+      ];
+    };
+    myWPthemes = newpkgs.myWPthemes // {
+      # you can do themename.overrideAttrs to override them
+      # and put the new replacement here.
+    };
+    myWPext = newpkgs.myWPext // {
+      # you can do pluginname.overrideAttrs to override them
+      # and put the new replacement here.
+    };
+  in { inherit myWPext myWPthemes; };
 in
 {
   options = {
@@ -74,19 +77,11 @@ in
         sslServerCert = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.crt"; # <-- wwwrun needs to be able to read it
         sslServerKey = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.key"; # <-- wwwrun needs to be able to read it
       };
-      themes = {
-        inherit (myWPext) vertice;
+      themes = autoWP.myWPthemes // {
       };
-      plugins = {
-        inherit (myWPext)
-          kubio
-          ldap-login-for-intranet-sites
-          any-hostname
-          media-sync
-          ;
+      plugins = autoWP.myWPext // {
         inherit (pkgs.wordpressPackages.plugins)
-          static-mail-sender-configurator
-          ;
+          static-mail-sender-configurator;
       };
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {

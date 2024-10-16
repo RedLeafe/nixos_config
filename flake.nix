@@ -30,7 +30,7 @@
       url = "github:dessibelle/any-hostname";
       flake = false;
     };
-    WPplugins-vertice = {
+    WPthemes-vertice = {
       url = "https://downloads.wordpress.org/theme/vertice.1.0.25.zip";
       flake = false;
     };
