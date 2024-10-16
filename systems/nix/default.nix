@@ -1,7 +1,7 @@
 { config, pkgs, lib, modulesPath, inputs, stateVersion, username, hostname, system-modules, authorized_keys, nixpkgs, ... }: let
   sqldbpkg = config.services.mysql.package;
   siteName = "LunarLooters";
-  backupDir = "/root/backup";
+  backupDir = "/backup";
   
 in {
   imports = with system-modules; [

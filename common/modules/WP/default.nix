@@ -121,7 +121,7 @@ in
       '';
       servicescript = pkgs.writeShellScript "${servicename}-script" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
-        umask 077
+        umask 027
         MOST_RECENT="${cfg.backupDir}/wp-dump.tar.gz"
         CACHEDIR="${cfg.backupDir}/backupcache"
         if [ -e "$MOST_RECENT" ]; then
@@ -148,6 +148,7 @@ in
           mv $MOST_RECENT "$CACHEDIR/$(basename "$MOST_RECENT").1"
         fi
         ${dumpDBall} "$MOST_RECENT"
+        sudo find '${cfg.backupDir}' -type f -exec chmod 600 {} \;
       '';
     in {
       services.${servicename} = {
