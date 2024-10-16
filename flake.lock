@@ -55,7 +55,7 @@
         "url": "https://downloads.wordpress.org/plugin/media-sync.1.4.6.zip"
       }
     },
-    "WPplugins-vertice": {
+    "WPthemes-vertice": {
       "flake": false,
       "locked": {
         "lastModified": 1722357276,
@@ -130,7 +130,7 @@
         "WPplugins-kubio": "WPplugins-kubio",
         "WPplugins-ldap-login-for-intranet-sites": "WPplugins-ldap-login-for-intranet-sites",
         "WPplugins-media-sync": "WPplugins-media-sync",
-        "WPplugins-vertice": "WPplugins-vertice",
+        "WPthemes-vertice": "WPthemes-vertice",
         "disko": "disko",
         "maximizer": "maximizer",
         "nixpkgs": "nixpkgs"
