@@ -107,7 +107,7 @@ in
       dumpDBall = pkgs.writeShellScript "dumpDBall" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils gnutar gzip ])}:$PATH";
         OUTFILE="$1"
-        umask 077
+        umask 027
         TEMPDIR="$(mktemp -d)"
         cleanup() {
           rm -rf "$TEMPDIR"
@@ -117,13 +117,16 @@ in
         mysqldump '${wp_dp_name}' > "$TEMPDIR/dump.sql"
         cp -r '${wp_ups}' "$TEMPDIR"
         tar -cvf "$OUTFILE" --directory="$TEMPDIR" . --use-compress-program="gzip -9"
-        rm -rf "$TEMPDIR"
       '';
       servicescript = pkgs.writeShellScript "${servicename}-script" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
         umask 027
         MOST_RECENT="${cfg.backupDir}/wp-dump.tar.gz"
         CACHEDIR="${cfg.backupDir}/backupcache"
+        cleanup() {
+          find '${cfg.backupDir}' -type f -exec chmod 600 {} \;
+        }
+        trap cleanup EXIT
         if [ -e "$MOST_RECENT" ]; then
           mkdir -p "$CACHEDIR"
           files=( $CACHEDIR/* )
@@ -148,7 +151,6 @@ in
           mv $MOST_RECENT "$CACHEDIR/$(basename "$MOST_RECENT").1"
         fi
         ${dumpDBall} "$MOST_RECENT"
-        sudo find '${cfg.backupDir}' -type f -exec chmod 600 {} \;
       '';
     in {
       services.${servicename} = {
