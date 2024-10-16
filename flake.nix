@@ -13,7 +13,7 @@
     # wordpress plugins
     # name them WPplugins-<plugin-name>
     # and a util grabs them and turns them into plugins
-    # in the WP module
+    # in the WP module and installs them
     WPplugins-ldap-login-for-intranet-sites = {
       url = "https://downloads.wordpress.org/plugin/ldap-login-for-intranet-sites.5.1.5.zip";
       flake = false;
@@ -30,6 +30,10 @@
       url = "github:dessibelle/any-hostname";
       flake = false;
     };
+    # wordpress themes
+    # name them WPthemes-<theme-name>
+    # and a util grabs them and turns them into themes
+    # in the WP module and installs them
     WPthemes-vertice = {
       url = "https://downloads.wordpress.org/theme/vertice.1.0.25.zip";
       flake = false;
