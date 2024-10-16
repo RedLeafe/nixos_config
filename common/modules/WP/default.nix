@@ -107,7 +107,7 @@ in
       dumpDBall = pkgs.writeShellScript "dumpDBall" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils gnutar gzip ])}:$PATH";
         OUTFILE="$1"
-        umask 027
+        umask 022
         TEMPDIR="$(mktemp -d)"
         cleanup() {
           rm -rf "$TEMPDIR"
@@ -120,7 +120,7 @@ in
       '';
       servicescript = pkgs.writeShellScript "${servicename}-script" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
-        umask 027
+        umask 022
         MOST_RECENT="${cfg.backupDir}/wp-dump.tar.gz"
         CACHEDIR="${cfg.backupDir}/backupcache"
         cleanup() {
