@@ -26,7 +26,7 @@ in {
         type = types.int;
       };
       backup_limit = mkOption {
-        default = 8;
+        default = 3;
         type = types.int;
       };
       default_theme = mkOption {
