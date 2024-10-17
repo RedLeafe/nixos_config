@@ -44,9 +44,9 @@ in {
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "gen_binary_cache_cert" ''
         cd /var
-        nix-store --generate-binary-cache-key ${cfg.domainname} cache-priv-key.pem cache-pub-key.pem
-        chown nix-serve cache-priv-key.pem
-        chmod 600 cache-priv-key.pem
+        sudo nix-store --generate-binary-cache-key ${cfg.domainname} cache-priv-key.pem cache-pub-key.pem
+        sudo chown nix-serve cache-priv-key.pem
+        sudo chmod 600 cache-priv-key.pem
         cat cache-pub-key.pem
       '')
     ];
