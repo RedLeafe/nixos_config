@@ -21,4 +21,5 @@ in
   ranger = import ./ranger args;
   shell = import ./shell args;
   gitea = import ./gitea args;
+  bincache = import ./bincache args;
 }
