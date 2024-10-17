@@ -13,6 +13,14 @@ in {
   ];
   virtualisation.vmware.guest.enable = true;
 
+  nix.settings = {
+    # bash-prompt-prefix = "✓";
+    trusted-substituters = [
+      "http://10.100.136.42:1337/"
+    ];
+    # trusted-public-keys = [
+    # ];
+  };
   moon_mods.WP = {
     enable = true;
     inherit siteName backupDir;
