@@ -4,6 +4,7 @@ in {
     "${modulesPath}/virtualisation/vmware-guest.nix"
     gitea
     sshgit
+    bincache
     ../vm.nix
     ./hardware-configuration.nix
   ];
