@@ -14,12 +14,12 @@ in {
   virtualisation.vmware.guest.enable = true;
 
   nix.settings = {
-    # bash-prompt-prefix = "✓";
     trusted-substituters = [
       "http://10.100.136.42/nix_cache/"
     ];
-    # trusted-public-keys = [
-    # ];
+    trusted-public-keys = [
+      "10.100.136.42:nfJ6qNyjZ4y+Z8AxejMc5vUSVyu4TOIuK9LiY2Lgiso="
+    ];
   };
   moon_mods.WP = {
     enable = true;
