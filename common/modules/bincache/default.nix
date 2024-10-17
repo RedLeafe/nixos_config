@@ -33,18 +33,9 @@ in {
       listen = [
         {
           ip = "*";
-          port = 80;
+          port = 1337;
         }
-      ] ++ (lib.optionals cfg.https
-      [
-        {
-          ip = "*";
-          port = 443;
-          ssl = true;
-        }
-      ]);
-      sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
-      sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
+      ];
       locations.${cfg.location} = {
         proxyPass = "http://${config.services.nix-serve.bindAddress}:${builtins.toString config.services.nix-serve.port}";
       };

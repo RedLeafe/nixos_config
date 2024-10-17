@@ -19,8 +19,8 @@ in {
 
   moon_mods.bincache = {
     enable = true;
-    domainname = "10.100.136.42";
-    location = "/nix_cache/";
+    domainname = "10.100.136.42:1337";
+    location = "/";
   };
 
   moon_mods.sshgit = {
