@@ -17,8 +17,11 @@ in {
     lfs = true;
   };
 
-  moon_mods.bincache.enable = true;
-  moon_mods.bincache.domainname = "10.100.136.42";
+  moon_mods.bincache = {
+    enable = true;
+    domainname = "10.100.136.42";
+    location = "/nix_cache/";
+  };
 
   moon_mods.sshgit = {
     enable = true;

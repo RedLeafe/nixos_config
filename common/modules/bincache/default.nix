@@ -11,6 +11,10 @@ in {
         default = "localhost";
         type = types.str;
       };
+      location = mkOption {
+        default = "/";
+        type = types.str;
+      };
     };
   };
 
@@ -29,13 +33,19 @@ in {
       listen = [
         {
           ip = "*";
-          port = 1337;
-          ssl = cfg.https;
+          port = 80;
         }
-      ];
+      ] ++ (lib.optionals cfg.https
+      [
+        {
+          ip = "*";
+          port = 443;
+          ssl = true;
+        }
+      ]);
       sslServerCert = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.crt"; # <-- wwwrun needs to be able to read it
       sslServerKey = lib.mkIf cfg.https "/.${cfg.domainname}/${cfg.domainname}.key"; # <-- wwwrun needs to be able to read it
-      locations."/" = {
+      locations.${cfg.location} = {
         proxyPass = "http://${config.services.nix-serve.bindAddress}:${builtins.toString config.services.nix-serve.port}";
       };
     };

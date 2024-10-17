@@ -16,7 +16,7 @@ in {
   nix.settings = {
     # bash-prompt-prefix = "✓";
     trusted-substituters = [
-      "http://10.100.136.42:1337/"
+      "http://10.100.136.42/nix_cache/"
     ];
     # trusted-public-keys = [
     # ];
