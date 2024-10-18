@@ -37,7 +37,7 @@ in {
         }
       ];
       locations.${cfg.location} = {
-        proxyPass = "http://${config.services.nix-serve.bindAddress}:${builtins.toString config.services.nix-serve.port}";
+        proxyPass = "http://${config.services.nix-serve.bindAddress}:${builtins.toString config.services.nix-serve.port}/";
       };
     };
 
