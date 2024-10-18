@@ -57,7 +57,7 @@ in {
 
   # firewall.
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 22 80 443 1337 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
 
   users.users.${username} = {
