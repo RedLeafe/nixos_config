@@ -110,7 +110,7 @@ in
       sqldbpkg = config.services.mysql.package;
       wp_dp_name = config.services.wordpress.sites.${cfg.siteName}.database.name;
       wp_ups = config.services.wordpress.sites.${cfg.siteName}.uploadsDir;
-      dumpDBall = pkgs.writeShellScript "dumpDBall" ''
+      dumpDBall = pkgs.writeShellScript "${servicename}-dump" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils gnutar gzip ])}:$PATH";
         OUTFILE="$1"
         umask 022
@@ -124,39 +124,13 @@ in
         cp -r '${wp_ups}' "$TEMPDIR"
         tar -cvf "$OUTFILE" --directory="$TEMPDIR" . --use-compress-program="gzip -9"
       '';
-      servicescript = pkgs.writeShellScript "${servicename}-script" ''
-        export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
-        umask 022
-        MOST_RECENT="${cfg.backup.dir}/wp-dump.tar.gz"
-        CACHEDIR="${cfg.backup.dir}/backupcache"
-        cleanup() {
-          find '${cfg.backup.dir}' -type f -exec chmod 600 {} \;
-        }
-        trap cleanup EXIT
-        if [ -e "$MOST_RECENT" ]; then
-          mkdir -p "$CACHEDIR"
-          files=( $(ls "$CACHEDIR" | sort -V) )
-          max=${builtins.toString cfg.backup.number}
-          for (( i=$((''${#files[@]}-1)); i>=0; i-- )); do
-            file="''${files[$i]}"
-            number="''${file##*[!0-9]}"
-            base="''${file%%[0-9]*}"
-            if [[ -n "$number" && "$base$number" == "$file" ]]; then
-              incremented_number=$((number + 1))
-            else
-              continue
-            fi
-            new_path="$base$incremented_number"
-            if [ $incremented_number -gt $max ]; then
-              rm -rf "$file"
-            else
-              mv "$file" "$new_path"
-            fi
-          done
-          mv $MOST_RECENT "$CACHEDIR/$(basename "$MOST_RECENT").1"
-        fi
-        ${dumpDBall} "$MOST_RECENT"
-      '';
+      servicescript = pkgs.callPackage (import ./utils.nix).backup_rotator {
+        SCRIPTNAME = "${servicename}-rotate";
+        MOST_RECENT = "${cfg.backup.dir}/wp-dump.tar.gz";
+        CACHEDIR = "${cfg.backup.dir}/backupcache";
+        dumpAction = dumpDBall;
+        max = cfg.backup.number;
+      };
     in {
       services.${servicename} = {
         description = "Run ${servicename}";
