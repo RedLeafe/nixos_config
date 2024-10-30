@@ -23,8 +23,12 @@ in {
   };
   moon_mods.WP = {
     enable = true;
-    inherit siteName backupDir;
-    mailaddr = "noreply@lunarlooters.com";
+    inherit siteName;
+    mailaddr = "noreply@${lib.toLower siteName}.com";
+    backup = {
+      dir = backupDir;
+      number = 3;
+    };
   };
 
   moon_mods.sshgit = {

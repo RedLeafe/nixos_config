@@ -35,9 +35,15 @@ in
         default = "noreply@example.com";
         type = types.str;
       };
-      backupDir = mkOption {
-        default = null;
-        type = types.nullOr types.str;
+      backup = {
+        dir = mkOption {
+          default = null;
+          type = types.nullOr types.str;
+        };
+        number = mkOption {
+          default = 3;
+          type = types.int;
+        };
       };
     };
   };
@@ -121,25 +127,24 @@ in
       servicescript = pkgs.writeShellScript "${servicename}-script" ''
         export PATH="${lib.makeBinPath (with pkgs; [ sqldbpkg coreutils ])}:$PATH";
         umask 022
-        MOST_RECENT="${cfg.backupDir}/wp-dump.tar.gz"
-        CACHEDIR="${cfg.backupDir}/backupcache"
+        MOST_RECENT="${cfg.backup.dir}/wp-dump.tar.gz"
+        CACHEDIR="${cfg.backup.dir}/backupcache"
         cleanup() {
-          find '${cfg.backupDir}' -type f -exec chmod 600 {} \;
+          find '${cfg.backup.dir}' -type f -exec chmod 600 {} \;
         }
         trap cleanup EXIT
         if [ -e "$MOST_RECENT" ]; then
           mkdir -p "$CACHEDIR"
-          files=( $CACHEDIR/* )
-          max=3 # NOTE: breaks at max=10
+          files=( $(ls "$CACHEDIR" | sort -V) )
+          max=${builtins.toString cfg.backup.number}
           for (( i=$((''${#files[@]}-1)); i>=0; i-- )); do
             file="''${files[$i]}"
-            [ "$CACHEDIR/*" == "$file" ] && break
             number="''${file##*[!0-9]}"
             base="''${file%%[0-9]*}"
-            if [[ -n "$number" ]]; then
+            if [[ -n "$number" && "$base$number" == "$file" ]]; then
               incremented_number=$((number + 1))
             else
-              incremented_number=1
+              continue
             fi
             new_path="$base$incremented_number"
             if [ $incremented_number -gt $max ]; then
