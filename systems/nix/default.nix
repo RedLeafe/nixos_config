@@ -18,7 +18,7 @@ in {
       "http://10.100.136.42:1337/"
     ];
     trusted-public-keys = [
-      "10.100.136.42:1337:EPni6vNsAFUP9ncIJgWKTGXNAQizhUxwfldtBF8eB6s="
+      "10.100.136.42:1337:LRWOOLqkUvYWWQWFcUDeltuS8TFj7O2mEA6fbpIN8jM="
     ];
   };
   moon_mods.WP = {
