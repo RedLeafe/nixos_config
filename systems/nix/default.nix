@@ -14,10 +14,10 @@ in {
   virtualisation.vmware.guest.enable = true;
 
   # nix.settings = {
-  #   trusted-substituters = [
+  #   extra-trusted-substituters = [
   #     "http://10.100.136.42:1337/"
   #   ];
-  #   trusted-public-keys = [
+  #   extra-trusted-public-keys = [
   #     "10.100.136.42:1337:LRWOOLqkUvYWWQWFcUDeltuS8TFj7O2mEA6fbpIN8jM="
   #   ];
   # };
@@ -38,7 +38,6 @@ in {
     default_git_email = "${username}@alien.moon.mine";
     repo_clone_hostname = "10.100.136.44";
     authorized_keys = authorized_keys;
-    fail2ban = true;
     settings = {
       AllowUsers = null;
       PasswordAuthentication = false;

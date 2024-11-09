@@ -14,10 +14,14 @@
     myWPthemes = newpkgs.myWPthemes // {
       # you can do themename.overrideAttrs to override them
       # and put the new replacement here.
+      # or just add more from other sources
     };
     myWPext = newpkgs.myWPext // {
       # you can do pluginname.overrideAttrs to override them
       # and put the new replacement here.
+      # or just add more from other sources
+      inherit (pkgs.wordpressPackages.plugins)
+        static-mail-sender-configurator;
     };
   in { inherit myWPext myWPthemes; };
 in
@@ -83,12 +87,8 @@ in
         sslServerCert = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.crt"; # <-- wwwrun needs to be able to read it
         sslServerKey = lib.mkIf cfg.https "/.${cfg.siteName}/${cfg.siteName}.key"; # <-- wwwrun needs to be able to read it
       };
-      themes = autoWP.myWPthemes // {
-      };
-      plugins = autoWP.myWPext // {
-        inherit (pkgs.wordpressPackages.plugins)
-          static-mail-sender-configurator;
-      };
+      themes = autoWP.myWPthemes;
+      plugins = autoWP.myWPext;
       # https://developer.wordpress.org/apis/wp-config-php
       settings = {
         WP_DEFAULT_THEME = "vertice";
