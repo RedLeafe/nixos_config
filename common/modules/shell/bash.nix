@@ -18,14 +18,16 @@ in {
     programs.bash = {
       enableVteIntegration = true;
       initExtra = ''
-        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${./atomic-emodipt.omp.json})"
+        export STARSHIP_CONFIG='${./starship.toml}'
+        eval "$(${pkgs.starship}/bin/starship init bash)"
         source ${fzfinit}
       '';
     };
   } else {
     programs.bash = {
       promptInit = ''
-        eval "$(${pkgs.oh-my-posh}/bin/oh-my-posh init bash --config ${./atomic-emodipt.omp.json})"
+        export STARSHIP_CONFIG='${./starship.toml}'
+        eval "$(${pkgs.starship}/bin/starship init bash)"
         source ${fzfinit}
       '';
     };
