@@ -23,23 +23,23 @@ in {
     services.nix-serve = {
       enable = true;
       secretKeyFile = "/var/cache-priv-key.pem";
-      bindAddress = "0.0.0.0";
+      bindAddress = "127.0.0.1";
       port = 5000;
     };
 
-    services.httpd.enable = true;
-    services.httpd.virtualHosts.${cfg.domainname} = {
-      serverAliases = [ "*" ];
-      listen = [
-        {
-          ip = "*";
-          port = 1337;
-        }
-      ];
-      locations.${cfg.location} = {
-        proxyPass = "http://${config.services.nix-serve.bindAddress}:${builtins.toString config.services.nix-serve.port}/";
-      };
-    };
+    # services.httpd.enable = true;
+    # services.httpd.virtualHosts.${cfg.domainname} = {
+    #   serverAliases = [ "*" ];
+    #   listen = [
+    #     {
+    #       ip = "*";
+    #       port = 1337;
+    #     }
+    #   ];
+    #   locations.${cfg.location} = {
+    #     proxyPass = "http://${config.services.nix-serve.bindAddress}:${builtins.toString config.services.nix-serve.port}/";
+    #   };
+    # };
 
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "gen_binary_cache_cert" ''
