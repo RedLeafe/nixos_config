@@ -1,7 +1,7 @@
 # pandemonium & nix @ moon.mine
 
 Run the correct script installed to the local admin user to get the backup dumps on nix and pandemonium hosts.
-Save the files to your machine and clone this config.
+Save the files to your machine and clone this config. Also grab the nix cache keys from the pandemonium host.
 
 With those, you can restore either nix or pandemonium hosts from any state if you know what you are doing.
 
