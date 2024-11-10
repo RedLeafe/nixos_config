@@ -13,14 +13,15 @@ in {
   ];
   virtualisation.vmware.guest.enable = true;
 
-  # nix.settings = {
-  #   extra-trusted-substituters = [
-  #     "http://10.100.136.42:1337/"
-  #   ];
-  #   extra-trusted-public-keys = [
-  #     "10.100.136.42:1337:LRWOOLqkUvYWWQWFcUDeltuS8TFj7O2mEA6fbpIN8jM="
-  #   ];
-  # };
+  nix.settings = {
+    extra-trusted-substituters = [
+      "http://10.100.136.42:1337/"
+    ];
+    extra-trusted-public-keys = [
+      "10.100.136.42:1337:O41cpDpiXqiWhRBj6uDwU2DSpuwkzrbNBtaBDtHgOiE="
+    ];
+  };
+
   moon_mods.WP = {
     enable = true;
     inherit siteName;
