@@ -84,7 +84,7 @@
           hostconfig = {
             nix = {
               admin = "pluto";
-              copyConfig = false;
+              copyConfig = true;
               postinstall = installuser: /*bash*/ ''
                 hostname="$1" # <- could change at call time
                 admin="$2" # <- could change at call time
@@ -95,7 +95,7 @@
             };
             pandemonium = {
               admin = "dorsa";
-              copyConfig = false;
+              copyConfig = true;
               postinstall = installuser: /*bash*/ ''
                 hostname="$1"
                 admin="$2"
