@@ -23,7 +23,7 @@ in {
     services.nix-serve = {
       enable = true;
       secretKeyFile = "/var/cache-priv-key.pem";
-      bindAddress = "127.0.0.1";
+      bindAddress = "0.0.0.0";
       port = 5000;
     };
 
