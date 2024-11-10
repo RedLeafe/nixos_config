@@ -19,7 +19,7 @@ in {
 
   moon_mods.bincache = {
     enable = true;
-    domainname = "10.100.136.42:1337";
+    domainname = "pandemonium.moon.mine-0";
     location = "/";
   };
 
