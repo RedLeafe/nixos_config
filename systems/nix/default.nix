@@ -13,14 +13,14 @@ in {
   ];
   virtualisation.vmware.guest.enable = true;
 
-  # nix.settings = {
-  #   extra-trusted-substituters = [
-  #     "http://10.100.136.42:1337/"
-  #   ];
-  #   extra-trusted-public-keys = [
-  #     "pandemonium.moon.mine-0:iR7q3OThLPExxywiFxJT9PQVow+RTnbjx4F8efpcxRs="
-  #   ];
-  # };
+  nix.settings = {
+    extra-trusted-substituters = [
+      "http://10.100.136.42:1337/"
+    ];
+    extra-trusted-public-keys = [
+      "pandemonium.moon.mine-0:iR7q3OThLPExxywiFxJT9PQVow+RTnbjx4F8efpcxRs="
+    ];
+  };
 
   moon_mods.WP = {
     enable = true;

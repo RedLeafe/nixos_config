@@ -19,7 +19,7 @@ in {
 
   moon_mods.bincache = {
     enable = true;
-    domainname = "pandemonium.moon.mine-0";
+    domainname = "pandemonium.moon.mine-0"; # <- CANNOT CONTAIN A ':' CHARACTER
     location = "/";
   };
 

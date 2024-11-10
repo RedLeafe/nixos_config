@@ -10,6 +10,7 @@ in {
       domainname = mkOption {
         default = "localhost";
         type = types.str;
+        description = "CANNOT CONTAIN A ':' CHARACTER";
       };
       location = mkOption {
         default = "/";
