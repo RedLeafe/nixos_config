@@ -68,7 +68,7 @@ in {
 
     users.groups.git = lib.mkIf cfg.enable_git_server {};
 
-    services.fail2ban.enable = true;
+    services.fail2ban.enable = cfg.fail2ban;
 
     programs.ssh.package = if cfg.AD_support then pkgs.opensshWithKerberos else pkgs.openssh;
 
