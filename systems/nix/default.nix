@@ -41,10 +41,10 @@ in {
     authorized_keys = authorized_keys;
     settings = {
       AllowUsers = null;
-      PasswordAuthentication = false;
+      PasswordAuthentication = true;
       UseDns = true;
       X11Forwarding = true;
-      PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
+      PermitRootLogin = "yes"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
   };
 

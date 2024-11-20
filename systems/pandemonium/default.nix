@@ -30,10 +30,10 @@ in {
     default_git_email = "${username}@alien.moon.mine";
     settings = {
       AllowUsers = null;
-      PasswordAuthentication = false;
+      PasswordAuthentication = true;
       UseDns = true;
       X11Forwarding = true;
-      PermitRootLogin = "prohibit-password"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
+      PermitRootLogin = "yes"; # "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
     };
   };
 
